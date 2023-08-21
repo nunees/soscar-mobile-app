@@ -1,11 +1,25 @@
-import { Button as ButtonNativeBase, IButtonProps, Text } from "native-base";
+import {
+  Button as ButtonNativeBase,
+  IButtonProps,
+  Icon,
+  Text,
+} from "native-base";
+import { Feather } from "@expo/vector-icons";
 
 type ButtonProps = IButtonProps & {
-  title: string;
+  title?: string;
   variant?: "solid" | "outline";
+  hasIcon?: boolean;
+  iconName?: string;
 };
 
-export function Button({ title, variant = "solid", ...rest }: ButtonProps) {
+export function Button({
+  title,
+  variant = "solid",
+  hasIcon,
+  iconName,
+  ...rest
+}: ButtonProps) {
   return (
     <ButtonNativeBase
       w="full"
@@ -17,13 +31,12 @@ export function Button({ title, variant = "solid", ...rest }: ButtonProps) {
       borderColor={variant === "outline" ? "orange.600" : "transparent"}
       {...rest}
     >
-      <Text
-        color={variant === "outline" ? "orange.500" : "white"}
-        fontFamily={"heading"}
-        fontSize={"sm"}
-      >
-        {title}
-      </Text>
+      {!hasIcon && (
+        <Text color={variant === "solid" ? "white" : "orange.600"}>
+          {title}
+        </Text>
+      )}
+      {hasIcon && <Icon as={Feather} name={iconName} size={8} color="white" />}
     </ButtonNativeBase>
   );
 }

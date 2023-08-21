@@ -1,5 +1,5 @@
 import { AppHeader } from "@components/AppHeader";
-import { VStack, ScrollView, useToast } from "native-base";
+import { VStack, ScrollView, useToast, Checkbox, Text } from "native-base";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useForm, Controller, set } from "react-hook-form";
@@ -36,9 +36,20 @@ const loginSchema = yup.object().shape({
 export function AddVehicle() {
   const [brands, setBrands] = useState<BrandDTO[]>([{}] as BrandDTO[]);
   const [models, setModels] = useState<ModelDTO[]>([{}] as ModelDTO[]);
+  const [insurances, setInsurances] = useState<any[]>([{}] as any[]);
 
   const [model, setModel] = useState(0);
   const [brand, setBrand] = useState(0);
+
+  const [year, setYear] = useState("");
+  const [plate, setPlate] = useState("");
+  const [color, setColor] = useState("");
+  const [notes, setNotes] = useState("");
+
+  const [insuranceId, setInsuranceId] = useState(0);
+  const [isMainVehicle, setIsMainVehicle] = useState(false);
+
+  const [toggleInsurance, setToggleInsurance] = useState(false);
 
   const navigation = useNavigation<AppNavigatorRoutesProps>();
   const toast = useToast();
@@ -74,15 +85,31 @@ export function AddVehicle() {
     setBrand(Number(value));
   }
 
+  async function getAllInsurances() {
+    const response = await api.get("/vehicles/insurances/all");
+    setInsurances(response.data);
+  }
+
   function handleSelectCar(value: string) {
     setModel(Number(value));
+  }
 
-    console.log("", model);
-    console.log(brand);
+  function handleAddVehicle(data: FormDataProps) {
+    const response = api.post("/vehicles", {
+      brand_id: Number(brand),
+      model_id: Number(model),
+      color,
+      year: Number(year),
+      plate,
+      notes,
+      insuranceId,
+      isPrimary: isMainVehicle,
+    });
   }
 
   useEffect(() => {
     getAllBrands();
+    getAllInsurances();
   }, []);
 
   return (
@@ -117,13 +144,54 @@ export function AddVehicle() {
                   : []
               }
               label={"Modelo"}
-              onValueChange={(value) => handleSelectCar(value)}
+              onValueChange={(value) => setModel(Number(value))}
             />
 
-            <Input placeholder="Ano" />
-            <Input placeholder="Placa" />
-            <Input placeholder="Cor" />
-            <TextArea placeholder="Observações" />
+            <Input placeholder="Ano" value={year} onChangeText={setYear} />
+            <Input placeholder="Placa" value={plate} onChangeText={setPlate} />
+            <Input placeholder="Cor" value={color} onChangeText={setColor} />
+
+            <Checkbox
+              colorScheme="orange"
+              value={""}
+              onChange={() => setToggleInsurance(!toggleInsurance)}
+              mb={3}
+            >
+              <Text>Meu veículo é segurado</Text>
+            </Checkbox>
+
+            {toggleInsurance && (
+              <SelectCar
+                data={
+                  insurances
+                    ? insurances.map((insurance) => {
+                        return {
+                          label: insurance.name,
+                          value: insurance.id,
+                        };
+                      })
+                    : []
+                }
+                label={"Seguradora"}
+                onValueChange={(value) => setInsuranceId(Number(value))}
+              />
+            )}
+
+            <TextArea
+              placeholder="Observações"
+              value={notes}
+              onChangeText={setNotes}
+            />
+
+            <Checkbox
+              colorScheme="orange"
+              value={"OK"}
+              onChange={() => setIsMainVehicle(!isMainVehicle)}
+            >
+              <Text color="gray.400" bold>
+                Definir como veículo padrão
+              </Text>
+            </Checkbox>
           </VStack>
           <Button
             onPress={() => navigation.goBack()}

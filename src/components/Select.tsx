@@ -6,7 +6,7 @@ import { BrandDTO } from "@dtos/BrandDTO";
 type Props = ISelectProps & {
   label: string;
   errorMessage?: string;
-  data: [];
+  data: any;
 };
 
 export function Select({ label, data, errorMessage, ...rest }: Props) {
@@ -23,8 +23,12 @@ export function Select({ label, data, errorMessage, ...rest }: Props) {
       placeholderTextColor="gray.400"
       {...rest}
     >
-      {data.map((item) => (
-        <SelectNative.Item key={item} label={item} value={item} />
+      {data.map((item: any) => (
+        <SelectNative.Item
+          key={item.id}
+          label={item.label}
+          value={item.value}
+        />
       ))}
     </SelectNative>
   );

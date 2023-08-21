@@ -27,7 +27,7 @@ import OilService from "@assets/services/oil.png";
 import SuspensionService from "@assets/services/suspension.png";
 import PaintService from "@assets/services/spray-gun.png";
 import WhellService from "@assets/services/wheel.png";
-import { useNavigation } from "@react-navigation/native";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
 
 export function HomeScreen() {
@@ -35,12 +35,16 @@ export function HomeScreen() {
 
   const navigation = useNavigation<AppNavigatorRoutesProps>();
 
+  const isFocused = useIsFocused();
+
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
       <VStack py={10} px={19}>
         <HStack alignItems={"baseline"} justifyContent={"space-between"}>
           <Box>
-            <Heading color="gray.200">Olá, {user.name}</Heading>
+            <Heading color="gray.200" fontSize="md">
+              Olá, {user.name}
+            </Heading>
             <TouchableOpacity onPress={signOut}>
               <Text bold mb={2}>
                 Sair

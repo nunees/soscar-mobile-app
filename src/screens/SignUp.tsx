@@ -17,7 +17,7 @@ import { Button } from "@components/Button";
 import { Input } from "@components/Input";
 import { Select } from "@components/Select";
 import { api } from "@services/api";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
 import { useForm, Controller } from "react-hook-form";
 
@@ -27,6 +27,7 @@ import { AppError } from "@utils/AppError";
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
 import { useAuth } from "@hooks/useAuth";
 import { SignIn } from "./SignIn";
+import { GenderDTO } from "@dtos/GenderDTO";
 
 type FormDataProps = {
   email: string;
@@ -56,13 +57,9 @@ const registrationSchema = yup.object().shape({
 
 export function SignUp() {
   const [isLoading, setIsLoading] = useState(false);
-  const [genders, setGenders] = useState([
-    "Masculino",
-    "Feminino",
-    "Transgênero",
-    "Não-binário",
-    "Outro",
-  ]);
+  const [allGenders, setAllGenders] = useState<GenderDTO[]>({} as GenderDTO[]);
+  const [selectedGender, setSelectedGender] = useState(0);
+
   const [date, setDate] = useState("");
   const [gender, setGender] = useState("Masculino");
 
@@ -108,19 +105,6 @@ export function SignUp() {
   }: FormDataProps) {
     setIsLoading(true);
 
-    let gender_id = 0;
-    if (gender === "Masculino") {
-      gender_id = 1;
-    } else if (gender === "Feminino") {
-      gender_id = 2;
-    } else if (gender === "Transgênero") {
-      gender_id = 3;
-    } else if (gender === "Não-binário") {
-      gender_id = 4;
-    } else {
-      gender_id = 0;
-    }
-
     if (!isTermsAccepted) {
       setIsLoading(false);
       Alert.alert(
@@ -138,7 +122,7 @@ export function SignUp() {
         birth_date: new Date(date),
         email,
         mobile_phone,
-        genderId: gender_id,
+        genderId: Number(selectedGender),
         username,
         password,
         isPartner,
@@ -160,6 +144,25 @@ export function SignUp() {
 
     setIsLoading(false);
   }
+
+  async function getGenders() {
+    try {
+      const response = await api.get("/data/genders");
+      setAllGenders(response.data);
+    } catch (error) {
+      const isAppError = error instanceof AppError;
+      const title = isAppError ? error.message : "Erro ao obter gêneros";
+      toast.show({
+        title,
+        placement: "top",
+        bgColor: "red.500",
+      });
+    }
+  }
+
+  useEffect(() => {
+    getGenders();
+  }, []);
 
   return (
     <ScrollView
@@ -294,7 +297,20 @@ export function SignUp() {
                 )}
               />
 
-              <Select label="Sexo" options={genders} />
+              <Select
+                label="Sexo"
+                data={
+                  allGenders
+                    ? allGenders.map((gender) => {
+                        return {
+                          label: gender.name,
+                          value: gender.id,
+                        };
+                      })
+                    : []
+                }
+                onValueChange={(value) => setSelectedGender(Number(value))}
+              />
 
               <Controller
                 control={control}

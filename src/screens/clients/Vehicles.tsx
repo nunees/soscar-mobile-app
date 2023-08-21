@@ -6,7 +6,19 @@ import { useAuth } from "@hooks/useAuth";
 import { useNavigation } from "@react-navigation/native";
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
 import { api } from "@services/api";
-import { View, Text, ScrollView, VStack, Heading, Center } from "native-base";
+import { Feather } from "@expo/vector-icons";
+import {
+  View,
+  Text,
+  ScrollView,
+  VStack,
+  Heading,
+  Center,
+  HStack,
+  Box,
+  Icon,
+  Fab,
+} from "native-base";
 import { useEffect, useState } from "react";
 
 export function Vechicles() {
@@ -36,40 +48,56 @@ export function Vechicles() {
   }, []);
 
   return (
-    <VStack>
-      <VStack>
-        <AppHeader title="Meus Veículos" />
-      </VStack>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ flexGrow: 1 }}
-      >
-        <VStack flex={1}>
-          <VStack py={10} px={19}>
-            <Heading textAlign={"center"}>Meus Veículos</Heading>
-            <VStack>
-              {vehicles.map((vehicle) => (
-                <QuickVehicleCard
-                  id={vehicle.id}
-                  brand={vehicle.brand.name}
-                  model={vehicle.name.name}
-                  year={vehicle.year}
-                  key={vehicle.id}
-                />
-              ))}
-            </VStack>
-
-            <VStack>
-              <Center>
-                <Button
-                  title="Adicionar veículo"
-                  onPress={() => navigation.navigate("addVehicle")}
-                />
-              </Center>
-            </VStack>
-          </VStack>
+    // Will Hold all the content
+    <VStack flex={1}>
+      {/* Header */}
+      <VStack flex={1}>
+        <VStack>
+          <AppHeader title="Meus Veículos" />
         </VStack>
-      </ScrollView>
+
+        {/* Content */}
+        <VStack>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ flexGrow: 1 }}
+          >
+            <VStack flex={1}>
+              <VStack py={10} px={19}>
+                {vehicles.length > 0 ? (
+                  <VStack>
+                    {vehicles.map((vehicle) => (
+                      <QuickVehicleCard
+                        id={vehicle.id}
+                        brand={vehicle.brand.name}
+                        model={vehicle.name.name}
+                        year={vehicle.year}
+                        key={vehicle.id}
+                      />
+                    ))}
+                  </VStack>
+                ) : (
+                  <Center>
+                    <Text textAlign={"center"} py={200} color="gray.500">
+                      Não há veiculos cadastrados
+                    </Text>
+                  </Center>
+                )}
+              </VStack>
+            </VStack>
+          </ScrollView>
+        </VStack>
+      </VStack>
+
+      <Fab
+        position="absolute"
+        placement="bottom-right"
+        renderInPortal={false}
+        size="md"
+        colorScheme="orange"
+        onPress={() => navigation.navigate("addVehicle")}
+        icon={<Icon as={Feather} name="plus" size={8} color="white" />}
+      />
     </VStack>
   );
 }
