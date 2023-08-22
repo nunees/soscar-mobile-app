@@ -1,7 +1,17 @@
 import { Button } from "@components/Button";
 import { Input } from "@components/Input";
-import { Center, Heading, VStack, Text, Box, useToast } from "native-base";
-import { TouchableOpacity } from "react-native";
+import {
+  Center,
+  Heading,
+  VStack,
+  Text,
+  Box,
+  useToast,
+  Image,
+  HStack,
+  ScrollView,
+} from "native-base";
+import { Pressable, TouchableOpacity } from "react-native";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -12,6 +22,8 @@ import { AuthNavigatorRoutesProps } from "@routes/auth.routes";
 import { useAuth } from "@hooks/useAuth";
 import { AppError } from "@utils/AppError";
 import axios from "axios";
+
+import TopHeader from "@assets/login/top-header.png";
 
 type FormDataProps = {
   email: string;
@@ -61,79 +73,183 @@ export function SignIn() {
   }
 
   return (
-    <VStack px={10} py={10}>
-      <VStack mt={60}>
-        <Center>
-          <Heading
-            pt={20}
-            pb={10}
-            fontWeight={"light"}
-            fontSize={40}
-            color="gray.400"
-          >
-            Login
-          </Heading>
+    // <VStack flex={0.8}>
+    //   <Image
+    //     width={428}
+    //     height={392}
+    //     source={TopHeader}
+    //     defaultSource={TopHeader}
+    //     alt="Top Header"
+    //   />
+    //   <VStack flex={1}>
+    //     <VStack>
+    //       <Center>
+    //         <Heading
+    //           pb={10}
+    //           fontWeight={"light"}
+    //           fontSize={40}
+    //           color="gray.400"
+    //         >
+    //           Login
+    //         </Heading>
 
-          <Controller
-            control={control}
-            name="email"
-            rules={{ required: "Informe seu e-mail" }}
-            render={({ field: { onChange, value } }) => (
-              <Input
-                placeholder="Email"
-                autoCapitalize="none"
-                keyboardType="email-address"
-                onChangeText={onChange}
-                value={value}
-                errorMessage={errors.email?.message}
-              />
-            )}
-          />
+    //         <Controller
+    //           control={control}
+    //           name="email"
+    //           rules={{ required: "Informe seu e-mail" }}
+    //           render={({ field: { onChange, value } }) => (
+    //             <Input
+    //               borderTopWidth={0}
+    //               borderLeftWidth={0}
+    //               borderRightWidth={0}
+    //               placeholder="Email"
+    //               autoCapitalize="none"
+    //               keyboardType="email-address"
+    //               onChangeText={onChange}
+    //               value={value}
+    //               errorMessage={errors.email?.message}
+    //             />
+    //           )}
+    //         />
 
-          <Controller
-            control={control}
-            name="password"
-            rules={{ required: "Informe sua senha" }}
-            render={({ field: { onChange, value } }) => (
-              <Input
-                placeholder="Senha"
-                autoCapitalize="none"
-                secureTextEntry
-                onChangeText={onChange}
-                value={value}
-                errorMessage={errors.password?.message}
-              />
-            )}
-          />
+    //         <Controller
+    //           control={control}
+    //           name="password"
+    //           rules={{ required: "Informe sua senha" }}
+    //           render={({ field: { onChange, value } }) => (
+    //             <Input
+    //               borderTopWidth={0}
+    //               borderLeftWidth={0}
+    //               borderRightWidth={0}
+    //               placeholder="Senha"
+    //               autoCapitalize="none"
+    //               secureTextEntry
+    //               onChangeText={onChange}
+    //               value={value}
+    //               errorMessage={errors.password?.message}
+    //             />
+    //           )}
+    //         />
 
-          <Box alignSelf="flex-end">
-            <TouchableOpacity>
-              <Text fontWeight={"bold"} color="gray.400">
-                Esqueci minha senha
-              </Text>
-            </TouchableOpacity>
-          </Box>
+    //         <Box alignSelf="flex-end">
+    //           <TouchableOpacity>
+    //             <Text fontWeight={"bold"} color="gray.400">
+    //               Esqueci minha senha
+    //             </Text>
+    //           </TouchableOpacity>
+    //         </Box>
 
-          <Button
-            title="Acessar"
-            mt={10}
-            onPress={handleSubmit(handleSignIn)}
-            isLoading={isLoading}
-          />
+    //         <Button
+    //           title="Acessar"
+    //           mt={10}
+    //           onPress={handleSubmit(handleSignIn)}
+    //           isLoading={isLoading}
+    //         />
 
-          <Text pt={5} pb={5}>
-            ou
-          </Text>
+    //         <Text pt={5} pb={5}>
+    //           ou
+    //         </Text>
 
-          <Button title="Registre-se" onPress={handleSignUp} />
+    //         <Button title="Registre-se" onPress={handleSignUp} />
 
-          <TouchableOpacity style={{ marginTop: 50 }}>
-            <Text>Ajuda</Text>
-          </TouchableOpacity>
+    //         <TouchableOpacity style={{ marginTop: 50 }}>
+    //           <Text>Ajuda</Text>
+    //         </TouchableOpacity>
 
-          <Text mt={5}>Versão 1.0.0</Text>
-        </Center>
+    //         <Text mt={5}>Versão 1.0.0</Text>
+    //       </Center>
+    //     </VStack>
+    //   </VStack>
+    // </VStack>
+    <ScrollView flex={1}>
+      <VStack>
+        <Image
+          width={428}
+          height={392}
+          source={TopHeader}
+          resizeMode="cover"
+          position={"absolute"}
+          top={-100}
+          defaultSource={TopHeader}
+          alt="Top Header"
+          zIndex={-1}
+        />
       </VStack>
-    </VStack>
+      <VStack mt={250} flex={1}>
+        <VStack>
+          <VStack ml={5}>
+            <Text bold fontSize="xlg">
+              Login
+            </Text>
+            <Text color="gray.500" fontSize="xs">
+              Por favor, entre com suas credencias para continuar
+            </Text>
+          </VStack>
+          <Center px={10} mt={5}>
+            <Controller
+              control={control}
+              name="email"
+              rules={{ required: "Informe seu e-mail" }}
+              render={({ field: { onChange, value } }) => (
+                <Input
+                  backgroundColor="gray.700"
+                  borderColor="transparent"
+                  fontSize="sm"
+                  placeholder="Email"
+                  autoCapitalize="none"
+                  keyboardType="email-address"
+                  onChangeText={onChange}
+                  value={value}
+                  errorMessage={errors.email?.message}
+                />
+              )}
+            />
+
+            <Controller
+              control={control}
+              name="password"
+              rules={{ required: "Informe sua senha" }}
+              render={({ field: { onChange, value } }) => (
+                <Input
+                  backgroundColor="gray.700"
+                  borderColor="transparent"
+                  fontSize="sm"
+                  placeholder="Senha"
+                  autoCapitalize="none"
+                  secureTextEntry
+                  onChangeText={onChange}
+                  value={value}
+                  errorMessage={errors.password?.message}
+                />
+              )}
+            />
+
+            <Box alignSelf="flex-end">
+              <TouchableOpacity>
+                <Text fontWeight={"bold"} color="orange.700" fontSize="xs">
+                  Esqueci minha senha
+                </Text>
+              </TouchableOpacity>
+            </Box>
+
+            <Button
+              title="Acessar"
+              mt={10}
+              onPress={handleSubmit(handleSignIn)}
+              isLoading={isLoading}
+            />
+
+            <HStack mt={5}>
+              <Text fontSize="xs">Não tem uma conta?</Text>
+              <Pressable onPress={handleSignUp}>
+                <Text color="orange.700" bold pl={1} fontSize="xs">
+                  Registre-se
+                </Text>
+              </Pressable>
+            </HStack>
+          </Center>
+        </VStack>
+      </VStack>
+    </ScrollView>
   );
 }

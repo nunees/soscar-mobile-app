@@ -31,8 +31,8 @@ export const THEME = extendTheme({
     },
   },
   fonts: {
-    heading: "Roboto_700Bold",
-    body: "Roboto_400Regular",
+    heading: "Poppins_700Bold",
+    body: "Poppins_400Regular",
   },
   fontSizes: {
     xs: 12,
