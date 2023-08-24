@@ -1,49 +1,64 @@
-import { Heading, VStack, Text, Box, Center } from "native-base";
-import { TouchableOpacity } from "react-native";
-import { Button } from "./Button";
-import { useState } from "react";
+import getLogoImage from "@components/LogosImages";
+import { IVehicleDTO } from "@dtos/IVechicleDTO";
+import { Entypo } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
+import { VStack, Text, HStack, Image, Icon } from "native-base";
+import { IVStackProps } from "native-base/lib/typescript/components/primitives/Stack/VStack";
+import { TouchableOpacity } from "react-native";
 
-type QuickVehicleCardProps = {
-  id: string;
-  brand: string;
-  model: string;
-  year: number;
+type QuickVehicleCardProps = IVStackProps & {
+  vehicle: IVehicleDTO;
 };
 
-export function QuickVehicleCard({
-  brand,
-  model,
-  year,
-  id,
-}: QuickVehicleCardProps) {
+export function QuickVehicleCard({ vehicle, ...rest }: QuickVehicleCardProps) {
   const navigation = useNavigation<AppNavigatorRoutesProps>();
 
   return (
     <VStack px={19} mb={5}>
-      <VStack borderWidth={1} borderColor={"gray.600"} rounded={5} h={150}>
-        <Box px={4} py={2}>
-          <Text bold fontSize={"lg"}>
-            {brand}
-          </Text>
-          <Text fontSize={"md"}>{model}</Text>
-          <Text fontSize={"xs"}>{year}</Text>
-        </Box>
-        <Center>
-          <Button
-            variant={"outline"}
-            title={"Mais detalhes"}
-            w={308}
-            h={10}
-            onPress={() =>
-              navigation.navigate("vehicleDetails", {
-                vehicleId: id,
-              })
-            }
-          />
-        </Center>
-      </VStack>
+      {vehicle && (
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate("vehicleDetails", { vehicleId: vehicle.id })
+          }
+        >
+          <VStack shadow={1} h={130} {...rest}>
+            <HStack
+              style={{
+                position: "absolute",
+                top: -5,
+                left: 300,
+                zIndex: 1,
+              }}
+            >
+              <Icon
+                as={Entypo}
+                name={vehicle.isPrimary ? "heart" : "heart-outlined"}
+                size={5}
+                mt={5}
+                mr={5}
+                color={vehicle.isPrimary ? "red.500" : "gray.500"}
+              />
+            </HStack>
+            <HStack px={5} justifyContent="space-between">
+              <VStack mt={5}>
+                <Text bold fontSize={"lg"}>
+                  {vehicle.brand.name}
+                </Text>
+                <Text fontSize={"md"}>{vehicle.name.name}</Text>
+                <Text fontSize={"xs"}>{vehicle.year}</Text>
+              </VStack>
+              <VStack>
+                <Image
+                  source={getLogoImage(vehicle.brand.icon)}
+                  alt={"Carro"}
+                  mt={3}
+                />
+              </VStack>
+            </HStack>
+          </VStack>
+        </TouchableOpacity>
+      )}
     </VStack>
   );
 }

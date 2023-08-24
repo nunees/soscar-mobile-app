@@ -1,16 +1,13 @@
-import { useCallback, useEffect, useState } from "react";
-import { VStack, Text, HStack } from "native-base";
-
+import { useFocusEffect } from "@react-navigation/native";
 import {
   requestForegroundPermissionsAsync,
   getCurrentPositionAsync,
-  LocationObject,
   reverseGeocodeAsync,
 } from "expo-location";
-import { useFocusEffect } from "@react-navigation/native";
+import { Text, HStack } from "native-base";
+import { useCallback, useState } from "react";
 
 export function UserLocation() {
-  const [location, setLocation] = useState<LocationObject | null>(null);
   const [address, setAddress] = useState<string>("");
 
   async function requestLocationPermission() {
@@ -18,20 +15,22 @@ export function UserLocation() {
     if (granted) {
       const currentPosition = await getCurrentPositionAsync();
       const address = await reverseGeocodeAsync(currentPosition.coords);
-      console.log(address[0].street);
-      setLocation(currentPosition);
+
+      setAddress(`${address[0].street}, ${address[0].district}`);
     }
   }
 
   useFocusEffect(
     useCallback(() => {
       requestLocationPermission();
-    }, [])
+    }, []),
   );
 
   return (
-    <VStack>
-      <Text>{address}</Text>
-    </VStack>
+    <HStack>
+      <Text bold fontSize="sm" pl={1}>
+        {address}
+      </Text>
+    </HStack>
   );
 }

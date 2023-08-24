@@ -1,28 +1,17 @@
+import CarSVG from "@assets//car.svg";
 import { AppHeader } from "@components/AppHeader";
-import { Button } from "@components/Button";
 import { QuickVehicleCard } from "@components/QuickVehicleCard";
-import { VehicleDTO } from "@dtos/VechicleDTO";
+import { IVehicleDTO } from "@dtos/IVechicleDTO";
+import { Feather } from "@expo/vector-icons";
 import { useAuth } from "@hooks/useAuth";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
 import { api } from "@services/api";
-import { Feather } from "@expo/vector-icons";
-import {
-  View,
-  Text,
-  ScrollView,
-  VStack,
-  Heading,
-  Center,
-  HStack,
-  Box,
-  Icon,
-  Fab,
-} from "native-base";
-import { useEffect, useState } from "react";
+import { Text, ScrollView, VStack, Icon, Fab } from "native-base";
+import { useCallback, useState } from "react";
 
 export function Vechicles() {
-  const [vehicles, setVehicles] = useState<VehicleDTO[]>([]);
+  const [vehicles, setVehicles] = useState<IVehicleDTO[]>([]);
 
   const { user } = useAuth();
 
@@ -43,9 +32,11 @@ export function Vechicles() {
     }
   }
 
-  useEffect(() => {
-    fetchUserVehicles();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchUserVehicles();
+    }, [vehicles]),
+  );
 
   return (
     // Will Hold all the content
@@ -67,21 +58,16 @@ export function Vechicles() {
                 {vehicles.length > 0 ? (
                   <VStack>
                     {vehicles.map((vehicle) => (
-                      <QuickVehicleCard
-                        id={vehicle.id}
-                        brand={vehicle.brand.name}
-                        model={vehicle.name.name}
-                        year={vehicle.year}
-                        key={vehicle.id}
-                      />
+                      <QuickVehicleCard vehicle={vehicle} />
                     ))}
                   </VStack>
                 ) : (
-                  <Center>
-                    <Text textAlign={"center"} py={200} color="gray.500">
-                      Não há veiculos cadastrados
+                  <VStack mt={100} alignItems={"center"}>
+                    <Text textAlign={"center"} color="gray.500">
+                      Não há veiculos cadastrados.
                     </Text>
-                  </Center>
+                    <CarSVG width={300} opacity={0.5} />
+                  </VStack>
                 )}
               </VStack>
             </VStack>

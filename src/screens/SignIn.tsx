@@ -1,30 +1,25 @@
+import LoginHeaderSVG from "@assets/login/login-header.svg";
 import { Button } from "@components/Button";
 import { Input } from "@components/Input";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useAuth } from "@hooks/useAuth";
+import { useNavigation } from "@react-navigation/native";
+import { AuthNavigatorRoutesProps } from "@routes/auth.routes";
+import { AppError } from "@utils/AppError";
 import {
   Center,
   Heading,
   VStack,
   Text,
-  Box,
   useToast,
-  Image,
   HStack,
   ScrollView,
   Checkbox,
 } from "native-base";
-import { Pressable, TouchableOpacity } from "react-native";
-
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
-import { useForm, Controller } from "react-hook-form";
-import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
-import { AuthNavigatorRoutesProps } from "@routes/auth.routes";
-import { useAuth } from "@hooks/useAuth";
-import { AppError } from "@utils/AppError";
-import axios from "axios";
-
-import LoginHeaderSVG from "@assets/login/login-header.svg";
+import { useForm, Controller } from "react-hook-form";
+import { Pressable, TouchableOpacity } from "react-native";
+import * as yup from "yup";
 
 type FormDataProps = {
   email: string;
@@ -75,9 +70,9 @@ export function SignIn() {
 
   return (
     <ScrollView flex={1}>
-      <VStack px={20} width={200} height={80}>
+      <HStack pl={100} width={200} height={80}>
         <LoginHeaderSVG width={200} />
-      </VStack>
+      </HStack>
       <VStack px={10} mt={-10}>
         <Heading pb={2}>Bem-vindo!</Heading>
         <Text>Faça login para continuar</Text>

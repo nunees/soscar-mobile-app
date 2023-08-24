@@ -10,11 +10,13 @@ import SuspensionService from "@assets/services/suspension.png";
 import AccessoriesService from "@assets/services/usb.png";
 import WhellService from "@assets/services/wheel.png";
 import AssistanceService from "@assets/services/worker.png";
+import { FavoriteCars } from "@components/FavoriteCars";
 import { ReminderBell } from "@components/ReminderBell";
 import { ServicesSmallCard } from "@components/ServicesSmallCard";
 import { SmallSchedulleCard } from "@components/SmallSchedulleCard";
 import { UserLocation } from "@components/UserLocation";
 import { UserPhoto } from "@components/UserPhoto";
+import { IVehicleDTO } from "@dtos/IVechicleDTO";
 import { Feather, Entypo } from "@expo/vector-icons";
 import { useAuth } from "@hooks/useAuth";
 import { useNavigation } from "@react-navigation/native";
@@ -29,9 +31,12 @@ import {
   Box,
   Icon,
 } from "native-base";
+import { useEffect, useState } from "react";
 import { TouchableOpacity } from "react-native";
 
 export function HomeScreen() {
+  const [vehicles, setVehicles] = useState<IVehicleDTO[]>([]);
+
   const { user } = useAuth();
 
   const navigation = useNavigation<AppNavigatorRoutesProps>();
@@ -47,21 +52,40 @@ export function HomeScreen() {
     return "Boa noite";
   }
 
+  async function fetchUserVehicles() {
+    try {
+      const response = await api.get("/vehicles/", {
+        headers: {
+          id: user.id,
+        },
+      });
+      setVehicles(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  useEffect(() => {
+    fetchUserVehicles();
+  }, []);
+
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
       <VStack py={10} px={19}>
+        <HStack mb={5} justifyContent={"center"}>
+          <Icon as={Feather} name="map-pin" size={5} color={"gray.400"} />
+          <UserLocation />
+        </HStack>
         <HStack justifyContent={"space-between"}>
           <HStack justifyItems={"baseline"}>
             <TouchableOpacity onPress={() => navigation.navigate("profile")}>
               <UserPhoto
+                defaultSource={user.avatar ? ProfilePicture : undefined}
+                source={{
+                  uri: `${api.defaults.baseURL}/user/avatar/${user.id}`,
+                }}
+                alt="Foto de perfil"
                 size={10}
-                defaultSource={ProfilePicture}
-                source={
-                  user.avatar
-                    ? { uri: `${api.defaults.baseURL}/user/avatar/${user.id}` }
-                    : ProfilePicture
-                }
-                alt="imagem de perfil"
               />
             </TouchableOpacity>
             <Box ml={2} pb={10}>
@@ -76,8 +100,7 @@ export function HomeScreen() {
           </HStack>
         </HStack>
 
-        {/*
-        <VStack py={10}>
+        <VStack>
           <HStack justifyContent={"space-between"}>
             <Text bold mb={2} color="gray.200">
               Meus Veículos
@@ -89,13 +112,18 @@ export function HomeScreen() {
               </Text>
             </TouchableOpacity>
           </HStack>
-          <QuickVehicleCard brand="" model={""} year={0} id={""} />
-        </VStack> */}
+        </VStack>
 
-        <HStack mb={10}>
-          <Icon as={Feather} name="map-pin" size={5} color={"gray.400"} />
-          <UserLocation />
-        </HStack>
+        <ScrollView
+          horizontal={true}
+          showsHorizontalScrollIndicator={false}
+          disableIntervalMomentum={true}
+          snapToInterval={400}
+        >
+          {vehicles.map((vehicle) => (
+            <FavoriteCars vehicle={vehicle} />
+          ))}
+        </ScrollView>
 
         <VStack>
           <HStack justifyContent={"space-between"}>

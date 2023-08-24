@@ -1,17 +1,18 @@
-import { Select as SelectNative, ISelectProps, FormControl } from "native-base";
-import { useState } from "react";
-import { ModelDTO } from "@dtos/ModelDTO";
-import { BrandDTO } from "@dtos/BrandDTO";
+import { Select as SelectNative, ISelectProps } from "native-base";
 
 type Props = ISelectProps & {
   label: string;
   errorMessage?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any;
 };
 
-export function Select({ label, data, errorMessage, ...rest }: Props) {
+export function Select({ label, data, errorMessage = "", ...rest }: Props) {
   return (
     <SelectNative
+      borderTopWidth={0}
+      borderLeftWidth={0}
+      borderRightWidth={0}
       mb={3}
       minWidth={"full"}
       accessibilityLabel={label}
@@ -23,13 +24,16 @@ export function Select({ label, data, errorMessage, ...rest }: Props) {
       placeholderTextColor="gray.400"
       {...rest}
     >
-      {data.map((item: any) => (
-        <SelectNative.Item
-          key={item.id}
-          label={item.label}
-          value={item.value}
-        />
-      ))}
+      {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        data.map((item: any) => (
+          <SelectNative.Item
+            key={item.id}
+            label={item.label}
+            value={item.value}
+          />
+        ))
+      }
     </SelectNative>
   );
 }

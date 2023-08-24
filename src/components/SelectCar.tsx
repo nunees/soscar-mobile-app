@@ -1,8 +1,4 @@
-import { Select as SelectNative, ISelectProps, FormControl } from "native-base";
-import { useState } from "react";
-import { ModelDTO } from "@dtos/ModelDTO";
-import { BrandDTO } from "@dtos/BrandDTO";
-import { AnyObjectSchema } from "yup";
+import { Select as SelectNative, ISelectProps } from "native-base";
 
 type Props = ISelectProps & {
   label: string;
@@ -14,6 +10,9 @@ export function SelectCar({ label, data, errorMessage, ...rest }: Props) {
   return (
     <SelectNative
       mb={3}
+      borderTopWidth={0}
+      borderLeftWidth={0}
+      borderRightWidth={0}
       minWidth={"full"}
       accessibilityLabel={label}
       placeholder={label}

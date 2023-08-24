@@ -1,3 +1,17 @@
+import ClientRideSVG from "@assets/driver-header.svg";
+import MechanicHeaderSVG from "@assets/mechanic-header.svg";
+import { Button } from "@components/Button";
+import { Input } from "@components/Input";
+import { LineDivider } from "@components/LineDivider";
+import { Select } from "@components/Select";
+import { GenderDTO } from "@dtos/GenderDTO";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useAuth } from "@hooks/useAuth";
+import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
+import { useNavigation } from "@react-navigation/native";
+import { AppNavigatorRoutesProps } from "@routes/app.routes";
+import { api } from "@services/api";
+import { AppError } from "@utils/AppError";
 import {
   Heading,
   ScrollView,
@@ -10,29 +24,12 @@ import {
   HStack,
   Divider,
 } from "native-base";
-
-import { yupResolver } from "@hookform/resolvers/yup";
+import { useEffect, useState } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { Alert, TouchableOpacity } from "react-native";
 import * as yup from "yup";
 
-import { Button } from "@components/Button";
-import { Input } from "@components/Input";
-import { Select } from "@components/Select";
-import { api } from "@services/api";
-import { useEffect, useState } from "react";
-import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
-import { useForm, Controller } from "react-hook-form";
-
-import { useNavigation } from "@react-navigation/native";
-import { Alert, TouchableOpacity } from "react-native";
-import { AppError } from "@utils/AppError";
-import { AppNavigatorRoutesProps } from "@routes/app.routes";
-import { useAuth } from "@hooks/useAuth";
 import { SignIn } from "./SignIn";
-import { GenderDTO } from "@dtos/GenderDTO";
-import { LineDivider } from "@components/LineDivider";
-
-import ClientRideSVG from "@assets/driver-header.svg";
-import MechanicHeaderSVG from "@assets/mechanic-header.svg";
 
 type FormDataProps = {
   email: string;
@@ -114,7 +111,7 @@ export function SignUp() {
       setIsLoading(false);
       Alert.alert(
         "Erro",
-        "Você precisa aceitar os termos de uso para continuar"
+        "Você precisa aceitar os termos de uso para continuar",
       );
       return;
     }
@@ -369,13 +366,15 @@ export function SignUp() {
                   onChange={() => setIsTermsAccepted(!isTermsAccepted)}
                   mt={5}
                 >
-                  <Text color="gray.100" fontSize="sm">
+                  <Text color="gray.100" fontSize="sm" textAlign="justify">
                     Ao prosseguir você concorda com os termos e condições de uso
-                    do aplicativo que estão disponíveis no link abaixo.
+                    do aplicativo que estão disponíveis abaixo.
                   </Text>
                 </Checkbox>
                 <TouchableOpacity>
-                  <Text fontWeight="bold">Termos e condições de uso</Text>
+                  <Text fontWeight="bold" textAlign="center">
+                    Termos e condições de uso
+                  </Text>
                 </TouchableOpacity>
               </Center>
 

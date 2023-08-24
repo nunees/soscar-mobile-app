@@ -1,42 +1,27 @@
 import { AppHeader } from "@components/AppHeader";
-import { VStack, ScrollView, useToast, Checkbox, Text } from "native-base";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
-import { useForm, Controller, set } from "react-hook-form";
-import { useNavigation } from "@react-navigation/native";
-import { AppNavigatorRoutesProps } from "@routes/app.routes";
+import { Button } from "@components/Button";
 import { Input } from "@components/Input";
+import { LoadingModal } from "@components/LoadingModal";
 import { SelectCar } from "@components/SelectCar";
 import { TextArea } from "@components/TextArea";
-import { Button } from "@components/Button";
 import { BrandDTO } from "@dtos/BrandDTO";
-import { useEffect, useState } from "react";
-import { api } from "@services/api";
+import { InsuranceDTO } from "@dtos/InsuranceDTO";
 import { ModelDTO } from "@dtos/ModelDTO";
-import { all } from "axios";
+import { useAuth } from "@hooks/useAuth";
+import { useNavigation } from "@react-navigation/native";
+import { AppNavigatorRoutesProps } from "@routes/app.routes";
+import { api } from "@services/api";
 import { AppError } from "@utils/AppError";
-import { compareSpecificity } from "native-base/lib/typescript/hooks/useThemeProps/propsFlattener";
-
-type FormDataProps = {
-  brand: string;
-  model: string;
-  year: number;
-  plate: string;
-  color: string;
-};
-
-const loginSchema = yup.object().shape({
-  brand: yup.string().required("Informe a marca do veículo"),
-  model: yup.string().required("Informe o modelo do veículo"),
-  year: yup.number().required("Informe o ano do veículo"),
-  plate: yup.string().required("Informe a placa do veículo"),
-  color: yup.string().required("Informe a cor do veículo"),
-});
+import { VStack, ScrollView, useToast, Checkbox, Text } from "native-base";
+import { useEffect, useState } from "react";
 
 export function AddVehicle() {
+  const [showModal, setShowModal] = useState(false);
   const [brands, setBrands] = useState<BrandDTO[]>([{}] as BrandDTO[]);
   const [models, setModels] = useState<ModelDTO[]>([{}] as ModelDTO[]);
-  const [insurances, setInsurances] = useState<any[]>([{}] as any[]);
+  const [insurances, setInsurances] = useState<InsuranceDTO[]>([
+    {},
+  ] as InsuranceDTO[]);
 
   const [model, setModel] = useState(0);
   const [brand, setBrand] = useState(0);
@@ -51,16 +36,12 @@ export function AddVehicle() {
 
   const [toggleInsurance, setToggleInsurance] = useState(false);
 
+  const [loadMessage, setLoadMessage] = useState("");
+
   const navigation = useNavigation<AppNavigatorRoutesProps>();
   const toast = useToast();
 
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<FormDataProps>({
-    resolver: yupResolver(loginSchema),
-  });
+  const { user } = useAuth();
 
   async function getAllBrands() {
     try {
@@ -80,31 +61,58 @@ export function AddVehicle() {
   }
 
   async function fetchAllModels(value: string) {
+    setLoadMessage("Buscando modelos");
+    setShowModal(true);
     const response = await api.get(`/vehicles/names/${value}`);
     setModels(response.data);
     setBrand(Number(value));
+    setShowModal(false);
   }
 
   async function getAllInsurances() {
+    setLoadMessage("Buscando seguradoras");
     const response = await api.get("/vehicles/insurances/all");
     setInsurances(response.data);
   }
 
-  function handleSelectCar(value: string) {
-    setModel(Number(value));
-  }
+  async function handleAddVehicle() {
+    try {
+      setShowModal(true);
 
-  function handleAddVehicle(data: FormDataProps) {
-    const response = api.post("/vehicles", {
-      brand_id: Number(brand),
-      model_id: Number(model),
-      color,
-      year: Number(year),
-      plate,
-      notes,
-      insuranceId,
-      isPrimary: isMainVehicle,
-    });
+      await api.post(
+        "/vehicles",
+        {
+          brand_id: Number(brand),
+          name_id: Number(model),
+          color,
+          year: Number(year),
+          plate,
+          notes,
+          insuranceId: Number(insuranceId) || 12,
+          isPrimary: isMainVehicle,
+        },
+        {
+          headers: {
+            id: user.id,
+          },
+        },
+      );
+      setShowModal(false);
+      navigation.navigate("vehicles");
+    } catch (error) {
+      setShowModal(false);
+      const isApperror = error instanceof AppError;
+      const title = isApperror
+        ? error.message
+        : "Ocorreu um erro ao adicionar o veículo";
+      toast.show({
+        title,
+        placement: "top",
+        bgColor: "red.500",
+      });
+    } finally {
+      setShowModal(false);
+    }
   }
 
   useEffect(() => {
@@ -119,7 +127,17 @@ export function AddVehicle() {
       </VStack>
 
       <VStack px={10} py={10}>
-        <ScrollView>
+        {showModal && (
+          <LoadingModal
+            showModal={showModal}
+            setShowModal={setShowModal}
+            message={loadMessage}
+          />
+        )}
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 120 }}
+        >
           <VStack>
             <SelectCar
               data={brands.map((brand) => {
@@ -147,7 +165,12 @@ export function AddVehicle() {
               onValueChange={(value) => setModel(Number(value))}
             />
 
-            <Input placeholder="Ano" value={year} onChangeText={setYear} />
+            <Input
+              placeholder="Ano"
+              value={year}
+              onChangeText={setYear}
+              keyboardType="numeric"
+            />
             <Input placeholder="Placa" value={plate} onChangeText={setPlate} />
             <Input placeholder="Cor" value={color} onChangeText={setColor} />
 
@@ -185,7 +208,7 @@ export function AddVehicle() {
 
             <Checkbox
               colorScheme="orange"
-              value={"OK"}
+              value={"mainVehicle"}
               onChange={() => setIsMainVehicle(!isMainVehicle)}
             >
               <Text color="gray.400" bold>
@@ -193,11 +216,7 @@ export function AddVehicle() {
               </Text>
             </Checkbox>
           </VStack>
-          <Button
-            onPress={() => navigation.goBack()}
-            title={"Salvar"}
-            mt={20}
-          />
+          <Button onPress={handleAddVehicle} title={"Salvar"} mt={20} />
         </ScrollView>
       </VStack>
     </VStack>

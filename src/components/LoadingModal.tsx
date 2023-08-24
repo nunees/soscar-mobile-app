@@ -1,20 +1,17 @@
-import {
-  HStack,
-  Heading,
-  IModalProps,
-  Modal,
-  Spinner,
-  VStack,
-  Text,
-} from "native-base";
-import { useState } from "react";
+import { IModalProps, Modal, Spinner, VStack, Text } from "native-base";
 
 type Props = IModalProps & {
+  message?: string | undefined;
   showModal: boolean;
   setShowModal: (value: boolean) => void;
 };
 
-export function LoadingModal({ showModal, setShowModal, ...rest }: Props) {
+export function LoadingModal({
+  showModal,
+  setShowModal,
+  message,
+  ...rest
+}: Props) {
   return (
     <Modal isOpen={showModal} onClose={() => setShowModal(false)} {...rest}>
       <Modal.Content maxWidth="400px">
@@ -25,7 +22,7 @@ export function LoadingModal({ showModal, setShowModal, ...rest }: Props) {
               accessibilityLabel="Aguarde..."
               size={50}
             />
-            <Text>Aguarde...</Text>
+            <Text>{message}</Text>
           </VStack>
         </Modal.Body>
       </Modal.Content>

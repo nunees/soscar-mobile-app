@@ -1,42 +1,35 @@
+import ProfilePicture from "@assets/profile.png";
 import { AppHeader } from "@components/AppHeader";
+import { Button } from "@components/Button";
+import { Input } from "@components/Input";
+import { LineDivider } from "@components/LineDivider";
+import { LoadingModal } from "@components/LoadingModal";
 import { UserPhoto } from "@components/UserPhoto";
+import { Entypo } from "@expo/vector-icons";
+import { yupResolver } from "@hookform/resolvers/yup";
 import { useAuth } from "@hooks/useAuth";
+import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { AppNavigatorRoutesProps } from "@routes/app.routes";
 import { api } from "@services/api";
+import { AppError } from "@utils/AppError";
+import * as FileSystem from "expo-file-system";
+import { FileInfo } from "expo-file-system";
+import * as ImagePicker from "expo-image-picker";
 import {
-  View,
   Text,
   ScrollView,
   VStack,
   Center,
   Skeleton,
   Icon,
-  Box,
   Pressable,
-  HStack,
   Heading,
   useToast,
-  Modal,
-  Spinner,
 } from "native-base";
 import { useCallback, useEffect, useState } from "react";
-import { TouchableOpacity } from "react-native";
-import { Entypo } from "@expo/vector-icons";
-import { Input } from "@components/Input";
-import { LineDivider } from "@components/LineDivider";
-import { Button } from "@components/Button";
-import * as ImagePicker from "expo-image-picker";
-import * as FileSystem from "expo-file-system";
-import { FileInfo } from "expo-file-system";
-import { Controller, FormState, set, useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
+import { Controller, useForm } from "react-hook-form";
 import * as yup from "yup";
-
-import ProfilePicture from "@assets/profile.png";
-import { AppError } from "@utils/AppError";
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
-import { LoadingModal } from "@components/LoadingModal";
-import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
-import { AppNavigatorRoutesProps } from "@routes/app.routes";
 
 const PHOTO_SIZE = 33;
 
@@ -82,7 +75,7 @@ export function Profile() {
     defaultValues: {
       name: user.name,
       lastName,
-      phone: phone,
+      phone,
       username: user.username,
     },
     resolver: yupResolver(profileSchema),
@@ -112,7 +105,7 @@ export function Profile() {
 
       if (photoSelected.assets[0].uri) {
         const photoInfo = (await FileSystem.getInfoAsync(
-          photoSelected.assets[0].uri
+          photoSelected.assets[0].uri,
         )) as FileInfo;
 
         if (photoInfo?.size && photoInfo.size / 1021 / 1024 > 5) {
@@ -129,6 +122,7 @@ export function Profile() {
           name: `${user.username}.${fileExtension}`.toLowerCase(),
           uri: photoSelected.assets[0].uri,
           type: `${photoSelected.assets[0].type}/${fileExtension}`,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } as any;
 
         const userPhotoUploadForm = new FormData();
@@ -142,7 +136,7 @@ export function Profile() {
               id: user.id,
               "Content-Type": "multipart/form-data",
             },
-          }
+          },
         );
 
         const userUpdated = user;
@@ -151,9 +145,10 @@ export function Profile() {
 
         toast.show({
           title: "Foto atualizada",
-          placement: "top-right",
+          placement: "top",
           bgColor: "green.500",
         });
+        setIsPhotoLoading(false);
       }
     } catch (error) {
       const isAppError = error instanceof AppError;
@@ -184,7 +179,7 @@ export function Profile() {
       setPhone(mobile_phone);
       setEmail(email);
       setBirthDate(
-        new Date(birth_date.split("T")[0]).toLocaleDateString("pt-BR")
+        new Date(birth_date.split("T")[0]).toLocaleDateString("pt-BR"),
       );
     } catch (error) {
       setShowModal(false);
@@ -219,7 +214,7 @@ export function Profile() {
           headers: {
             id: user.id,
           },
-        }
+        },
       );
 
       await updateUserProfile(userUpdated);
@@ -241,11 +236,9 @@ export function Profile() {
     }
   }
 
-  useFocusEffect(
-    useCallback(() => {
-      fetchProfile();
-    }, [])
-  );
+  useEffect(() => {
+    fetchProfile();
+  }, []);
 
   return (
     <VStack>
@@ -255,7 +248,11 @@ export function Profile() {
 
       <VStack px={10} py={10}>
         {showModal && (
-          <LoadingModal showModal={showModal} setShowModal={setShowModal} />
+          <LoadingModal
+            showModal={showModal}
+            setShowModal={setShowModal}
+            message="Carregando dados..."
+          />
         )}
         <ScrollView
           showsVerticalScrollIndicator={false}
@@ -272,11 +269,10 @@ export function Profile() {
               />
             ) : (
               <UserPhoto
-                source={
-                  !user.avatar
-                    ? ProfilePicture
-                    : { uri: `${api.defaults.baseURL}/user/avatar/${user.id}` }
-                }
+                defaultSource={user.avatar ? ProfilePicture : undefined}
+                source={{
+                  uri: `${api.defaults.baseURL}/user/avatar/${user.id}`,
+                }}
                 alt="Foto de perfil"
                 size={PHOTO_SIZE}
               />
