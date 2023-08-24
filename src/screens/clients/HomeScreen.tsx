@@ -1,3 +1,25 @@
+import ProfilePicture from "@assets/profile.png";
+import EngineService from "@assets/services/car-engine.png";
+import WashService from "@assets/services/car-service.png";
+import GearService from "@assets/services/gear.png";
+import GlassService from "@assets/services/glass.png";
+import OilService from "@assets/services/oil.png";
+import EletricService from "@assets/services/spark-plug.png";
+import PaintService from "@assets/services/spray-gun.png";
+import SuspensionService from "@assets/services/suspension.png";
+import AccessoriesService from "@assets/services/usb.png";
+import WhellService from "@assets/services/wheel.png";
+import AssistanceService from "@assets/services/worker.png";
+import { ReminderBell } from "@components/ReminderBell";
+import { ServicesSmallCard } from "@components/ServicesSmallCard";
+import { SmallSchedulleCard } from "@components/SmallSchedulleCard";
+import { UserLocation } from "@components/UserLocation";
+import { UserPhoto } from "@components/UserPhoto";
+import { Feather, Entypo } from "@expo/vector-icons";
+import { useAuth } from "@hooks/useAuth";
+import { useNavigation } from "@react-navigation/native";
+import { AppNavigatorRoutesProps } from "@routes/app.routes";
+import { api } from "@services/api";
 import {
   HStack,
   Heading,
@@ -6,67 +28,23 @@ import {
   Text,
   Box,
   Icon,
-  Image,
-  useToast,
 } from "native-base";
-import { ImageSourcePropType, TouchableOpacity } from "react-native";
-import { Entypo, Feather } from "@expo/vector-icons";
-import { ReminderBell } from "@components/ReminderBell";
-import { QuickVehicleCard } from "@components/QuickVehicleCard";
-import { ServicesSmallCard } from "@components/ServicesSmallCard";
-import { SmallSchedulleCard } from "@components/SmallSchedulleCard";
-import { useAuth } from "@hooks/useAuth";
-import {
-  useFocusEffect,
-  useIsFocused,
-  useNavigation,
-} from "@react-navigation/native";
-import { AppNavigatorRoutesProps } from "@routes/app.routes";
-import { UserPhoto } from "@components/UserPhoto";
-import { api } from "@services/api";
-
-import { useCallback, useEffect, useState } from "react";
-
-import EngineService from "@assets/services/car-engine.png";
-import WashService from "@assets/services/car-service.png";
-import GearService from "@assets/services/gear.png";
-import EletricService from "@assets/services/spark-plug.png";
-import AccessoriesService from "@assets/services/usb.png";
-import AssistanceService from "@assets/services/worker.png";
-import GlassService from "@assets/services/glass.png";
-import OilService from "@assets/services/oil.png";
-import SuspensionService from "@assets/services/suspension.png";
-import PaintService from "@assets/services/spray-gun.png";
-import WhellService from "@assets/services/wheel.png";
-
-import ProfilePicture from "@assets/profile.png";
-import { AppError } from "@utils/AppError";
-
-import * as Location from "expo-location";
-import { UserLocation } from "@components/UserLocation";
+import { TouchableOpacity } from "react-native";
 
 export function HomeScreen() {
-  const { user, signOut, updateUserProfile } = useAuth();
-  const [havePhoto, setHavePhoto] = useState(false);
-
-  const toast = useToast();
+  const { user } = useAuth();
 
   const navigation = useNavigation<AppNavigatorRoutesProps>();
 
-  const isFocused = useIsFocused();
-
   function greeting() {
     const hours = new Date().getHours();
-    if (user.avatar) {
-      setHavePhoto(true);
-    }
     if (hours >= 0 && hours < 12) {
       return "Bom dia";
-    } else if (hours >= 12 && hours < 18) {
-      return "Boa tarde";
-    } else {
-      return "Boa noite";
     }
+    if (hours >= 12 && hours < 18) {
+      return "Boa tarde";
+    }
+    return "Boa noite";
   }
 
   return (
