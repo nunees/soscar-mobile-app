@@ -32,7 +32,7 @@ export function Button({
       {...rest}
     >
       {!hasIcon && (
-        <Text color={variant === "solid" ? "white" : "orange.600"}>
+        <Text bold color={variant === "solid" ? "white" : "orange.600"}>
           {title}
         </Text>
       )}

@@ -24,7 +24,7 @@ export function ServicesSmallCard({ image, alt, title, ...rest }: Props) {
           <Image source={image} alt={alt} w={70} h={70} {...rest} />
         </VStack>
       </TouchableOpacity>
-      <Text bold mt={2} textAlign={"center"}>
+      <Text mt={2} textAlign={"center"}>
         {title}
       </Text>
     </Box>

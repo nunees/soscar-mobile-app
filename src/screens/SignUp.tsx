@@ -8,6 +8,7 @@ import {
   Checkbox,
   Box,
   HStack,
+  Divider,
 } from "native-base";
 
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -28,6 +29,10 @@ import { AppNavigatorRoutesProps } from "@routes/app.routes";
 import { useAuth } from "@hooks/useAuth";
 import { SignIn } from "./SignIn";
 import { GenderDTO } from "@dtos/GenderDTO";
+import { LineDivider } from "@components/LineDivider";
+
+import ClientRideSVG from "@assets/driver-header.svg";
+import MechanicHeaderSVG from "@assets/mechanic-header.svg";
 
 type FormDataProps = {
   email: string;
@@ -170,20 +175,20 @@ export function SignUp() {
       showsVerticalScrollIndicator={false}
     >
       {!showForm && (
-        <VStack px={10} py={10}>
-          <VStack mt={200}>
+        <VStack px={10} py={60}>
+          <VStack>
             <Center>
-              <Heading fontFamily="heading" color="gray.100" pb={10}>
-                Quem é você?
-              </Heading>
+              <ClientRideSVG />
               <Button
                 title={"Sou um Cliente"}
                 onPress={() => {
                   setIsPartner(false);
                   setShowForm(true);
                 }}
-                mb={5}
               />
+
+              <LineDivider />
+              <MechanicHeaderSVG width={450} height={300} />
               <Button
                 title={"Sou um Parceiro"}
                 onPress={() => {

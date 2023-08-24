@@ -11,6 +11,7 @@ import { Profile } from "@screens/clients/Profile";
 import { Schedules } from "@screens/clients/Schedules";
 import { VehicleDetails } from "@screens/clients/VehicleDetails";
 import { AddVehicle } from "@screens/clients/AddVehicle";
+import { ChangePassword } from "@screens/clients/ChangePassword";
 
 type AppRotes = {
   home: undefined;
@@ -20,6 +21,7 @@ type AppRotes = {
   assistance: undefined;
   vehicleDetails: { vehicleId: string };
   addVehicle: undefined;
+  changePassword: undefined;
 };
 
 export type AppNavigatorRoutesProps = BottomTabNavigationProp<AppRotes>;
@@ -111,6 +113,12 @@ export function AppRoutes() {
       <Screen
         name="addVehicle"
         component={AddVehicle}
+        options={{ tabBarButton: () => null }}
+      />
+
+      <Screen
+        name="changePassword"
+        component={ChangePassword}
         options={{ tabBarButton: () => null }}
       />
     </Navigator>

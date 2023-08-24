@@ -1,9 +1,14 @@
-import { Spinner, Center } from "native-base";
+import { Spinner, Center, VStack, Text } from "native-base";
 
 export function Loading() {
   return (
-    <Center flex={1} bg="gray.700">
-      <Spinner size={100} color="green.500" />
-    </Center>
+    <VStack alignItems="center" mt={300}>
+      <Spinner
+        color="orange.500"
+        accessibilityLabel="Carregando dados, aguarde"
+        size={50}
+      />
+      <Text>Carregando dados, aguarde</Text>
+    </VStack>
   );
 }

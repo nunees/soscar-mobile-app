@@ -6,15 +6,26 @@ import {
   Text,
   Box,
   Icon,
+  Image,
+  useToast,
 } from "native-base";
-import { TouchableOpacity } from "react-native";
-import { Feather } from "@expo/vector-icons";
+import { ImageSourcePropType, TouchableOpacity } from "react-native";
+import { Entypo, Feather } from "@expo/vector-icons";
 import { ReminderBell } from "@components/ReminderBell";
 import { QuickVehicleCard } from "@components/QuickVehicleCard";
 import { ServicesSmallCard } from "@components/ServicesSmallCard";
 import { SmallSchedulleCard } from "@components/SmallSchedulleCard";
-import { Entypo } from "@expo/vector-icons";
 import { useAuth } from "@hooks/useAuth";
+import {
+  useFocusEffect,
+  useIsFocused,
+  useNavigation,
+} from "@react-navigation/native";
+import { AppNavigatorRoutesProps } from "@routes/app.routes";
+import { UserPhoto } from "@components/UserPhoto";
+import { api } from "@services/api";
+
+import { useCallback, useEffect, useState } from "react";
 
 import EngineService from "@assets/services/car-engine.png";
 import WashService from "@assets/services/car-service.png";
@@ -27,33 +38,65 @@ import OilService from "@assets/services/oil.png";
 import SuspensionService from "@assets/services/suspension.png";
 import PaintService from "@assets/services/spray-gun.png";
 import WhellService from "@assets/services/wheel.png";
-import { useIsFocused, useNavigation } from "@react-navigation/native";
-import { AppNavigatorRoutesProps } from "@routes/app.routes";
+
+import ProfilePicture from "@assets/profile.png";
+import { AppError } from "@utils/AppError";
+
+import * as Location from "expo-location";
+import { UserLocation } from "@components/UserLocation";
 
 export function HomeScreen() {
-  const { user, signOut } = useAuth();
+  const { user, signOut, updateUserProfile } = useAuth();
+  const [havePhoto, setHavePhoto] = useState(false);
+
+  const toast = useToast();
 
   const navigation = useNavigation<AppNavigatorRoutesProps>();
 
   const isFocused = useIsFocused();
 
+  function greeting() {
+    const hours = new Date().getHours();
+    if (user.avatar) {
+      setHavePhoto(true);
+    }
+    if (hours >= 0 && hours < 12) {
+      return "Bom dia";
+    } else if (hours >= 12 && hours < 18) {
+      return "Boa tarde";
+    } else {
+      return "Boa noite";
+    }
+  }
+
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
       <VStack py={10} px={19}>
-        <HStack alignItems={"baseline"} justifyContent={"space-between"}>
-          <Box>
-            <Heading color="gray.200" fontSize="md">
-              Olá, {user.name}
-            </Heading>
-            <TouchableOpacity onPress={signOut}>
-              <Text bold mb={2}>
-                Sair
-              </Text>
+        <HStack justifyContent={"space-between"}>
+          <HStack justifyItems={"baseline"}>
+            <TouchableOpacity onPress={() => navigation.navigate("profile")}>
+              <UserPhoto
+                size={10}
+                defaultSource={ProfilePicture}
+                source={{
+                  uri: `${api.defaults.baseURL}/user/avatar/${user.id}`,
+                }}
+                alt="imagem de perfil"
+              />
             </TouchableOpacity>
-          </Box>
-          <ReminderBell />
+            <Box ml={2} pb={10}>
+              <Heading color="gray.200" fontSize="lg">
+                {`${greeting()},`}
+              </Heading>
+              <Text>{`${user.name}`}</Text>
+            </Box>
+          </HStack>
+          <HStack mt={3}>
+            <ReminderBell />
+          </HStack>
         </HStack>
 
+        {/*
         <VStack py={10}>
           <HStack justifyContent={"space-between"}>
             <Text bold mb={2} color="gray.200">
@@ -67,7 +110,12 @@ export function HomeScreen() {
             </TouchableOpacity>
           </HStack>
           <QuickVehicleCard brand="" model={""} year={0} id={""} />
-        </VStack>
+        </VStack> */}
+
+        <HStack mb={10}>
+          <Icon as={Feather} name="map-pin" size={5} color={"gray.400"} />
+          <UserLocation />
+        </HStack>
 
         <VStack>
           <HStack justifyContent={"space-between"}>
@@ -81,6 +129,7 @@ export function HomeScreen() {
               </Text>
             </TouchableOpacity>
           </HStack>
+
           <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
             <ServicesSmallCard
               image={EngineService}

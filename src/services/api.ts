@@ -2,6 +2,7 @@ import axios, { AxiosError, AxiosInstance } from "axios";
 
 import { AppError } from "@utils/AppError";
 import { storageAuthTokenGet, storageAuthTokenSave } from "@storage/storageAuthToken";
+import { useAuth } from "@hooks/useAuth";
 
 type SignOut = () => void;
 
@@ -15,7 +16,7 @@ type APIInstanceProps = AxiosInstance & {
 }
 
 const api = axios.create({
-  baseURL: 'http://172.28.11.198:3333',
+  baseURL: 'http://172.28.11.198:3333'
 }) as APIInstanceProps;
 
 let failedQueued: Array<PromiseType> = [];
