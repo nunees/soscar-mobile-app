@@ -14,6 +14,7 @@ import {
 import { api } from "@services/api";
 import { UserDTO } from "@dtos/UserDTO";
 import axios from "axios";
+import { AppError } from "@utils/AppError";
 
 export type AuthContextDataProps = {
   user: UserDTO;
@@ -74,7 +75,7 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
         userAndTokenUpdate(data.user, data.token);
       }
     } catch (error) {
-      throw error;
+      throw new AppError("Erro ao autenticar usuário");
     } finally {
       setIsLoadingUserStorageData(false);
     }

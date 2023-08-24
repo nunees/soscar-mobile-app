@@ -78,9 +78,11 @@ export function HomeScreen() {
               <UserPhoto
                 size={10}
                 defaultSource={ProfilePicture}
-                source={{
-                  uri: `${api.defaults.baseURL}/user/avatar/${user.id}`,
-                }}
+                source={
+                  user.avatar
+                    ? { uri: `${api.defaults.baseURL}/user/avatar/${user.id}` }
+                    : ProfilePicture
+                }
                 alt="imagem de perfil"
               />
             </TouchableOpacity>

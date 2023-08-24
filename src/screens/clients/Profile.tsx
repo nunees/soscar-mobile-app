@@ -272,9 +272,11 @@ export function Profile() {
               />
             ) : (
               <UserPhoto
-                source={{
-                  uri: `${api.defaults.baseURL}/user/avatar/${user.id}`,
-                }}
+                source={
+                  !user.avatar
+                    ? ProfilePicture
+                    : { uri: `${api.defaults.baseURL}/user/avatar/${user.id}` }
+                }
                 alt="Foto de perfil"
                 size={PHOTO_SIZE}
               />

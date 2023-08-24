@@ -312,7 +312,7 @@ export function SignUp() {
                           value: gender.id,
                         };
                       })
-                    : []
+                    : {}
                 }
                 onValueChange={(value) => setSelectedGender(Number(value))}
               />
