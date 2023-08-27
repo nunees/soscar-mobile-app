@@ -1,17 +1,16 @@
-import { StyleSheet, Text, View, StatusBar, LogBox } from "react-native";
-
+import { Loading } from '@components/Loading';
+import { AuthContextProvider } from '@contexts/AuthContext';
+import { ProfileContextProvider } from '@contexts/UserContext';
 import {
   useFonts,
   Poppins_400Regular,
   Poppins_700Bold,
-} from "@expo-google-fonts/poppins";
+} from '@expo-google-fonts/poppins';
+import { Routes } from '@routes/index';
+import { NativeBaseProvider } from 'native-base';
+import { StatusBar } from 'react-native';
 
-import { THEME } from "./src/theme";
-import { NativeBaseProvider } from "native-base";
-import { Loading } from "@components/Loading";
-
-import { Routes } from "@routes/index";
-import { AuthContextProvider } from "@contexts/AuthContext";
+import { THEME } from './src/theme';
 
 export default function App() {
   const [fontsLoaded] = useFonts({ Poppins_400Regular, Poppins_700Bold });
@@ -24,7 +23,9 @@ export default function App() {
         translucent
       />
       <AuthContextProvider>
-        {fontsLoaded ? <Routes /> : <Loading />}
+        <ProfileContextProvider>
+          {fontsLoaded ? <Routes /> : <Loading />}
+        </ProfileContextProvider>
       </AuthContextProvider>
     </NativeBaseProvider>
   );

@@ -6,8 +6,11 @@ import {
 import { AddVehicle } from '@screens/clients/AddVehicle';
 import { ChangePassword } from '@screens/clients/ChangePassword';
 import { HomeScreen } from '@screens/clients/HomeScreen';
+import { PartnerDetails } from '@screens/clients/PartnerDetails';
 import { Profile } from '@screens/clients/Profile';
 import { Schedules } from '@screens/clients/Schedules';
+import { SearchSchedule } from '@screens/clients/SearchSchedule';
+import { Services } from '@screens/clients/Services';
 import { VehicleDetails } from '@screens/clients/VehicleDetails';
 import { Vechicles } from '@screens/clients/Vehicles';
 import { Icon, useTheme } from 'native-base';
@@ -16,11 +19,14 @@ type AppRotes = {
   home: undefined;
   vehicles: undefined;
   profile: undefined;
-  schedules: undefined;
   assistance: undefined;
   vehicleDetails: { vehicleId: string };
   addVehicle: undefined;
   changePassword: undefined;
+  services: undefined;
+  schedules: undefined;
+  searchSchedule: { serviceId: string };
+  partnerDetails: { partnerId: string };
 };
 
 export type AppNavigatorRoutesProps = BottomTabNavigationProp<AppRotes>;
@@ -65,14 +71,32 @@ export function AppRoutes() {
         }}
       />
       <Screen
-        name="schedules"
-        component={Schedules}
+        name="services"
+        component={Services}
         options={{
-          title: 'Agendamentos',
+          title: 'Serviços',
           tabBarIcon: ({ color }) => (
-            <Icon as={Feather} name="calendar" size={iconSize} color={color} />
+            <Icon as={Feather} name="clipboard" size={iconSize} color={color} />
           ),
         }}
+      />
+
+      <Screen
+        name="schedules"
+        component={Schedules}
+        options={{ tabBarButton: () => null }}
+      />
+
+      <Screen
+        name="searchSchedule"
+        component={SearchSchedule}
+        options={{ tabBarButton: () => null }}
+      />
+
+      <Screen
+        name="partnerDetails"
+        component={PartnerDetails}
+        options={{ tabBarButton: () => null }}
       />
 
       <Screen

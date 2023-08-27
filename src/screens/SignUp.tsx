@@ -1,17 +1,18 @@
-import ClientRideSVG from "@assets/driver-header.svg";
-import MechanicHeaderSVG from "@assets/mechanic-header.svg";
-import { Button } from "@components/Button";
-import { Input } from "@components/Input";
-import { LineDivider } from "@components/LineDivider";
-import { Select } from "@components/Select";
-import { GenderDTO } from "@dtos/GenderDTO";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { useAuth } from "@hooks/useAuth";
-import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
-import { useNavigation } from "@react-navigation/native";
-import { AppNavigatorRoutesProps } from "@routes/app.routes";
-import { api } from "@services/api";
-import { AppError } from "@utils/AppError";
+import ClientRideSVG from '@assets/driver-header.svg';
+import MechanicHeaderSVG from '@assets/mechanic-header.svg';
+import { Button } from '@components/Button';
+import { Input } from '@components/Input';
+import { LineDivider } from '@components/LineDivider';
+import { Select } from '@components/Select';
+import { IGenderDTO } from '@dtos/IGenderDTO';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { useAuth } from '@hooks/useAuth';
+import { useProfile } from '@hooks/useProfile';
+import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
+import { useNavigation } from '@react-navigation/native';
+import { AppNavigatorRoutesProps } from '@routes/app.routes';
+import { api } from '@services/api';
+import { AppError } from '@utils/AppError';
 import {
   Heading,
   ScrollView,
@@ -20,16 +21,11 @@ import {
   Center,
   useToast,
   Checkbox,
-  Box,
-  HStack,
-  Divider,
-} from "native-base";
-import { useEffect, useState } from "react";
-import { useForm, Controller } from "react-hook-form";
-import { Alert, TouchableOpacity } from "react-native";
-import * as yup from "yup";
-
-import { SignIn } from "./SignIn";
+} from 'native-base';
+import { useEffect, useState } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { Alert, TouchableOpacity } from 'react-native';
+import * as yup from 'yup';
 
 type FormDataProps = {
   email: string;
@@ -43,32 +39,32 @@ type FormDataProps = {
 };
 
 const registrationSchema = yup.object().shape({
-  name: yup.string().required("Informe um nome"),
-  lastName: yup.string().required("Informe um sobrenome"),
-  cpf: yup.string().required("Informe um CPF"),
-  mobile_phone: yup.string().required("Informe um número de telefone"),
-  email: yup.string().required("Informe um e-mail"),
-  username: yup.string().required("Informe um nome de usuário"),
-  password: yup.string().required("Informe uma senha"),
+  name: yup.string().required('Informe um nome'),
+  lastName: yup.string().required('Informe um sobrenome'),
+  cpf: yup.string().required('Informe um CPF'),
+  mobile_phone: yup.string().required('Informe um número de telefone'),
+  email: yup.string().required('Informe um e-mail'),
+  username: yup.string().required('Informe um nome de usuário'),
+  password: yup.string().required('Informe uma senha'),
   confirmPassword: yup
     .string()
-    .required("Confirme sua senha")
-    .min(6, "A senha deve ter no mínimo 6 caracteres")
-    .oneOf([yup.ref("password")], "As senhas devem ser iguais"),
+    .required('Confirme sua senha')
+    .min(6, 'A senha deve ter no mínimo 6 caracteres')
+    .oneOf([yup.ref('password')], 'As senhas devem ser iguais'),
 });
 
 export function SignUp() {
   const [isLoading, setIsLoading] = useState(false);
-  const [allGenders, setAllGenders] = useState<GenderDTO[]>({} as GenderDTO[]);
+  const [allGenders, setAllGenders] = useState<IGenderDTO[]>(
+    {} as IGenderDTO[]
+  );
   const [selectedGender, setSelectedGender] = useState(0);
 
-  const [date, setDate] = useState("");
-  const [gender, setGender] = useState("Masculino");
+  const [date, setDate] = useState('');
 
   const [isTermsAccepted, setIsTermsAccepted] = useState(false);
   const [isPartner, setIsPartner] = useState(false);
 
-  const [userType, setUserType] = useState("");
   const [showForm, setShowForm] = useState(false);
 
   const toast = useToast();
@@ -76,6 +72,7 @@ export function SignUp() {
   const navigation = useNavigation<AppNavigatorRoutesProps>();
 
   const { signIn } = useAuth();
+  const { saveProfile } = useProfile();
 
   const {
     control,
@@ -110,14 +107,14 @@ export function SignUp() {
     if (!isTermsAccepted) {
       setIsLoading(false);
       Alert.alert(
-        "Erro",
-        "Você precisa aceitar os termos de uso para continuar",
+        'Erro',
+        'Você precisa aceitar os termos de uso para continuar'
       );
       return;
     }
 
     try {
-      await api.post("/user/new", {
+      await api.post('/user/new', {
         name,
         last_name: lastName,
         cpf,
@@ -130,15 +127,23 @@ export function SignUp() {
         isPartner,
         isTermsAccepted,
       });
+      await saveProfile({
+        name,
+        last_name: lastName,
+        cpf,
+        birth_date: new Date(date),
+        phone: mobile_phone,
+        genderId: Number(selectedGender),
+      });
       setIsLoading(false);
       await signIn(email, password);
     } catch (error) {
       const isAppError = error instanceof AppError;
-      const title = isAppError ? error.message : "Erro ao realizar cadastro";
+      const title = isAppError ? error.message : 'Erro ao realizar cadastro';
       toast.show({
         title,
-        placement: "top",
-        bgColor: "red.500",
+        placement: 'top',
+        bgColor: 'red.500',
       });
     } finally {
       setIsLoading(false);
@@ -149,15 +154,15 @@ export function SignUp() {
 
   async function getGenders() {
     try {
-      const response = await api.get("/data/genders");
+      const response = await api.get('/data/genders');
       setAllGenders(response.data);
     } catch (error) {
       const isAppError = error instanceof AppError;
-      const title = isAppError ? error.message : "Erro ao obter gêneros";
+      const title = isAppError ? error.message : 'Erro ao obter gêneros';
       toast.show({
         title,
-        placement: "top",
-        bgColor: "red.500",
+        placement: 'top',
+        bgColor: 'red.500',
       });
     }
   }
@@ -177,7 +182,7 @@ export function SignUp() {
             <Center>
               <ClientRideSVG />
               <Button
-                title={"Sou um Cliente"}
+                title={'Sou um Cliente'}
                 onPress={() => {
                   setIsPartner(false);
                   setShowForm(true);
@@ -187,7 +192,7 @@ export function SignUp() {
               <LineDivider />
               <MechanicHeaderSVG width={450} height={300} />
               <Button
-                title={"Sou um Parceiro"}
+                title={'Sou um Parceiro'}
                 onPress={() => {
                   setIsPartner(true);
                   setShowForm(true);
@@ -207,7 +212,7 @@ export function SignUp() {
               <Text
                 color="gray.100"
                 pt={5}
-                fontFamily={"body"}
+                fontFamily={'body'}
                 fontSize="md"
                 pb={5}
               >
@@ -278,7 +283,7 @@ export function SignUp() {
                 caretHidden
                 onPressIn={() => {
                   DateTimePickerAndroid.open({
-                    mode: "date",
+                    mode: 'date',
                     value: new Date(),
                     onChange: (event, date) => handleDate(date as Date),
                   });
@@ -387,7 +392,7 @@ export function SignUp() {
 
               <Button
                 title="Voltar"
-                variant={"outline"}
+                variant={'outline'}
                 onPress={handleGoBack}
                 mt={3}
               />

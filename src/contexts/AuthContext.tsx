@@ -1,4 +1,4 @@
-import { UserDTO } from '@dtos/UserDTO';
+import { IUserDTO } from '@dtos/IUserDTO';
 import { api } from '@services/api';
 import {
   storageAuthTokenSave,
@@ -14,9 +14,9 @@ import { AppError } from '@utils/AppError';
 import { createContext, ReactNode, useEffect, useState } from 'react';
 
 export type AuthContextDataProps = {
-  user: UserDTO;
+  user: IUserDTO;
   signIn: (email: string, password: string) => Promise<void>;
-  updateUserProfile: (userUpdated: UserDTO) => Promise<void>;
+  updateUserAuth: (userUpdated: IUserDTO) => Promise<void>;
   signOut: () => Promise<void>;
   isLoadingUserStorageData: boolean;
 };
@@ -30,18 +30,18 @@ export const AuthContext = createContext<AuthContextDataProps>(
 );
 
 export function AuthContextProvider({ children }: AuthContextProviderProps) {
-  const [user, setUser] = useState<UserDTO>({} as UserDTO);
+  const [user, setUser] = useState<IUserDTO>({} as IUserDTO);
   const [isLoadingUserStorageData, setIsLoadingUserStorageData] =
     useState(true);
 
-  async function userAndTokenUpdate(userData: UserDTO, token: string) {
+  async function userAndTokenUpdate(userData: IUserDTO, token: string) {
     api.defaults.headers.common.Authorization = `Bearer ${token}`;
 
     setUser(userData);
   }
 
   async function storageUserAndTokenSave(
-    userData: UserDTO,
+    userData: IUserDTO,
     token: string,
     refresh_token: string
   ) {
@@ -76,13 +76,13 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
 
   async function signOut() {
     setIsLoadingUserStorageData(true);
-    setUser({} as UserDTO);
+    setUser({} as IUserDTO);
     await storageUserRemove();
     await storageAuthTokenRemove();
     setIsLoadingUserStorageData(false);
   }
 
-  async function updateUserProfile(userUpdated: UserDTO) {
+  async function updateUserAuth(userUpdated: IUserDTO) {
     setUser(userUpdated);
     await storageUserSave(userUpdated);
   }
@@ -117,7 +117,7 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
       value={{
         user,
         signIn,
-        updateUserProfile,
+        updateUserAuth,
         signOut,
         isLoadingUserStorageData,
       }}

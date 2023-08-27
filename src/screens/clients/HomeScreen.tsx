@@ -1,4 +1,3 @@
-import ProfilePicture from '@assets/profile.png';
 import EngineService from '@assets/services/car-engine.png';
 import WashService from '@assets/services/car-service.png';
 import GearService from '@assets/services/gear.png';
@@ -33,6 +32,8 @@ import {
 } from 'native-base';
 import { useEffect, useState } from 'react';
 import { TouchableOpacity } from 'react-native';
+
+const PHOTO_SIZE = 10;
 
 export function HomeScreen() {
   const [vehicles, setVehicles] = useState<IVehicleDTO[]>([]);
@@ -80,12 +81,11 @@ export function HomeScreen() {
           <HStack justifyItems={'baseline'}>
             <TouchableOpacity onPress={() => navigation.navigate('profile')}>
               <UserPhoto
-                defaultSource={ProfilePicture}
                 source={{
                   uri: `${api.defaults.baseURL}/user/avatar/${user.id}/${user.avatar}`,
                 }}
                 alt="Foto de perfil"
-                size={10}
+                size={PHOTO_SIZE}
               />
             </TouchableOpacity>
             <Box ml={2} pb={10}>
