@@ -1,4 +1,4 @@
-import { View, Text } from "native-base";
+import { View, Text } from 'native-base';
 
 export function Assistance() {
   return (

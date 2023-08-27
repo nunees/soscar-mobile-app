@@ -1,22 +1,20 @@
-import { VStack, Text, Heading, Center } from "native-base";
-import { Tutorial } from "@components/Tutorial";
-import { useState } from "react";
-import { Button } from "@components/Button";
-import { TouchableOpacity } from "react-native";
-
-import { PublicNavigatorRoutesProps } from "@routes/public.routes";
-
-import FirstImage from "@assets/welcome/first.png";
-import SecondImage from "@assets/welcome/second.png";
-import ThirdImage from "@assets/welcome/third.png";
-import FourthImage from "@assets/welcome/fourth.png";
-
-import { useNavigation } from "@react-navigation/native";
+/* eslint-disable no-nested-ternary */
+import FirstImage from '@assets/welcome/first.png';
+import FourthImage from '@assets/welcome/fourth.png';
+import SecondImage from '@assets/welcome/second.png';
+import ThirdImage from '@assets/welcome/third.png';
+import { Button } from '@components/Button';
+import { Tutorial } from '@components/Tutorial';
+import { useNavigation } from '@react-navigation/native';
+import { AuthNavigatorRoutesProps } from '@routes/auth.routes';
+import { VStack, Text, Center } from 'native-base';
+import { useState } from 'react';
+import { TouchableOpacity } from 'react-native';
 
 export function Welcome() {
   const [page, setPage] = useState(1);
 
-  const navigation = useNavigation<PublicNavigatorRoutesProps>();
+  const navigation = useNavigation<AuthNavigatorRoutesProps>();
 
   function handleNextPage() {
     if (page === 4) {
@@ -26,19 +24,11 @@ export function Welcome() {
     }
   }
 
-  function handleUserSignup() {
-    navigation.navigate("clientSignUp");
-  }
-
-  function handlePartnerSignup() {
-    navigation.navigate("partnerSignUp");
-  }
-
   return (
     <VStack flex={1} px={10}>
       {page !== 5 && (
         <TouchableOpacity
-          onPress={() => navigation.navigate("login")}
+          onPress={() => navigation.navigate('SignUp')}
           style={{ marginTop: 20 }}
         >
           <Text
@@ -54,31 +44,31 @@ export function Welcome() {
       )}
       {page === 1 ? (
         <Tutorial
-          title={"Oficinas Mecânicas"}
+          title={'Oficinas Mecânicas'}
           text={
-            "A oficina mecânica que você procura pode estar perto da sua casa."
+            'A oficina mecânica que você procura pode estar perto da sua casa.'
           }
           source={FirstImage}
           alt="Carro em um elevador"
-          btnText={"Avançar"}
+          btnText={'Avançar'}
           nextPage={() => handleNextPage()}
         />
       ) : page === 2 ? (
         <Tutorial
-          title={"Agende a sua manutenção"}
+          title={'Agende a sua manutenção'}
           text={
-            "Te ajudamos a agendar a manutenção do seu veículo com um de  nossos parceiros."
+            'Te ajudamos a agendar a manutenção do seu veículo com um de  nossos parceiros.'
           }
           source={SecondImage}
-          alt={"Uma garota com um relógio"}
-          btnText={"Avançar"}
+          alt={'Uma garota com um relógio'}
+          btnText={'Avançar'}
           nextPage={() => handleNextPage()}
         />
       ) : page === 3 ? (
         <Tutorial
-          title={"Socorro 24 horas"}
-          text={"Peça socorro de profissionais 24 horas por dia"}
-          btnText={"Avançar"}
+          title={'Socorro 24 horas'}
+          text={'Peça socorro de profissionais 24 horas por dia'}
+          btnText={'Avançar'}
           source={ThirdImage}
           alt="Carro sendo guinchado"
           nextPage={() => handleNextPage()}
@@ -86,15 +76,15 @@ export function Welcome() {
       ) : page === 4 ? (
         <Center>
           <Tutorial
-            title={"Encontre Clientes"}
-            text={"Encontre clientes e aumente suas receita."}
+            title={'Encontre Clientes'}
+            text={'Encontre clientes e aumente suas receita.'}
             source={FourthImage}
             alt="Duas pessoas se cumprimentando"
           />
 
           <Button
-            title={"Tudo bem, vamos lá!"}
-            onPress={() => navigation.navigate("login")}
+            title={'Tudo bem, vamos lá!'}
+            onPress={() => navigation.navigate('SignUp')}
             mb={5}
           />
         </Center>

@@ -1,11 +1,8 @@
-import { useAuth } from "@hooks/useAuth";
-import { useNavigation } from "@react-navigation/native";
-import { View, Text } from "native-base";
-import { TouchableOpacity } from "react-native";
+import { useAuth } from '@hooks/useAuth';
+import { View, Text } from 'native-base';
+import { TouchableOpacity } from 'react-native';
 
 export function HomeScreen() {
-  const navigation = useNavigation();
-
   const { signOut } = useAuth();
 
   return (

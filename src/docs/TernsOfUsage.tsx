@@ -1,4 +1,4 @@
-import { Center, TextArea } from "native-base";
+import { Center, Text } from 'native-base';
 
 export function TermsOfUsage() {
   const preFormattedText = `
@@ -60,7 +60,7 @@ Caso você tenha qualquer dúvida sobre os Termos de Uso, por favor, entre em co
 
   return (
     <Center>
-      <TextArea>{preFormattedText}</TextArea>
+      <Text>{preFormattedText}</Text>
     </Center>
   );
 }

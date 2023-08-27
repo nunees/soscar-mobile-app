@@ -1,11 +1,11 @@
-import { Platform } from "react-native";
-import { Icon, useTheme } from "native-base";
+import { Entypo } from '@expo/vector-icons';
 import {
   createBottomTabNavigator,
   BottomTabNavigationProp,
-} from "@react-navigation/bottom-tabs";
-import { HomeScreen } from "@screens/partners/HomeScreen";
-import { Entypo } from "@expo/vector-icons";
+} from '@react-navigation/bottom-tabs';
+import { HomeScreen } from '@screens/partners/HomeScreen';
+import { Icon, useTheme } from 'native-base';
+import { Platform } from 'react-native';
 
 type PartnerRoutes = {
   home: undefined;
@@ -18,7 +18,7 @@ const { Screen, Navigator } = createBottomTabNavigator<PartnerRoutes>();
 export function PartnerRoutes() {
   const { sizes, colors } = useTheme();
 
-  const iconSize = sizes["6"];
+  const iconSize = sizes['6'];
 
   return (
     <Navigator
@@ -30,7 +30,7 @@ export function PartnerRoutes() {
         tabBarStyle: {
           backgroundColor: colors.gray[600],
           borderTopWidth: 0,
-          height: Platform.OS === "android" ? "auto" : 96,
+          height: Platform.OS === 'android' ? 'auto' : 96,
           paddingBottom: sizes[10],
           paddingTop: sizes[6],
         },

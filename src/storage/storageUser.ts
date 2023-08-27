@@ -1,20 +1,20 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { IUserDTO } from '@dtos/IUserDTO';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { UserDTO } from "@dtos/UserDTO";
-import { USER_STORAGE } from "./storageConfig";
+import { USER_STORAGE } from './storageConfig';
 
-export async function storageUserSave(user: UserDTO){
+export async function storageUserSave(user: IUserDTO) {
   await AsyncStorage.setItem(USER_STORAGE, JSON.stringify(user));
 }
 
-export async function storageUserGet(){
+export async function storageUserGet() {
   const response = await AsyncStorage.getItem(USER_STORAGE);
 
-  const user: UserDTO = response ? JSON.parse(response) : {};
+  const user: IUserDTO = response ? JSON.parse(response) : {};
 
   return user;
 }
 
-export async function storageUserRemove(){
+export async function storageUserRemove() {
   await AsyncStorage.removeItem(USER_STORAGE);
 }

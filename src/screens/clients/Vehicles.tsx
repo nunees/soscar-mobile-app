@@ -1,14 +1,14 @@
-import CarSVG from "@assets//car.svg";
-import { AppHeader } from "@components/AppHeader";
-import { QuickVehicleCard } from "@components/QuickVehicleCard";
-import { IVehicleDTO } from "@dtos/IVechicleDTO";
-import { Feather } from "@expo/vector-icons";
-import { useAuth } from "@hooks/useAuth";
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
-import { AppNavigatorRoutesProps } from "@routes/app.routes";
-import { api } from "@services/api";
-import { Text, ScrollView, VStack, Icon, Fab } from "native-base";
-import { useCallback, useState } from "react";
+import CarSVG from '@assets//car.svg';
+import { AppHeader } from '@components/AppHeader';
+import { QuickVehicleCard } from '@components/QuickVehicleCard';
+import { IVehicleDTO } from '@dtos/IVechicleDTO';
+import { Feather } from '@expo/vector-icons';
+import { useAuth } from '@hooks/useAuth';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { AppNavigatorRoutesProps } from '@routes/app.routes';
+import { api } from '@services/api';
+import { Text, ScrollView, VStack, Icon, Fab } from 'native-base';
+import { useCallback, useState } from 'react';
 
 export function Vechicles() {
   const [vehicles, setVehicles] = useState<IVehicleDTO[]>([]);
@@ -19,7 +19,7 @@ export function Vechicles() {
 
   async function fetchUserVehicles() {
     try {
-      const response = await api.get("/vehicles/", {
+      const response = await api.get('/vehicles/', {
         headers: {
           id: user.id,
         },
@@ -35,7 +35,7 @@ export function Vechicles() {
   useFocusEffect(
     useCallback(() => {
       fetchUserVehicles();
-    }, [vehicles]),
+    }, [vehicles])
   );
 
   return (
@@ -62,8 +62,8 @@ export function Vechicles() {
                     ))}
                   </VStack>
                 ) : (
-                  <VStack mt={100} alignItems={"center"}>
-                    <Text textAlign={"center"} color="gray.500">
+                  <VStack mt={100} alignItems={'center'}>
+                    <Text textAlign={'center'} color="gray.500">
                       Não há veiculos cadastrados.
                     </Text>
                     <CarSVG width={300} opacity={0.5} />
@@ -81,7 +81,7 @@ export function Vechicles() {
         renderInPortal={false}
         size="md"
         colorScheme="orange"
-        onPress={() => navigation.navigate("addVehicle")}
+        onPress={() => navigation.navigate('addVehicle')}
         icon={<Icon as={Feather} name="plus" size={8} color="white" />}
       />
     </VStack>

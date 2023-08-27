@@ -1,11 +1,11 @@
-import { AppHeader } from "@components/AppHeader";
-import { Input } from "@components/Input";
-import { VehicleDTO } from "@dtos/VechicleDTO";
-import { useAuth } from "@hooks/useAuth";
-import { useRoute } from "@react-navigation/native";
-import { api } from "@services/api";
-import { ScrollView, VStack, Text, useToast, Heading } from "native-base";
-import { useEffect, useState } from "react";
+import { AppHeader } from '@components/AppHeader';
+import { Input } from '@components/Input';
+import { IVehicleDTO } from '@dtos/IVechicleDTO';
+import { useAuth } from '@hooks/useAuth';
+import { useRoute } from '@react-navigation/native';
+import { api } from '@services/api';
+import { ScrollView, VStack, Text, useToast, Heading } from 'native-base';
+import { useEffect, useState } from 'react';
 
 type RouteParamsProps = {
   vehicleId: string;
@@ -19,7 +19,7 @@ export function VehicleDetails() {
 
   const { vehicleId } = route.params as RouteParamsProps;
 
-  const [vehicle, setVehicle] = useState<VehicleDTO>({} as VehicleDTO);
+  const [vehicle, setVehicle] = useState<IVehicleDTO>({} as IVehicleDTO);
 
   async function fetchVehicleDetails() {
     try {
@@ -28,13 +28,13 @@ export function VehicleDetails() {
           id: user.id,
         },
       });
-      setVehicle(response.data as VehicleDTO);
+      setVehicle(response.data as IVehicleDTO);
       console.log(vehicle);
     } catch {
       toast.show({
-        title: "Erro ao buscar detalhes do veículo",
-        placement: "top",
-        bgColor: "red.500",
+        title: 'Erro ao buscar detalhes do veículo',
+        placement: 'top',
+        bgColor: 'red.500',
       });
     } finally {
       console.log(vehicle);
@@ -61,10 +61,10 @@ export function VehicleDetails() {
             <Input
               value={vehicle.brand?.name}
               editable={false}
-              bg={"gray.700"}
+              bg={'gray.700'}
               _focus={{
-                borderColor: "gray.700",
-                backgroundColor: "gray.700",
+                borderColor: 'gray.700',
+                backgroundColor: 'gray.700',
                 caretHidden: true,
               }}
             />
@@ -72,10 +72,10 @@ export function VehicleDetails() {
             <Input
               value={vehicle.name?.name}
               editable={false}
-              bg={"gray.700"}
+              bg={'gray.700'}
               _focus={{
-                borderColor: "gray.700",
-                backgroundColor: "gray.700",
+                borderColor: 'gray.700',
+                backgroundColor: 'gray.700',
                 caretHidden: true,
               }}
             />
@@ -84,10 +84,10 @@ export function VehicleDetails() {
             <Input
               value={vehicle.color}
               editable={false}
-              bg={"gray.700"}
+              bg={'gray.700'}
               _focus={{
-                borderColor: "gray.700",
-                backgroundColor: "gray.700",
+                borderColor: 'gray.700',
+                backgroundColor: 'gray.700',
                 caretHidden: true,
               }}
             />
@@ -96,10 +96,10 @@ export function VehicleDetails() {
             <Input
               value={String(vehicle.year)}
               editable={false}
-              bg={"gray.700"}
+              bg={'gray.700'}
               _focus={{
-                borderColor: "gray.700",
-                backgroundColor: "gray.700",
+                borderColor: 'gray.700',
+                backgroundColor: 'gray.700',
                 caretHidden: true,
               }}
             />
@@ -108,10 +108,10 @@ export function VehicleDetails() {
             <Input
               value={vehicle.plate}
               editable={false}
-              bg={"gray.700"}
+              bg={'gray.700'}
               _focus={{
-                borderColor: "gray.700",
-                backgroundColor: "gray.700",
+                borderColor: 'gray.700',
+                backgroundColor: 'gray.700',
                 caretHidden: true,
               }}
             />
@@ -120,22 +120,22 @@ export function VehicleDetails() {
             <Input
               value={String(vehicle.engineMiles)}
               editable={false}
-              bg={"gray.700"}
+              bg={'gray.700'}
               _focus={{
-                borderColor: "gray.700",
-                backgroundColor: "gray.700",
+                borderColor: 'gray.700',
+                backgroundColor: 'gray.700',
                 caretHidden: true,
               }}
             />
 
             <Text bold>Total Gasto</Text>
             <Input
-              value={"2.585, 00"}
+              value={'2.585, 00'}
               editable={false}
-              bg={"gray.700"}
+              bg={'gray.700'}
               _focus={{
-                borderColor: "gray.700",
-                backgroundColor: "gray.700",
+                borderColor: 'gray.700',
+                backgroundColor: 'gray.700',
                 caretHidden: true,
               }}
             />

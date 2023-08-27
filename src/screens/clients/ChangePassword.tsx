@@ -1,19 +1,15 @@
-import { AppHeader } from "@components/AppHeader";
-import { VStack, Text, Toast, useToast } from "native-base";
-
-import { Controller, FormState, set, useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
-import { Input } from "@components/Input";
-
-import { useState } from "react";
-import { Button } from "@components/Button";
-import { LoadingModal } from "@components/LoadingModal";
-import { api } from "@services/api";
-import { useAuth } from "@hooks/useAuth";
-import { AppError } from "@utils/AppError";
-import { useNavigation } from "@react-navigation/native";
-import { AppNavigatorRoutesProps } from "@routes/app.routes";
+import { AppHeader } from '@components/AppHeader';
+import { Button } from '@components/Button';
+import { Input } from '@components/Input';
+import { LoadingModal } from '@components/LoadingModal';
+import { useAuth } from '@hooks/useAuth';
+import { useNavigation } from '@react-navigation/native';
+import { AppNavigatorRoutesProps } from '@routes/app.routes';
+import { api } from '@services/api';
+import { AppError } from '@utils/AppError';
+import { VStack, Text, useToast } from 'native-base';
+import { useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 
 type FormDataProps = {
   oldPassword: string;
@@ -21,13 +17,13 @@ type FormDataProps = {
   confirm_password: string;
 };
 
-const profileSchema = yup.object().shape({
-  oldPassword: yup.string().required("Senha atual é obrigatória"),
-  password: yup.string().min(6, "A senha deve ter pelo menos 6 dígitos."),
-  confirm_password: yup
-    .string()
-    .oneOf([yup.ref("password")], "As senhas devem ser iguais."),
-});
+// const profileSchema = yup.object().shape({
+//   oldPassword: yup.string().required('Senha atual é obrigatória'),
+//   password: yup.string().min(6, 'A senha deve ter pelo menos 6 dígitos.'),
+//   confirm_password: yup
+//     .string()
+//     .oneOf([yup.ref('password')], 'As senhas devem ser iguais.'),
+// });
 
 export function ChangePassword() {
   const [showModal, setShowModal] = useState(false);
@@ -48,7 +44,7 @@ export function ChangePassword() {
     setShowModal(true);
     try {
       await api.put(
-        "/user/password/update",
+        '/user/password/update',
         {
           old_password: data.oldPassword,
           password: data.password,
@@ -60,19 +56,19 @@ export function ChangePassword() {
         }
       );
       toast.show({
-        title: "Senha alterada com sucesso!",
-        placement: "top",
-        bgColor: "green.500",
+        title: 'Senha alterada com sucesso!',
+        placement: 'top',
+        bgColor: 'green.500',
       });
       setShowModal(false);
-      navigation.navigate("home");
+      navigation.navigate('home');
     } catch (error) {
       setShowModal(false);
       const isAppError = error instanceof AppError;
       toast.show({
-        title: isAppError ? error.message : "Erro ao obter dados",
-        placement: "top",
-        bgColor: "red.500",
+        title: isAppError ? error.message : 'Erro ao obter dados',
+        placement: 'top',
+        bgColor: 'red.500',
       });
     } finally {
       setShowModal(false);

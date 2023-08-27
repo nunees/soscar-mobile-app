@@ -1,11 +1,11 @@
-import LoginHeaderSVG from "@assets/login/login-header.svg";
-import { Button } from "@components/Button";
-import { Input } from "@components/Input";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { useAuth } from "@hooks/useAuth";
-import { useNavigation } from "@react-navigation/native";
-import { AuthNavigatorRoutesProps } from "@routes/auth.routes";
-import { AppError } from "@utils/AppError";
+import LoginHeaderSVG from '@assets/login/login-header.svg';
+import { Button } from '@components/Button';
+import { Input } from '@components/Input';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { useAuth } from '@hooks/useAuth';
+import { useNavigation } from '@react-navigation/native';
+import { AuthNavigatorRoutesProps } from '@routes/auth.routes';
+import { AppError } from '@utils/AppError';
 import {
   Center,
   Heading,
@@ -15,11 +15,11 @@ import {
   HStack,
   ScrollView,
   Checkbox,
-} from "native-base";
-import { useState } from "react";
-import { useForm, Controller } from "react-hook-form";
-import { Pressable, TouchableOpacity } from "react-native";
-import * as yup from "yup";
+} from 'native-base';
+import { useState } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { Pressable, TouchableOpacity } from 'react-native';
+import * as yup from 'yup';
 
 type FormDataProps = {
   email: string;
@@ -27,8 +27,8 @@ type FormDataProps = {
 };
 
 const loginSchema = yup.object().shape({
-  email: yup.string().required("Informe um e-mail"),
-  password: yup.string().required("Informe uma senha"),
+  email: yup.string().required('Informe um e-mail'),
+  password: yup.string().required('Informe uma senha'),
 });
 
 export function SignIn() {
@@ -47,7 +47,7 @@ export function SignIn() {
   });
 
   function handleSignUp() {
-    navigation.navigate("SignUp");
+    navigation.navigate('SignUp');
   }
 
   async function handleSignIn({ email, password }: FormDataProps) {
@@ -56,12 +56,12 @@ export function SignIn() {
       await signIn(email, password);
     } catch (error) {
       const isAppError = error instanceof AppError;
-      const title = isAppError ? error.message : "Erro ao realizar login";
+      const title = isAppError ? error.message : 'Erro ao realizar login';
 
       toast.show({
         title,
-        placement: "top",
-        bgColor: "red.500",
+        placement: 'top',
+        bgColor: 'red.500',
       });
     } finally {
       setIsLoading(false);
@@ -84,7 +84,7 @@ export function SignIn() {
             <Controller
               control={control}
               name="email"
-              rules={{ required: "Informe seu e-mail" }}
+              rules={{ required: 'Informe seu e-mail' }}
               render={({ field: { onChange, value } }) => (
                 <Input
                   borderTopWidth={0}
@@ -104,7 +104,7 @@ export function SignIn() {
             <Controller
               control={control}
               name="password"
-              rules={{ required: "Informe sua senha" }}
+              rules={{ required: 'Informe sua senha' }}
               render={({ field: { onChange, value } }) => (
                 <Input
                   borderTopWidth={0}
@@ -121,17 +121,17 @@ export function SignIn() {
               )}
             />
 
-            <HStack justifyContent={"space-between"}>
+            <HStack justifyContent={'space-between'}>
               <Checkbox
                 colorScheme="orange"
-                value={""}
+                value={''}
                 onChange={() => {}}
                 mr={10}
               >
                 <Text fontSize="xs">Salvar credenciais</Text>
               </Checkbox>
               <TouchableOpacity>
-                <Text fontWeight={"bold"} color="orange.700" fontSize="xs">
+                <Text fontWeight={'bold'} color="orange.700" fontSize="xs">
                   Esqueci minha senha
                 </Text>
               </TouchableOpacity>

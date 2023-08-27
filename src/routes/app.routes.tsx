@@ -1,17 +1,16 @@
-import { Platform } from "react-native";
-import { Icon, Text, useTheme } from "native-base";
+import { FontAwesome, Feather, Entypo } from '@expo/vector-icons';
 import {
   createBottomTabNavigator,
   BottomTabNavigationProp,
-} from "@react-navigation/bottom-tabs";
-import { HomeScreen } from "@screens/clients/HomeScreen";
-import { FontAwesome, Feather, Entypo } from "@expo/vector-icons";
-import { Vechicles } from "@screens/clients/Vehicles";
-import { Profile } from "@screens/clients/Profile";
-import { Schedules } from "@screens/clients/Schedules";
-import { VehicleDetails } from "@screens/clients/VehicleDetails";
-import { AddVehicle } from "@screens/clients/AddVehicle";
-import { ChangePassword } from "@screens/clients/ChangePassword";
+} from '@react-navigation/bottom-tabs';
+import { AddVehicle } from '@screens/clients/AddVehicle';
+import { ChangePassword } from '@screens/clients/ChangePassword';
+import { HomeScreen } from '@screens/clients/HomeScreen';
+import { Profile } from '@screens/clients/Profile';
+import { Schedules } from '@screens/clients/Schedules';
+import { VehicleDetails } from '@screens/clients/VehicleDetails';
+import { Vechicles } from '@screens/clients/Vehicles';
+import { Icon, useTheme } from 'native-base';
 
 type AppRotes = {
   home: undefined;
@@ -29,7 +28,7 @@ export type AppNavigatorRoutesProps = BottomTabNavigationProp<AppRotes>;
 const { Screen, Navigator } = createBottomTabNavigator<AppRotes>();
 
 export function AppRoutes() {
-  const { sizes, colors, fonts } = useTheme();
+  const { colors, fonts } = useTheme();
 
   const iconSize = 5;
 
@@ -38,11 +37,11 @@ export function AppRoutes() {
       screenOptions={{
         headerShown: false,
         tabBarShowLabel: true,
-        tabBarLabelPosition: "below-icon",
+        tabBarLabelPosition: 'below-icon',
         tabBarLabelStyle: {
           fontSize: 10,
           fontFamily: fonts.body,
-          fontWeight: "bold",
+          fontWeight: 'bold',
           paddingBottom: 20,
         },
         tabBarActiveTintColor: colors.orange[700],
@@ -59,7 +58,7 @@ export function AppRoutes() {
         component={HomeScreen}
         navigationKey="home"
         options={{
-          title: "Início",
+          title: 'Início',
           tabBarIcon: ({ color }) => (
             <Icon as={Feather} name="home" size={iconSize} color={color} />
           ),
@@ -69,7 +68,7 @@ export function AppRoutes() {
         name="schedules"
         component={Schedules}
         options={{
-          title: "Agendamentos",
+          title: 'Agendamentos',
           tabBarIcon: ({ color }) => (
             <Icon as={Feather} name="calendar" size={iconSize} color={color} />
           ),
@@ -80,7 +79,7 @@ export function AppRoutes() {
         name="assistance"
         component={Schedules}
         options={{
-          title: "Assistência",
+          title: 'Assistência',
           tabBarIcon: ({ color }) => (
             <Icon as={Entypo} name="lifebuoy" size={iconSize} color={color} />
           ),
@@ -91,7 +90,7 @@ export function AppRoutes() {
         name="profile"
         component={Profile}
         options={{
-          title: "Perfil",
+          title: 'Perfil',
           tabBarIcon: ({ color }) => (
             <Icon as={FontAwesome} name="user" size={iconSize} color={color} />
           ),
