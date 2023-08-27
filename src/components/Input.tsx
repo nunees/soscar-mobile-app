@@ -2,7 +2,7 @@ import {
   Input as NativeBaseInput,
   FormControl,
   IInputProps,
-} from "native-base";
+} from 'native-base';
 
 type Props = IInputProps & {
   errorMessage?: string | null;
@@ -22,16 +22,16 @@ export function Input({ errorMessage = null, isInvalid, ...rest }: Props) {
         borderWidth={2}
         fontSize="md"
         color="gray.200"
-        fontFamily={"body"}
+        fontFamily={'body'}
         placeholderTextColor="gray.500"
         isInvalid={isInvalid}
         _invalid={{
           borderWidth: 2,
-          borderColor: "red.500",
+          borderColor: 'red.500',
         }}
         _focus={{
-          bg: "white",
-          borderColor: "orange.500",
+          bg: 'white',
+          borderColor: 'orange.500',
           borderWidth: 2,
         }}
         {...rest}

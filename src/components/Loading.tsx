@@ -1,4 +1,4 @@
-import { Spinner, Center, VStack, Text } from "native-base";
+import { Spinner, VStack, Text } from 'native-base';
 
 export function Loading() {
   return (
@@ -8,7 +8,9 @@ export function Loading() {
         accessibilityLabel="Carregando dados, aguarde"
         size={50}
       />
-      <Text>Carregando dados, aguarde</Text>
+      <Text pt={10} fontSize="md" bold>
+        Carregando dados, aguarde
+      </Text>
     </VStack>
   );
 }

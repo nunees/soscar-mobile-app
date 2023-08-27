@@ -2,7 +2,7 @@ import {
   TextArea as NativeTextArea,
   ITextAreaProps,
   FormControl,
-} from "native-base";
+} from 'native-base';
 
 type Props = ITextAreaProps & {
   errorMessage?: string | null;
@@ -19,16 +19,16 @@ export function TextArea({ errorMessage = null, ...rest }: Props) {
         borderWidth={2}
         fontSize="md"
         color="gray.200"
-        fontFamily={"body"}
+        fontFamily={'body'}
         placeholderTextColor="gray.500"
         isInvalid={invalid}
         _invalid={{
           borderWidth: 2,
-          borderColor: "red.500",
+          borderColor: 'red.500',
         }}
         _focus={{
-          bg: "white",
-          borderColor: "orange.500",
+          bg: 'white',
+          borderColor: 'orange.500',
           borderWidth: 2,
         }}
         {...rest}

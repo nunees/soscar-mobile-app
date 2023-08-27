@@ -1,14 +1,14 @@
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect } from '@react-navigation/native';
 import {
   requestForegroundPermissionsAsync,
   getCurrentPositionAsync,
   reverseGeocodeAsync,
-} from "expo-location";
-import { Text, HStack } from "native-base";
-import { useCallback, useState } from "react";
+} from 'expo-location';
+import { Text, HStack } from 'native-base';
+import { useCallback, useState } from 'react';
 
 export function UserLocation() {
-  const [address, setAddress] = useState<string>("");
+  const [address, setAddress] = useState<string>('');
 
   async function requestLocationPermission() {
     const { granted } = await requestForegroundPermissionsAsync();
@@ -23,7 +23,7 @@ export function UserLocation() {
   useFocusEffect(
     useCallback(() => {
       requestLocationPermission();
-    }, []),
+    }, [])
   );
 
   return (

@@ -1,8 +1,8 @@
-import { Heading, Icon, VStack, IIconProps, HStack, Center } from "native-base";
-import { Feather } from "@expo/vector-icons";
-import { TouchableOpacity } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import { AppNavigatorRoutesProps } from "@routes/app.routes";
+import { Feather } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { AppNavigatorRoutesProps } from '@routes/app.routes';
+import { Heading, Icon, VStack, IIconProps, HStack } from 'native-base';
+import { TouchableOpacity } from 'react-native';
 
 type Props = IIconProps & {
   title: string;
@@ -14,17 +14,17 @@ export function AppHeader({ title, icon }: Props) {
 
   return (
     <VStack mt={10} px={5}>
-      <HStack justifyContent={"flex-start"}>
+      <HStack justifyContent={'flex-start'}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Icon
             as={Feather}
-            name={icon || "arrow-left"}
+            name={icon || 'arrow-left'}
             size={8}
             color="gray.100"
           />
         </TouchableOpacity>
 
-        <Heading fontSize={"lg"} mt={2} ml={5}>
+        <Heading fontSize={'lg'} mt={2} ml={5}>
           {title}
         </Heading>
       </HStack>

@@ -1,17 +1,15 @@
-import { Text, Center, Heading, IButtonProps, IImageProps } from "native-base";
-import { Button } from "@components/Button";
-import { Image } from "react-native";
-import { ImageSourcePropType, ImageURISource } from "react-native";
+import { Button } from '@components/Button';
+import { Text, Center, Heading } from 'native-base';
+import { Image, ImageSourcePropType, ImageURISource } from 'react-native';
 
-type TutorialProps = IButtonProps &
-  IImageProps & {
-    title: string;
-    text: string;
-    btnText?: string;
-    source: ImageSourcePropType | ImageURISource;
-    alt: string;
-    nextPage?: () => void;
-  };
+type TutorialProps = {
+  title: string;
+  text: string;
+  btnText?: string;
+  source: ImageSourcePropType | ImageURISource;
+  alt: string;
+  nextPage?: () => void;
+};
 
 export function Tutorial({
   title,
@@ -20,7 +18,6 @@ export function Tutorial({
   nextPage,
   source,
   alt,
-  ...rest
 }: TutorialProps) {
   return (
     <Center mt={50}>

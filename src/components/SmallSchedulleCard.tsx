@@ -1,6 +1,6 @@
-import { Icon, VStack, Text } from "native-base";
-import { TouchableOpacity } from "react-native";
-import { Feather, Entypo } from "@expo/vector-icons";
+import { Feather, Entypo } from '@expo/vector-icons';
+import { Icon, VStack, Text } from 'native-base';
+import { TouchableOpacity } from 'react-native';
 
 export function SmallSchedulleCard() {
   return (
@@ -12,12 +12,12 @@ export function SmallSchedulleCard() {
         py={5}
         px={3}
         mb={2}
-        bg={"gray.700"}
-        flexDir={"row"}
-        justifyContent={"space-between"}
-        alignContent={"baseline"}
+        bg={'gray.700'}
+        flexDir={'row'}
+        justifyContent={'space-between'}
+        alignContent={'baseline'}
       >
-        <Icon as={Feather} name="calendar" size={10} color={"gray.400"} />
+        <Icon as={Feather} name="calendar" size={10} color={'gray.400'} />
         <VStack mr={10}>
           <Text bold>13/05/2023</Text>
           <Text>13:15</Text>
@@ -28,7 +28,7 @@ export function SmallSchedulleCard() {
           <Text>Renato</Text>
         </VStack>
 
-        <Icon as={Entypo} name="location-pin" size={10} color={"gray.400"} />
+        <Icon as={Entypo} name="location-pin" size={10} color={'gray.400'} />
       </VStack>
     </TouchableOpacity>
   );

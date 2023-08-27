@@ -1,4 +1,4 @@
-import { IModalProps, Modal, Spinner, VStack, Text } from "native-base";
+import { IModalProps, Modal, Spinner, VStack, Text } from 'native-base';
 
 type Props = IModalProps & {
   message?: string | undefined;

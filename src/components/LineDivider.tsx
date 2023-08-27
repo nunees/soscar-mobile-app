@@ -1,14 +1,14 @@
-import { Box, HStack, IBoxProps } from "native-base";
+import { Box, HStack, IBoxProps } from 'native-base';
 
 type Props = IBoxProps & {
   color?: string;
 };
 
-export function LineDivider({ color = "gray.700", ...rest }: Props) {
+export function LineDivider({ color = 'gray.700', ...rest }: Props) {
   return (
     <HStack>
       <Box
-        w={"100%"}
+        w={'100%'}
         h={1}
         backgroundColor={color}
         mt={5}

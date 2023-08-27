@@ -1,21 +1,20 @@
-import ProfilePicture from "@assets/profile.png";
-import { AppHeader } from "@components/AppHeader";
-import { Button } from "@components/Button";
-import { Input } from "@components/Input";
-import { LineDivider } from "@components/LineDivider";
-import { LoadingModal } from "@components/LoadingModal";
-import { UserPhoto } from "@components/UserPhoto";
-import { Entypo } from "@expo/vector-icons";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { useAuth } from "@hooks/useAuth";
-import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
-import { AppNavigatorRoutesProps } from "@routes/app.routes";
-import { api } from "@services/api";
-import { AppError } from "@utils/AppError";
-import * as FileSystem from "expo-file-system";
-import { FileInfo } from "expo-file-system";
-import * as ImagePicker from "expo-image-picker";
+import { AppHeader } from '@components/AppHeader';
+import { Button } from '@components/Button';
+import { Input } from '@components/Input';
+import { LineDivider } from '@components/LineDivider';
+import { LoadingModal } from '@components/LoadingModal';
+import { UserPhoto } from '@components/UserPhoto';
+import { Entypo } from '@expo/vector-icons';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { useAuth } from '@hooks/useAuth';
+import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
+import { useNavigation } from '@react-navigation/native';
+import { AppNavigatorRoutesProps } from '@routes/app.routes';
+import { api } from '@services/api';
+import { AppError } from '@utils/AppError';
+import { FileInfo } from 'expo-file-system';
+import * as FileSystem from 'expo-file-system';
+import * as ImagePicker from 'expo-image-picker';
 import {
   Text,
   ScrollView,
@@ -26,10 +25,10 @@ import {
   Pressable,
   Heading,
   useToast,
-} from "native-base";
-import { useCallback, useEffect, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
-import * as yup from "yup";
+} from 'native-base';
+import { useEffect, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import * as yup from 'yup';
 
 const PHOTO_SIZE = 33;
 
@@ -41,27 +40,27 @@ type FormDataProps = {
 };
 
 const profileSchema = yup.object().shape({
-  name: yup.string().required("Nome é obrigatório"),
-  lastName: yup.string().required("Sobrenome é obrigatório"),
-  phone: yup.string().required("Telefone é obrigatório"),
-  username: yup.string().required("Nome de usuário é obrigatório"),
+  name: yup.string().required('Nome é obrigatório'),
+  lastName: yup.string().required('Sobrenome é obrigatório'),
+  phone: yup.string().required('Telefone é obrigatório'),
+  username: yup.string().required('Nome de usuário é obrigatório'),
 });
 
 export function Profile() {
   const { user, signOut, updateUserProfile } = useAuth();
   const [showModal, setShowModal] = useState(false);
 
-  const [date, setDate] = useState("");
+  const [date, setDate] = useState('');
   const [serverDate, setServerDate] = useState<Date | null>(null);
 
   const [isPhotoLoading, setIsPhotoLoading] = useState(false);
 
-  const [lastName, setLastName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [cpf, setCpf] = useState("");
-  const [email, setEmail] = useState("");
+  const [lastName, setLastName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [cpf, setCpf] = useState('');
+  const [email, setEmail] = useState('');
 
-  const [birth_date, setBirthDate] = useState("");
+  const [birth_date, setBirthDate] = useState('');
 
   const toast = useToast();
 
@@ -105,18 +104,18 @@ export function Profile() {
 
       if (photoSelected.assets[0].uri) {
         const photoInfo = (await FileSystem.getInfoAsync(
-          photoSelected.assets[0].uri,
+          photoSelected.assets[0].uri
         )) as FileInfo;
 
         if (photoInfo?.size && photoInfo.size / 1021 / 1024 > 5) {
           toast.show({
-            title: "A imagem deve ter no máximo 5MB",
-            placement: "top",
-            bgColor: "red.500",
+            title: 'A imagem deve ter no máximo 5MB',
+            placement: 'top',
+            bgColor: 'red.500',
           });
         }
 
-        const fileExtension = photoSelected.assets[0].uri.split(".").pop();
+        const fileExtension = photoSelected.assets[0].uri.split('.').pop();
 
         const photoFile = {
           name: `${user.username}.${fileExtension}`.toLowerCase(),
@@ -126,17 +125,17 @@ export function Profile() {
         } as any;
 
         const userPhotoUploadForm = new FormData();
-        userPhotoUploadForm.append("avatar", photoFile);
+        userPhotoUploadForm.append('avatar', photoFile);
 
         const avatarResponse = await api.patch(
-          "/user/avatar",
+          '/user/avatar',
           userPhotoUploadForm,
           {
             headers: {
               id: user.id,
-              "Content-Type": "multipart/form-data",
+              'Content-Type': 'multipart/form-data',
             },
-          },
+          }
         );
 
         const userUpdated = user;
@@ -144,19 +143,19 @@ export function Profile() {
         updateUserProfile(userUpdated);
 
         toast.show({
-          title: "Foto atualizada",
-          placement: "top",
-          bgColor: "green.500",
+          title: 'Foto atualizada',
+          placement: 'top',
+          bgColor: 'green.500',
         });
         setIsPhotoLoading(false);
       }
     } catch (error) {
       const isAppError = error instanceof AppError;
-      const title = isAppError ? error.message : "Erro na atualização";
+      const title = isAppError ? error.message : 'Erro na atualização';
       toast.show({
         title,
-        placement: "top",
-        bgColor: "red.500",
+        placement: 'top',
+        bgColor: 'red.500',
       });
     } finally {
       setIsPhotoLoading(false);
@@ -166,7 +165,7 @@ export function Profile() {
   async function fetchProfile() {
     setShowModal(true);
     try {
-      const response = await api.get("/user/profile", {
+      const response = await api.get('/user/profile', {
         headers: {
           id: user.id,
         },
@@ -179,15 +178,15 @@ export function Profile() {
       setPhone(mobile_phone);
       setEmail(email);
       setBirthDate(
-        new Date(birth_date.split("T")[0]).toLocaleDateString("pt-BR"),
+        new Date(birth_date.split('T')[0]).toLocaleDateString('pt-BR')
       );
     } catch (error) {
       setShowModal(false);
       const isAppError = error instanceof AppError;
       toast.show({
-        title: isAppError ? error.message : "Erro ao obter dados",
-        placement: "top",
-        bgColor: "red.500",
+        title: isAppError ? error.message : 'Erro ao obter dados',
+        placement: 'top',
+        bgColor: 'red.500',
       });
     } finally {
       setShowModal(false);
@@ -202,7 +201,7 @@ export function Profile() {
       userUpdated.username = data.username;
 
       await api.patch(
-        "/user",
+        '/user',
         {
           name: data.name,
           last_name: data.lastName,
@@ -214,22 +213,22 @@ export function Profile() {
           headers: {
             id: user.id,
           },
-        },
+        }
       );
 
       await updateUserProfile(userUpdated);
       toast.show({
-        title: "Perfil atualizado",
-        placement: "top",
-        bgColor: "green.500",
+        title: 'Perfil atualizado',
+        placement: 'top',
+        bgColor: 'green.500',
       });
     } catch (error) {
       setShowModal(false);
       const isAppError = error instanceof AppError;
       toast.show({
-        title: isAppError ? error.message : "Erro ao obter dados",
-        placement: "top",
-        bgColor: "red.500",
+        title: isAppError ? error.message : 'Erro ao obter dados',
+        placement: 'top',
+        bgColor: 'red.500',
       });
     } finally {
       setShowModal(false);
@@ -263,15 +262,14 @@ export function Profile() {
               <Skeleton
                 w={PHOTO_SIZE}
                 height={PHOTO_SIZE}
-                rounded={"full"}
-                startColor={"orange.400"}
-                endColor={"orange.900"}
+                rounded={'full'}
+                startColor={'orange.400'}
+                endColor={'orange.900'}
               />
             ) : (
               <UserPhoto
-                defaultSource={user.avatar ? ProfilePicture : undefined}
                 source={{
-                  uri: `${api.defaults.baseURL}/user/avatar/${user.id}`,
+                  uri: `${api.defaults.baseURL}/user/avatar/${user.id}/${user.avatar}`,
                 }}
                 alt="Foto de perfil"
                 size={PHOTO_SIZE}
@@ -289,7 +287,7 @@ export function Profile() {
               alignItems="center"
               shadow={3}
               onPress={handleUserProfilePictureSelect}
-              _pressed={{ backgroundColor: "orange.600" }}
+              _pressed={{ backgroundColor: 'orange.600' }}
             >
               <Icon as={Entypo} name="edit" size="lg" color="white" />
             </Pressable>
@@ -345,7 +343,7 @@ export function Profile() {
               editable={false}
               caretHidden={true}
               backgroundColor="gray.700"
-              borderBottomColor={"gray.700"}
+              borderBottomColor={'gray.700'}
             />
 
             <Text bold fontSize="xs">
@@ -373,7 +371,7 @@ export function Profile() {
               editable={false}
               caretHidden={true}
               backgroundColor="gray.700"
-              borderBottomColor={"gray.700"}
+              borderBottomColor={'gray.700'}
             />
 
             <Text bold fontSize="xs">
@@ -402,7 +400,7 @@ export function Profile() {
               caretHidden
               onPressIn={() => {
                 DateTimePickerAndroid.open({
-                  mode: "date",
+                  mode: 'date',
                   value: new Date(),
                   onChange: (event, date) => handleDate(date as Date),
                 });
@@ -419,7 +417,7 @@ export function Profile() {
               isLoading={showModal}
               title="Alterar senha"
               mt={10}
-              onPress={() => navigation.navigate("changePassword")}
+              onPress={() => navigation.navigate('changePassword')}
             />
           </VStack>
         </ScrollView>
