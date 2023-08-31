@@ -18,6 +18,7 @@ import { UserPhoto } from '@components/UserPhoto';
 import { IVehicleDTO } from '@dtos/IVechicleDTO';
 import { Feather, Entypo } from '@expo/vector-icons';
 import { useAuth } from '@hooks/useAuth';
+import { useProfile } from '@hooks/useProfile';
 import { useNavigation } from '@react-navigation/native';
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
 import { api } from '@services/api';
@@ -39,6 +40,9 @@ export function HomeScreen() {
   const [vehicles, setVehicles] = useState<IVehicleDTO[]>([]);
 
   const { user } = useAuth();
+  const { profile } = useProfile();
+
+  console.log({ profile });
 
   const navigation = useNavigation<AppNavigatorRoutesProps>();
 

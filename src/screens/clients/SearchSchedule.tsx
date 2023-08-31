@@ -18,7 +18,12 @@ export function SearchSchedule() {
       </VStack>
 
       <PartnerCard
-        onPress={() => navigation.navigate('partnerDetails', { partnerId: 1 })}
+        onPress={() =>
+          navigation.navigate('partnerDetails', {
+            partnerId: '1',
+            typeofService: 'schedule',
+          })
+        }
       />
     </VStack>
   );

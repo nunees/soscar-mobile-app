@@ -2,6 +2,8 @@ import ProfilePicture from '@assets/profile.png';
 import { AppHeader } from '@components/AppHeader';
 import { Button } from '@components/Button';
 import { Feather, Entypo } from '@expo/vector-icons';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { AppNavigatorRoutesProps } from '@routes/app.routes';
 import {
   ScrollView,
   Text,
@@ -12,7 +14,17 @@ import {
   Icon,
 } from 'native-base';
 
+type RouteParamsProps = {
+  partnerId: string;
+  typeofService: string;
+};
+
 export function PartnerDetails() {
+  const navigation = useNavigation<AppNavigatorRoutesProps>();
+  const routes = useRoute();
+
+  const { partnerId, typeofService } = routes.params as RouteParamsProps;
+
   return (
     <VStack pb={10}>
       <VStack mb={10}>
@@ -46,7 +58,21 @@ export function PartnerDetails() {
         </VStack>
 
         <VStack px={5} mt={5}>
-          <Button title="Agendar" onPress={() => null} />
+          {typeofService === 'quote' ? (
+            <Button
+              title="Realizar orçamento"
+              onPress={() =>
+                navigation.navigate('newSchedule', { partnerId: '1' })
+              }
+            />
+          ) : (
+            <Button
+              title="Agendar"
+              onPress={() =>
+                navigation.navigate('newSchedule', { partnerId: '1' })
+              }
+            />
+          )}
         </VStack>
 
         <VStack px={5} mt={5}>

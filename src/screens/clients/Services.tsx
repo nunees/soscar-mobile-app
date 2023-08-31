@@ -23,6 +23,7 @@ export function Services() {
         icon="file-text"
         title={'Orçamento de  serviços'}
         text={'Agende seus serviços sem sair de casa'}
+        onPress={() => navigation.navigate('quotes')}
       />
       <ServiceCardTypes
         icon="briefcase"

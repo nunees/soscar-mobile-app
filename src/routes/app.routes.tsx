@@ -6,9 +6,12 @@ import {
 import { AddVehicle } from '@screens/clients/AddVehicle';
 import { ChangePassword } from '@screens/clients/ChangePassword';
 import { HomeScreen } from '@screens/clients/HomeScreen';
+import { NewSchedule } from '@screens/clients/NewSchedule';
 import { PartnerDetails } from '@screens/clients/PartnerDetails';
 import { Profile } from '@screens/clients/Profile';
+import { Quotes } from '@screens/clients/Quotes';
 import { Schedules } from '@screens/clients/Schedules';
+import { SearchQuote } from '@screens/clients/SearchQuote';
 import { SearchSchedule } from '@screens/clients/SearchSchedule';
 import { Services } from '@screens/clients/Services';
 import { VehicleDetails } from '@screens/clients/VehicleDetails';
@@ -26,7 +29,10 @@ type AppRotes = {
   services: undefined;
   schedules: undefined;
   searchSchedule: { serviceId: string };
-  partnerDetails: { partnerId: string };
+  partnerDetails: { partnerId: string; typeofService: string };
+  newSchedule: { partnerId: string };
+  quotes: undefined;
+  searchQuote: { serviceId: string };
 };
 
 export type AppNavigatorRoutesProps = BottomTabNavigationProp<AppRotes>;
@@ -36,7 +42,7 @@ const { Screen, Navigator } = createBottomTabNavigator<AppRotes>();
 export function AppRoutes() {
   const { colors, fonts } = useTheme();
 
-  const iconSize = 5;
+  const iconSize = 8;
 
   return (
     <Navigator
@@ -48,7 +54,7 @@ export function AppRoutes() {
           fontSize: 10,
           fontFamily: fonts.body,
           fontWeight: 'bold',
-          paddingBottom: 20,
+          paddingBottom: 10,
         },
         tabBarActiveTintColor: colors.orange[700],
         tabBarInactiveTintColor: colors.gray[500],
@@ -100,6 +106,12 @@ export function AppRoutes() {
       />
 
       <Screen
+        name="newSchedule"
+        component={NewSchedule}
+        options={{ tabBarButton: () => null }}
+      />
+
+      <Screen
         name="assistance"
         component={Schedules}
         options={{
@@ -142,6 +154,18 @@ export function AppRoutes() {
       <Screen
         name="changePassword"
         component={ChangePassword}
+        options={{ tabBarButton: () => null }}
+      />
+
+      <Screen
+        name="quotes"
+        component={Quotes}
+        options={{ tabBarButton: () => null }}
+      />
+
+      <Screen
+        name="searchQuote"
+        component={SearchQuote}
         options={{ tabBarButton: () => null }}
       />
     </Navigator>

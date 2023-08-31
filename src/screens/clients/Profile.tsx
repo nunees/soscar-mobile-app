@@ -27,7 +27,7 @@ import {
   Heading,
   useToast,
 } from 'native-base';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
@@ -211,6 +211,27 @@ export function Profile() {
       setShowModal(false);
     }
   }
+
+  async function loadData() {
+    if (!profile.last_name) {
+      const response = await api.get('/user/profile', {
+        headers: {
+          id: user.id,
+        },
+      });
+
+      profile.name = response.data.name;
+      profile.last_name = response.data.last_name;
+      profile.phone = response.data.mobile_phone;
+      profile.birth_date = response.data.birth_date;
+      profile.cpf = response.data.cpf;
+      await updateProfile(profile);
+    }
+  }
+
+  useEffect(() => {
+    loadData();
+  }, []);
 
   return (
     <VStack>
