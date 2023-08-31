@@ -4,7 +4,6 @@ import { Button } from '@components/Button';
 import { Input } from '@components/Input';
 import { LineDivider } from '@components/LineDivider';
 import { Select } from '@components/Select';
-import { IGenderDTO } from '@dtos/IGenderDTO';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useAuth } from '@hooks/useAuth';
 import { useProfile } from '@hooks/useProfile';
@@ -26,6 +25,8 @@ import { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { Alert, TouchableOpacity } from 'react-native';
 import * as yup from 'yup';
+
+import { genders } from '../data/genders';
 
 type FormDataProps = {
   email: string;
@@ -55,9 +56,7 @@ const registrationSchema = yup.object().shape({
 
 export function SignUp() {
   const [isLoading, setIsLoading] = useState(false);
-  const [allGenders, setAllGenders] = useState<IGenderDTO[]>(
-    {} as IGenderDTO[]
-  );
+  const [allGenders] = useState(genders);
   const [selectedGender, setSelectedGender] = useState(0);
 
   const [date, setDate] = useState('');
@@ -151,25 +150,6 @@ export function SignUp() {
 
     setIsLoading(false);
   }
-
-  async function getGenders() {
-    try {
-      const response = await api.get('/data/genders');
-      setAllGenders(response.data);
-    } catch (error) {
-      const isAppError = error instanceof AppError;
-      const title = isAppError ? error.message : 'Erro ao obter gêneros';
-      toast.show({
-        title,
-        placement: 'top',
-        bgColor: 'red.500',
-      });
-    }
-  }
-
-  useEffect(() => {
-    getGenders();
-  }, []);
 
   return (
     <ScrollView
@@ -305,18 +285,17 @@ export function SignUp() {
               />
 
               <Select
-                label="Sexo"
-                data={
-                  allGenders
-                    ? allGenders.map((gender) => {
-                        return {
-                          label: gender.name,
-                          value: gender.id,
-                        };
-                      })
-                    : {}
+                data={allGenders.map((item) => {
+                  return { label: item.name, value: item.id };
+                })}
+                label={
+                  selectedGender
+                    ? allGenders.find((item) => item.id === selectedGender)
+                        ?.name
+                    : 'Gênero'
                 }
                 onValueChange={(value) => setSelectedGender(Number(value))}
+                key={allGenders.find((item) => item.id === selectedGender)?.id}
               />
 
               <Controller

@@ -1,7 +1,7 @@
 import { Select as SelectNative, ISelectProps } from 'native-base';
 
 type Props = ISelectProps & {
-  label: string;
+  label: string | undefined;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any;
 };
