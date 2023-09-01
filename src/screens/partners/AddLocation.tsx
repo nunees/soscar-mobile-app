@@ -127,28 +127,10 @@ export function AddLocation() {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } as any;
 
-        const userPhotoUploadForm = new FormData();
-        userPhotoUploadForm.append('avatar', photoFile);
-
-        setPhotos([...photos, photoSelected.assets[0]]);
-
-        // const avatarResponse = await api.patch(
-        //   '/user/avatar',
-        //   userPhotoUploadForm,
-        //   {
-        //     headers: {
-        //       id: user.id,
-        //       'Content-Type': 'multipart/form-data',
-        //     },
-        //   }
-        // );
-
-        // const userUpdated = user;
-        // userUpdated.avatar = avatarResponse.data.avatar;
-        // updateUserAuth(userUpdated);
+        setPhotos([...photos, photoFile]);
 
         toast.show({
-          title: 'Foto atualizada',
+          title: 'Foto adicionada',
           placement: 'top',
           bgColor: 'green.500',
         });
@@ -162,51 +144,55 @@ export function AddLocation() {
         placement: 'top',
         bgColor: 'red.500',
       });
+      setIsPhotoLoading(false);
     } finally {
       setIsPhotoLoading(false);
     }
   }
 
-  // function deletePhoto(id: number) {
-  //   const newPhotos = photos.filter((photo, index) => index !== id);
-  //   setPhotos(newPhotos);
-  // }
-
   async function handleSubmitBusiness() {
     try {
-      const response = await api.post(
-        '/locations',
-        {
-          cnpj,
-          business_name: businessName,
-          business_phone: businessPhone,
-          business_email: businessPhone,
-          address_line: addressLine,
-          number,
-          city,
-          district,
-          state,
-          zipcode: zipCode,
-          payment_methods: selectedPaymentMethods,
-          business_categories: selectedBusinessServices,
-          business_description: businessDescription,
-        },
-        {
-          headers: {
-            id: user.id,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      // const response = await api.post(
+      //   '/locations',
+      //   {
+      //     cnpj,
+      //     business_name: businessName,
+      //     business_phone: businessPhone,
+      //     business_email: businessPhone,
+      //     address_line: addressLine,
+      //     number: Number(number),
+      //     city,
+      //     district,
+      //     state,
+      //     zipcode: zipCode,
+      //     payment_methods: selectedPaymentMethods,
+      //     business_categories: selectedBusinessServices,
+      //     business_description: businessDescription,
+      //   },
+      //   {
+      //     headers: {
+      //       id: user.id,
+      //     },
+      //   }
+      // );
 
-      if (photos.length > 0) {
-        await api.patch(`/locations/${response.data.id}/photos`, photos, {
+      // if (photos.length > 0) {
+      await api.patch(
+        `/locations/8da90eec-c3fc-4a11-93eb-9f0bb82a27f4/upload`,
+        {},
+        {
           headers: {
             id: user.id,
             'Content-Type': 'multipart/form-data',
           },
-        });
-      }
+        }
+      );
+      // }
+      toast.show({
+        title: 'Fotos enviadas',
+        placement: 'top',
+        bgColor: 'green.500',
+      });
     } catch (error) {
       const isAppError = error instanceof AppError;
       const title = isAppError ? error.message : 'Erro ao realizar cadastro';
