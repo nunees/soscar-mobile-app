@@ -4,14 +4,14 @@ import { AppError } from '@utils/AppError';
 import { IFileInfo } from 'expo-file-system';
 import * as FileSystem from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';
-import { HStack, useToast, Image, VStack, Modal, Center } from 'native-base';
+import { HStack, useToast, Image, VStack, Modal } from 'native-base';
 import { useState } from 'react';
 import { TouchableOpacity } from 'react-native';
 
 export function AddPhoto() {
   const [photos, setPhotos] = useState<ImagePicker.ImagePickerAsset[]>([]);
   const [showModal, setShowModal] = useState(false);
-  const [isPhotoLoading, setIsPhotoLoading] = useState(false);
+  const [setIsPhotoLoading] = useState(false);
 
   const toast = useToast();
 
@@ -91,11 +91,6 @@ export function AddPhoto() {
     } finally {
       setIsPhotoLoading(false);
     }
-  }
-
-  function deletePhoto(id: number) {
-    const newPhotos = photos.filter((photo, index) => index !== id);
-    setPhotos(newPhotos);
   }
 
   return (

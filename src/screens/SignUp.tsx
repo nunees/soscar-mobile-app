@@ -21,7 +21,7 @@ import {
   useToast,
   Checkbox,
 } from 'native-base';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { Alert, TouchableOpacity } from 'react-native';
 import * as yup from 'yup';

@@ -18,8 +18,6 @@ import {
 import { TouchableOpacity } from 'react-native';
 
 export function HomeScreen() {
-  const { signOut } = useAuth();
-
   const { user } = useAuth();
   const navigation = useNavigation<PartnerNavigatorRoutesProps>();
 

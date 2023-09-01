@@ -1,7 +1,7 @@
 import { Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
-import { Heading, Icon, VStack, IIconProps, HStack, Text } from 'native-base';
+import { Icon, VStack, IIconProps, HStack, Text } from 'native-base';
 import { TouchableOpacity } from 'react-native';
 
 type Props = IIconProps & {
@@ -24,9 +24,9 @@ export function AppHeader({ title, icon }: Props) {
           />
         </TouchableOpacity>
 
-        <Heading ml={5} textAlign="center">
+        <Text bold ml={5} mt={1} textAlign="center" fontSize="md">
           {title}
-        </Heading>
+        </Text>
       </HStack>
     </VStack>
   );
