@@ -1,5 +1,5 @@
 export interface ILocation {
-  id?: string;
+  id: string;
   user_id?: string;
   location_id?: string;
   cnpj: string;
@@ -15,4 +15,5 @@ export interface ILocation {
   payment_methods: number[];
   business_categories: number[];
   business_description: string | null;
+  photos: string[];
 }

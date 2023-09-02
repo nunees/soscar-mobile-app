@@ -4,7 +4,9 @@ import {
   BottomTabNavigationProp,
 } from '@react-navigation/bottom-tabs';
 import { AddLocation } from '@screens/partners/AddLocation';
+import { EditLocation } from '@screens/partners/EditLocation';
 import { HomeScreen } from '@screens/partners/HomeScreen';
+import { LocationDetails } from '@screens/partners/LocationDetails';
 import { Locations } from '@screens/partners/Locations';
 import { Icon, useTheme } from 'native-base';
 
@@ -12,6 +14,8 @@ type PartnerRoutes = {
   home: undefined;
   locations: undefined;
   addLocation: undefined;
+  locationDetails: { locationId: string };
+  editLocation: { locationId: string };
 };
 
 export type PartnerNavigatorRoutesProps =
@@ -70,6 +74,18 @@ export function PartnerRoutes() {
       <Screen
         name="addLocation"
         component={AddLocation}
+        options={{ tabBarButton: () => null }}
+      />
+
+      <Screen
+        name="locationDetails"
+        component={LocationDetails}
+        options={{ tabBarButton: () => null }}
+      />
+
+      <Screen
+        name="editLocation"
+        component={EditLocation}
         options={{ tabBarButton: () => null }}
       />
     </Navigator>

@@ -2,7 +2,7 @@ import { Spinner, VStack, Text } from 'native-base';
 
 export function Loading() {
   return (
-    <VStack alignItems="center" mt={300}>
+    <VStack alignItems="center" flex={1} w={'full'} h={'full'}>
       <Spinner
         color="orange.500"
         accessibilityLabel="Carregando dados, aguarde"

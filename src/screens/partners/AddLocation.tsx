@@ -1,26 +1,15 @@
 import { AppHeader } from '@components/AppHeader';
 import { Button } from '@components/Button';
 import { Input } from '@components/Input';
+import { LoadingModal } from '@components/LoadingModal';
 import { TextArea } from '@components/TextArea';
 import { useAuth } from '@hooks/useAuth';
+import { useNavigation } from '@react-navigation/native';
+import { PartnerNavigatorRoutesProps } from '@routes/partner.routes';
 import { api } from '@services/api';
 import { AppError } from '@utils/AppError';
-import { IFileInfo } from 'expo-file-system';
-import * as FileSystem from 'expo-file-system';
-import { ImagePickerAsset } from 'expo-image-picker';
-import * as ImagePicker from 'expo-image-picker';
-import {
-  ScrollView,
-  VStack,
-  Text,
-  Checkbox,
-  useToast,
-  HStack,
-  Image,
-  Modal,
-} from 'native-base';
+import { ScrollView, VStack, Text, Checkbox, useToast } from 'native-base';
 import { useState } from 'react';
-import { TouchableOpacity } from 'react-native';
 
 export function AddLocation() {
   const [paymentMethods] = useState([
@@ -64,12 +53,13 @@ export function AddLocation() {
   >([]);
   const [businessDescription, setBusinessDescription] = useState('');
 
-  const [photos, setPhotos] = useState<ImagePickerAsset[]>([]);
-  const [isPhotoLoading, setIsPhotoLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
   const { user } = useAuth();
   const toast = useToast();
+  const navigation = useNavigation<PartnerNavigatorRoutesProps>();
+
+  const [isUploading, setIsUploading] = useState(false);
 
   function setPaymentMethodsHandler(value: number) {
     setSelectedPaymentMethods((prevState) => {
@@ -91,108 +81,39 @@ export function AddLocation() {
     });
   }
 
-  async function handleUserProfilePictureSelect() {
-    try {
-      setIsPhotoLoading(true);
-      const photoSelected = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        quality: 1,
-        aspect: [4, 4],
-        allowsEditing: true,
-      });
-
-      if (photoSelected.canceled) {
-        return;
-      }
-
-      if (photoSelected.assets[0].uri) {
-        const photoInfo = (await FileSystem.getInfoAsync(
-          photoSelected.assets[0].uri
-        )) as IFileInfo;
-
-        if (photoInfo?.size && photoInfo.size / 1021 / 1024 > 5) {
-          toast.show({
-            title: 'A imagem deve ter no máximo 5MB',
-            placement: 'top',
-            bgColor: 'red.500',
-          });
-        }
-
-        const fileExtension = photoSelected.assets[0].uri.split('.').pop();
-
-        const photoFile = {
-          name: `${user.username}.${fileExtension}`.toLowerCase(),
-          uri: photoSelected.assets[0].uri,
-          type: `${photoSelected.assets[0].type}/${fileExtension}`,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } as any;
-
-        setPhotos([...photos, photoFile]);
-
-        toast.show({
-          title: 'Foto adicionada',
-          placement: 'top',
-          bgColor: 'green.500',
-        });
-        setIsPhotoLoading(false);
-      }
-    } catch (error) {
-      const isAppError = error instanceof AppError;
-      const title = isAppError ? error.message : 'Erro na atualização';
-      toast.show({
-        title,
-        placement: 'top',
-        bgColor: 'red.500',
-      });
-      setIsPhotoLoading(false);
-    } finally {
-      setIsPhotoLoading(false);
-    }
-  }
-
   async function handleSubmitBusiness() {
     try {
-      // const response = await api.post(
-      //   '/locations',
-      //   {
-      //     cnpj,
-      //     business_name: businessName,
-      //     business_phone: businessPhone,
-      //     business_email: businessPhone,
-      //     address_line: addressLine,
-      //     number: Number(number),
-      //     city,
-      //     district,
-      //     state,
-      //     zipcode: zipCode,
-      //     payment_methods: selectedPaymentMethods,
-      //     business_categories: selectedBusinessServices,
-      //     business_description: businessDescription,
-      //   },
-      //   {
-      //     headers: {
-      //       id: user.id,
-      //     },
-      //   }
-      // );
-
-      // if (photos.length > 0) {
-      await api.patch(
-        `/locations/8da90eec-c3fc-4a11-93eb-9f0bb82a27f4/upload`,
-        {},
+      setIsUploading(true);
+      const response = await api.post(
+        '/locations',
+        {
+          cnpj,
+          business_name: businessName,
+          business_phone: businessPhone,
+          business_email: businessPhone,
+          address_line: addressLine,
+          number: Number(number),
+          city,
+          district,
+          state,
+          zipcode: zipCode,
+          payment_methods: selectedPaymentMethods,
+          business_categories: selectedBusinessServices,
+          business_description: businessDescription,
+        },
         {
           headers: {
             id: user.id,
-            'Content-Type': 'multipart/form-data',
           },
         }
       );
-      // }
       toast.show({
-        title: 'Fotos enviadas',
+        title: response.data.message,
         placement: 'top',
         bgColor: 'green.500',
       });
+      setIsUploading(false);
+      navigation.navigate('locations');
     } catch (error) {
       const isAppError = error instanceof AppError;
       const title = isAppError ? error.message : 'Erro ao realizar cadastro';
@@ -201,6 +122,8 @@ export function AddLocation() {
         placement: 'top',
         bgColor: 'red.500',
       });
+    } finally {
+      setIsUploading(false);
     }
   }
 
@@ -209,6 +132,14 @@ export function AddLocation() {
       <VStack>
         <AppHeader title="Adicionar Local" />
       </VStack>
+
+      {isUploading && (
+        <LoadingModal
+          showModal={showModal}
+          setShowModal={setShowModal}
+          message="Salvando dados, aguarde..."
+        />
+      )}
 
       <VStack>
         <ScrollView
@@ -300,7 +231,7 @@ export function AddLocation() {
               value={businessDescription}
               onChangeText={setBusinessDescription}
             />
-            <VStack>
+            {/* <VStack>
               <Text fontSize="md" pb={5} bold>
                 Adicione fotos do local
               </Text>
@@ -344,8 +275,8 @@ export function AddLocation() {
                   onPress={handleUserProfilePictureSelect}
                 />
               </VStack>
-            </VStack>
-            <Button title="Salvar" onPress={handleSubmitBusiness} mt={100} />
+            </VStack> */}
+            <Button title="Salvar" onPress={handleSubmitBusiness} mt={150} />
           </VStack>
         </ScrollView>
       </VStack>
