@@ -10,8 +10,17 @@ import { AppError } from '@utils/AppError';
 import { IFileInfo } from 'expo-file-system';
 import * as FileSystem from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';
-import { VStack, Text, useToast, ScrollView, HStack, Icon } from 'native-base';
+import {
+  VStack,
+  Text,
+  useToast,
+  ScrollView,
+  HStack,
+  Icon,
+  Image,
+} from 'native-base';
 import { useEffect, useState } from 'react';
+import { TouchableOpacity } from 'react-native';
 
 type RouteParamsProps = {
   locationId: string;
@@ -109,8 +118,8 @@ export function LocationDetails() {
         const userPhotoUploadForm = new FormData();
         userPhotoUploadForm.append('photo', photoFile);
 
-        await api.post(
-          `/locations/upload/${location.id}`,
+        await api.patch(
+          `/locations/upload/new/${location.id}`,
           userPhotoUploadForm,
           {
             headers: {
@@ -137,6 +146,30 @@ export function LocationDetails() {
       });
     } finally {
       setIsPhotoLoading(false);
+      await handleFetchLocationDetails();
+    }
+  }
+
+  async function deletePhoto(photo: string) {
+    try {
+      const response = await api.delete(`/locations/photo/${photo}`, {
+        headers: {
+          id: user.id,
+        },
+      });
+
+      toast.show({
+        title: response.data.message ?? 'Foto deletada',
+        placement: 'top',
+        bgColor: 'green.500',
+      });
+      await handleFetchLocationDetails();
+    } catch (error) {
+      toast.show({
+        title: 'Erro ao deletar foto',
+        placement: 'top',
+        bgColor: 'red.500',
+      });
     }
   }
 
@@ -344,15 +377,58 @@ export function LocationDetails() {
                     );
                   })}
 
-                {location.photos?.length === 0 && (
+                {location.LocationsPhotos?.length === 0 ? (
                   <VStack mb={5}>
                     <Text>
                       Adicione fotos ao seu local e atraia mais clientes
                     </Text>
                   </VStack>
+                ) : (
+                  <VStack mb={5}>
+                    {location.LocationsPhotos?.map((photo) => (
+                      <VStack mb={5} borderWidth={2} borderColor={'orange.700'}>
+                        <Image
+                          key={photo.id}
+                          source={{
+                            uri: `${api.defaults.baseURL}/locations/photo/${location.id}/${photo.photo}`,
+                          }}
+                          alt="local"
+                          w={400}
+                          h={400}
+                        />
+                        <VStack
+                          w={60}
+                          h={8}
+                          position={'absolute'}
+                          bottom={0}
+                          left={0}
+                          borderTopRightRadius={10}
+                          borderTopLeftRadius={0}
+                          bg={'orange.900'}
+                          alignItems={'center'}
+                          justifyItems={'center'}
+                        >
+                          <TouchableOpacity
+                            onPress={() => deletePhoto(photo.id!)}
+                          >
+                            <Icon
+                              as={Feather}
+                              name="trash-2"
+                              size={7}
+                              color="white"
+                            />
+                          </TouchableOpacity>
+                        </VStack>
+                      </VStack>
+                    ))}
+                  </VStack>
                 )}
                 <Button
-                  title="Adicionar fotos"
+                  title={
+                    location.LocationsPhotos?.length === 0
+                      ? 'Adicionar photo'
+                      : 'Adicionar mais fotos'
+                  }
                   onPress={handleUserProfilePictureSelect}
                   h={50}
                 />

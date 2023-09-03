@@ -16,4 +16,11 @@ export interface ILocation {
   business_categories: number[];
   business_description: string | null;
   photos: string[];
+  LocationsPhotos?: {
+    id?: string;
+    location_id?: string;
+    photo: string;
+    created_at: Date | null;
+    updated_at: Date | null;
+  }[];
 }

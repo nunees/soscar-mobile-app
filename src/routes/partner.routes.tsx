@@ -3,6 +3,7 @@ import {
   createBottomTabNavigator,
   BottomTabNavigationProp,
 } from '@react-navigation/bottom-tabs';
+import { Profile } from '@screens/clients/Profile';
 import { AddLocation } from '@screens/partners/AddLocation';
 import { EditLocation } from '@screens/partners/EditLocation';
 import { HomeScreen } from '@screens/partners/HomeScreen';
@@ -12,6 +13,7 @@ import { Icon, useTheme } from 'native-base';
 
 type PartnerRoutes = {
   home: undefined;
+  profile: undefined;
   locations: undefined;
   addLocation: undefined;
   locationDetails: { locationId: string };
@@ -67,6 +69,17 @@ export function PartnerRoutes() {
           title: 'Locais',
           tabBarIcon: ({ color }) => (
             <Icon as={Feather} name="map-pin" size={iconSize} color={color} />
+          ),
+        }}
+      />
+
+      <Screen
+        name="profile"
+        component={Profile}
+        options={{
+          title: 'Perfil',
+          tabBarIcon: ({ color }) => (
+            <Icon as={Feather} name="user" size={iconSize} color={color} />
           ),
         }}
       />
