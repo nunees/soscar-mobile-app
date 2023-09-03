@@ -3,6 +3,7 @@ import { UserLocation } from '@components/UserLocation';
 import { UserPhoto } from '@components/UserPhoto';
 import { Feather } from '@expo/vector-icons';
 import { useAuth } from '@hooks/useAuth';
+import { useProfile } from '@hooks/useProfile';
 import { useNavigation } from '@react-navigation/native';
 import { PartnerNavigatorRoutesProps } from '@routes/partner.routes';
 import { api } from '@services/api';
@@ -19,6 +20,7 @@ import { TouchableOpacity } from 'react-native';
 
 export function HomeScreen() {
   const { user } = useAuth();
+  const { profile } = useProfile();
   const navigation = useNavigation<PartnerNavigatorRoutesProps>();
 
   function greeting() {
@@ -36,7 +38,6 @@ export function HomeScreen() {
     <ScrollView showsVerticalScrollIndicator={false}>
       <VStack py={10} px={19}>
         <HStack mb={5} justifyContent={'center'}>
-          <Icon as={Feather} name="map-pin" size={5} color={'gray.400'} />
           <UserLocation />
         </HStack>
 
