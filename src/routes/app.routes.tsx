@@ -6,13 +6,13 @@ import {
 import { AddVehicle } from '@screens/clients/AddVehicle';
 import { ChangePassword } from '@screens/clients/ChangePassword';
 import { HomeScreen } from '@screens/clients/HomeScreen';
-import { NewSchedule } from '@screens/clients/NewSchedule';
 import { PartnerDetails } from '@screens/clients/PartnerDetails';
 import { Profile } from '@screens/clients/Profile';
-import { Quotes } from '@screens/clients/Quotes';
-import { Schedules } from '@screens/clients/Schedules';
-import { SearchQuote } from '@screens/clients/SearchQuote';
-import { SearchSchedule } from '@screens/clients/SearchSchedule';
+import { Quotes } from '@screens/clients/quotes/Quotes';
+import { SearchQuote } from '@screens/clients/quotes/SearchQuote';
+import { NewSchedule } from '@screens/clients/schedule/NewSchedule';
+import { Schedules } from '@screens/clients/schedule/Schedules';
+import { SearchSchedule } from '@screens/clients/schedule/SearchSchedule';
 import { Services } from '@screens/clients/Services';
 import { VehicleDetails } from '@screens/clients/VehicleDetails';
 import { Vechicles } from '@screens/clients/Vehicles';
@@ -30,7 +30,7 @@ type AppRotes = {
   schedules: undefined;
   searchSchedule: { serviceId: string };
   partnerDetails: { partnerId: string; typeofService: string };
-  newSchedule: { partnerId: string };
+  newSchedule: { locationId: string; typeofService: number };
   quotes: undefined;
   searchQuote: { serviceId: string };
 };

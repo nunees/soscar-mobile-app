@@ -1,59 +1,40 @@
 import { Feather } from '@expo/vector-icons';
-import { useProfile } from '@hooks/useProfile';
-import { useFocusEffect } from '@react-navigation/native';
+import { useGPS } from '@hooks/useGPS';
 import { AppError } from '@utils/AppError';
-import {
-  requestForegroundPermissionsAsync,
-  getCurrentPositionAsync,
-  reverseGeocodeAsync,
-  LocationObjectCoords,
-} from 'expo-location';
+import { reverseGeocodeAsync } from 'expo-location';
 import { Text, HStack, Icon } from 'native-base';
-import { useCallback, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export function UserLocation() {
   const [address, setAddress] = useState<string>('');
-  const [coord, setCoord] = useState<LocationObjectCoords>(
-    {} as LocationObjectCoords
-  );
 
-  const { profile, updateProfile } = useProfile();
+  const { coords } = useGPS();
 
-  async function requestLocationPermission() {
+  async function displayAddress() {
     try {
-      const { granted } = await requestForegroundPermissionsAsync();
-      if (granted) {
-        const currentPosition = await getCurrentPositionAsync();
-        setCoord(currentPosition.coords);
-        profile.latitude = coord.latitude;
-        profile.longitude = coord.longitude;
-        updateProfile(profile);
-
-        const address = await reverseGeocodeAsync(coord);
-        setAddress(`${address[0].street}, ${address[0].district}`);
-      }
+      const address = await reverseGeocodeAsync(coords);
+      setAddress(`${address[0].street}, ${address[0].district}`);
     } catch (error) {
       throw new AppError('Não foi possível obter a localização do usuário.');
     }
   }
 
-  useFocusEffect(
-    useCallback(() => {
-      requestLocationPermission();
-    }, [])
-  );
+  useEffect(() => {
+    displayAddress();
+  }, [coords]);
 
   return (
     <HStack>
-      <Icon
-        as={Feather}
-        name="map-pin"
-        size={5}
-        color={profile.latitude ? 'gray.600' : 'red.500'}
-      />
-      <Text bold fontSize="sm" pl={1}>
-        {address}
-      </Text>
+      <Icon as={Feather} name="map-pin" size={5} />
+      {address ? (
+        <Text bold fontSize="sm" pl={1}>
+          {address}
+        </Text>
+      ) : (
+        <Text bold fontSize="sm" pl={1}>
+          localização não encontrada
+        </Text>
+      )}
     </HStack>
   );
 }

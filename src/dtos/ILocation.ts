@@ -23,4 +23,10 @@ export interface ILocation {
     created_at: Date | null;
     updated_at: Date | null;
   }[];
+  users?: {
+    id: string;
+    name: string;
+    email: string;
+    avatar: string;
+  };
 }

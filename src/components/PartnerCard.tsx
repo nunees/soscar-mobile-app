@@ -8,8 +8,9 @@ import {
   Icon,
   IImageProps,
   IIconProps,
+  Divider,
 } from 'native-base';
-import { ImageSourcePropType, Pressable } from 'react-native';
+import { ImageSourcePropType, TouchableOpacity } from 'react-native';
 
 type Props = IImageProps &
   IIconProps & {
@@ -19,9 +20,23 @@ type Props = IImageProps &
     last_name: string;
     address: string;
     distance: string;
-    specialty: string[];
+    specialty: number[];
     reviews: number;
   };
+
+const servicesCategories = [
+  { id: 1, name: 'Acessorios' },
+  { id: 2, name: 'Cambio' },
+  { id: 3, name: 'Eletrica' },
+  { id: 4, name: 'Fluidos' },
+  { id: 5, name: 'Funilaria e Pintura' },
+  { id: 6, name: 'Lavagem' },
+  { id: 7, name: 'Mecanica' },
+  { id: 8, name: 'Pneus' },
+  { id: 9, name: 'Suspensão' },
+  { id: 10, name: 'Vidros' },
+  { id: 11, name: 'Outros' },
+];
 
 export function PartnerCard({
   image,
@@ -35,8 +50,8 @@ export function PartnerCard({
   ...rest
 }: Props) {
   return (
-    <VStack px={10} w={400} borderWidth={1} rounded={10} alignSelf="center">
-      <Pressable {...rest}>
+    <VStack px={10} w={400} alignSelf="center">
+      <TouchableOpacity {...rest}>
         <HStack pt={5}>
           <Image
             source={image}
@@ -67,10 +82,23 @@ export function PartnerCard({
         <HStack mb={3}>
           <Icon as={Feather} name="tool" size={5} ml={3} />
           <VStack ml={4}>
-            <Text>Especialista em {specialty}</Text>
+            <Text>
+              Especialista em:{' '}
+              {specialty.map((specialty) => {
+                return (
+                  <Text>
+                    {servicesCategories.map((category) =>
+                      category.id === specialty ? category.name : ''
+                    )}
+                    {', '}
+                  </Text>
+                );
+              })}
+            </Text>
           </VStack>
         </HStack>
-      </Pressable>
+      </TouchableOpacity>
+      <Divider />
     </VStack>
   );
 }

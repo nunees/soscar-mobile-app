@@ -1,84 +1,98 @@
 import { Button } from '@components/Button';
 import { useAuth } from '@hooks/useAuth';
+import { api } from '@services/api';
 import { AppError } from '@utils/AppError';
 import { IFileInfo } from 'expo-file-system';
 import * as FileSystem from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';
-import { HStack, useToast, Image, VStack, Modal } from 'native-base';
+import { HStack, useToast, Image, VStack } from 'native-base';
 import { useState } from 'react';
 import { TouchableOpacity } from 'react-native';
 
-export function AddPhoto() {
-  const [photos, setPhotos] = useState<ImagePicker.ImagePickerAsset[]>([]);
-  const [showModal, setShowModal] = useState(false);
-  const [setIsPhotoLoading] = useState(false);
+type Props = {
+  fileType: 'image' | 'video' | 'all';
+  remoteFieldName: string;
+  url: string;
+};
+
+export function AddPhoto({ fileType, remoteFieldName, url }: Props) {
+  const [files, setfiles] = useState<ImagePicker.ImagePickerAsset[]>([]);
 
   const toast = useToast();
-
   const { user } = useAuth();
+  const userPhotoUploadForm = new FormData();
 
   async function handleUserProfilePictureSelect() {
     try {
-      setIsPhotoLoading(true);
-      const photoSelected = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        quality: 1,
-        aspect: [4, 4],
-        allowsEditing: true,
-      });
+      let media;
 
-      if (photoSelected.canceled) {
+      if (fileType === 'image') {
+        media = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          quality: 1,
+          aspect: [4, 4],
+          allowsEditing: true,
+        });
+      } else if (fileType === 'video') {
+        media = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.Videos,
+          quality: 1,
+          aspect: [4, 4],
+        });
+      } else {
+        media = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.All,
+        });
+      }
+
+      if (media.canceled) {
         return;
       }
 
-      if (photoSelected.assets[0].uri) {
-        const photoInfo = (await FileSystem.getInfoAsync(
-          photoSelected.assets[0].uri
+      if (media.assets[0].uri) {
+        const mediaInfo = (await FileSystem.getInfoAsync(
+          media.assets[0].uri
         )) as IFileInfo;
 
-        if (photoInfo?.size && photoInfo.size / 1021 / 1024 > 5) {
+        if (mediaInfo?.size && mediaInfo.size / 1021 / 1024 > 5) {
           toast.show({
-            title: 'A imagem deve ter no máximo 5MB',
+            title: 'O arquivo deve ter no máximo 5MB',
             placement: 'top',
             bgColor: 'red.500',
           });
         }
 
-        const fileExtension = photoSelected.assets[0].uri.split('.').pop();
+        const fileExtension = media.assets[0].uri.split('.').pop();
+        if (
+          fileExtension !== 'jpg' &&
+          fileExtension !== 'jpeg' &&
+          fileExtension !== 'png' &&
+          fileExtension !== 'mp4'
+        ) {
+          toast.show({
+            title: 'Formato de arquivo não suportado',
+            placement: 'top',
+            bgColor: 'red.500',
+          });
+          return;
+        }
 
-        const photoFile = {
+        const file = {
           name: `${user.username}.${fileExtension}`.toLowerCase(),
-          uri: photoSelected.assets[0].uri,
-          type: `${photoSelected.assets[0].type}/${fileExtension}`,
+          uri: media.assets[0].uri,
+          type: `${media.assets[0].type}/${fileExtension}`,
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } as any;
 
-        const userPhotoUploadForm = new FormData();
-        userPhotoUploadForm.append('avatar', photoFile);
+        userPhotoUploadForm.append(remoteFieldName, file);
 
-        setPhotos([...photos, photoSelected.assets[0]]);
-
-        // const avatarResponse = await api.patch(
-        //   '/user/avatar',
-        //   userPhotoUploadForm,
-        //   {
-        //     headers: {
-        //       id: user.id,
-        //       'Content-Type': 'multipart/form-data',
-        //     },
-        //   }
-        // );
-
-        // const userUpdated = user;
-        // userUpdated.avatar = avatarResponse.data.avatar;
-        // updateUserAuth(userUpdated);
+        setfiles([...files, media.assets[0]]);
 
         toast.show({
-          title: 'Foto atualizada',
+          title: 'Arquivo anexado',
           placement: 'top',
           bgColor: 'green.500',
         });
-        setIsPhotoLoading(false);
       }
     } catch (error) {
       const isAppError = error instanceof AppError;
@@ -88,36 +102,35 @@ export function AddPhoto() {
         placement: 'top',
         bgColor: 'red.500',
       });
-    } finally {
-      setIsPhotoLoading(false);
     }
+  }
+
+  async function handleSubmit() {
+    const response = await api.patch(url, userPhotoUploadForm, {
+      headers: {
+        id: user.id,
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    console.log(response.data);
   }
 
   return (
     <VStack maxW={400} flexWrap="wrap">
-      {photos.map((photo) => (
+      {files.map((item) => (
         <HStack>
-          <TouchableOpacity onPress={() => setShowModal(true)}>
+          <TouchableOpacity>
             <HStack mb={5}>
               <Image
                 w={'full'}
                 height={200}
-                source={photo}
+                source={item}
                 alt="Some thing in the way"
                 resizeMode="cover"
               />
             </HStack>
           </TouchableOpacity>
-
-          <HStack>
-            <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
-              <Modal.Content>
-                <Modal.Body>
-                  <Image source={photo} alt="Photo" resizeMode="contain" />
-                </Modal.Body>
-              </Modal.Content>
-            </Modal>
-          </HStack>
         </HStack>
       ))}
 
