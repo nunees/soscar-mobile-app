@@ -128,9 +128,9 @@ export function VehicleDetails() {
               }}
             />
 
-            <Text bold>Total Gasto</Text>
+            <Text bold>Total Gasto (R$)</Text>
             <Input
-              value={'2.585, 00'}
+              value={'0'}
               editable={false}
               bg={'gray.700'}
               _focus={{

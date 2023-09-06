@@ -4,11 +4,11 @@ import { QuickVehicleCard } from '@components/QuickVehicleCard';
 import { IVehicleDTO } from '@dtos/IVechicleDTO';
 import { Feather } from '@expo/vector-icons';
 import { useAuth } from '@hooks/useAuth';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
 import { api } from '@services/api';
 import { Text, ScrollView, VStack, Icon, Fab } from 'native-base';
-import { useCallback, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export function Vechicles() {
   const [vehicles, setVehicles] = useState<IVehicleDTO[]>([]);
@@ -32,11 +32,9 @@ export function Vechicles() {
     }
   }
 
-  useFocusEffect(
-    useCallback(() => {
-      fetchUserVehicles();
-    }, [vehicles])
-  );
+  useEffect(() => {
+    fetchUserVehicles();
+  }, []);
 
   return (
     // Will Hold all the content

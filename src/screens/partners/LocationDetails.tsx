@@ -51,7 +51,6 @@ const servicesCategories = [
 
 export function LocationDetails() {
   const [location, setLocation] = useState<ILocation>({} as ILocation);
-  const [hasPhotos, setHasPhotos] = useState(false);
   const [isPhotoLoading, setIsPhotoLoading] = useState(false);
 
   const routes = useRoute();
@@ -223,7 +222,7 @@ export function LocationDetails() {
                 color="amber.600"
               />
               <VStack ml={2}>
-                <Text>{location.cnpj}</Text>
+                <Text>CNPJ/CPF: {location.cnpj}</Text>
               </VStack>
             </HStack>
           </HStack>
@@ -432,6 +431,26 @@ export function LocationDetails() {
                   onPress={handleUserProfilePictureSelect}
                   h={50}
                 />
+              </VStack>
+            </HStack>
+          </HStack>
+        </VStack>
+
+        <VStack px={5} mt={10}>
+          <HStack>
+            <HStack>
+              <Icon
+                as={Feather}
+                name="clock"
+                size={5}
+                ml={3}
+                color="amber.600"
+              />
+              <VStack ml={2}>
+                <Text>
+                  Criado em:{' '}
+                  {new Date(location.created_at).toLocaleDateString('pt-br')}
+                </Text>
               </VStack>
             </HStack>
           </HStack>

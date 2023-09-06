@@ -6,7 +6,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
 import { api } from '@services/api';
 import { AppError } from '@utils/AppError';
-import { VStack, Text, useToast } from 'native-base';
+import { VStack, Text, useToast, Center } from 'native-base';
 import { useEffect, useState } from 'react';
 
 type RouteParamsProps = {
@@ -54,10 +54,7 @@ export function SearchSchedule() {
       </VStack>
 
       <VStack mb={5} px={5}>
-        <Text textAlign="center" bold mb={5}>
-          Mostrando parceiros próximos a você
-        </Text>
-        {locations ? (
+        {locations?.length ? (
           locations?.map((location) => {
             return (
               <PartnerCard
@@ -82,7 +79,11 @@ export function SearchSchedule() {
             );
           })
         ) : (
-          <Text>Nenhum parceiro encontrado</Text>
+          <VStack py={200}>
+            <Center>
+              <Text>Nenhum local encontrado </Text>
+            </Center>
+          </VStack>
         )}
       </VStack>
     </VStack>

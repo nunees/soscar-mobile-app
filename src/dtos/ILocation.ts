@@ -29,4 +29,6 @@ export interface ILocation {
     email: string;
     avatar: string;
   };
+  created_at: Date | null;
+  updated_at: Date | null;
 }

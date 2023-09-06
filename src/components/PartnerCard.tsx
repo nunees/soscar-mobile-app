@@ -72,7 +72,13 @@ export function PartnerCard({
         </HStack>
 
         <HStack mb={3}>
-          <Icon as={Feather} name="map-pin" size={5} ml={3} />
+          <Icon
+            as={Feather}
+            name="map-pin"
+            size={5}
+            ml={3}
+            color="orange.600"
+          />
           <VStack ml={4}>
             <Text>{address}</Text>
             <Text>{distance}km de voce</Text>
@@ -80,7 +86,7 @@ export function PartnerCard({
         </HStack>
 
         <HStack mb={3}>
-          <Icon as={Feather} name="tool" size={5} ml={3} />
+          <Icon as={Feather} name="tool" size={5} ml={3} color="orange.600" />
           <VStack ml={4}>
             <Text>
               Especialista em:{' '}
