@@ -21,6 +21,7 @@ export function QuickVehicleCard({ vehicle, ...rest }: QuickVehicleCardProps) {
           onPress={() =>
             navigation.navigate('vehicleDetails', { vehicleId: vehicle.id })
           }
+          key={vehicle.id}
         >
           <VStack shadow={1} h={130} {...rest}>
             <HStack

@@ -30,6 +30,7 @@ import {
   Text,
   Box,
   Icon,
+  Center,
 } from 'native-base';
 import { useEffect, useState } from 'react';
 import { TouchableOpacity } from 'react-native';
@@ -123,9 +124,24 @@ export function HomeScreen() {
           disableIntervalMomentum={true}
           snapToInterval={400}
         >
-          {vehicles.map((vehicle) => (
-            <FavoriteCars vehicle={vehicle} />
-          ))}
+          {vehicles.length > 0 ? (
+            vehicles.map((vehicle) => <FavoriteCars vehicle={vehicle} />)
+          ) : (
+            <VStack px={10} py={5}>
+              <TouchableOpacity
+                onPress={() => navigation.navigate('addVehicle')}
+              >
+                <Center>
+                  <Text color="gray.400">
+                    Você não possui veículos cadastrados
+                  </Text>
+                  <Text color="orange.600" bold>
+                    Toque aqui para adicionar
+                  </Text>
+                </Center>
+              </TouchableOpacity>
+            </VStack>
+          )}
         </ScrollView>
 
         <VStack>

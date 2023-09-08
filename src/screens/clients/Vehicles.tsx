@@ -17,6 +17,8 @@ export function Vechicles() {
 
   const navigation = useNavigation<AppNavigatorRoutesProps>();
 
+  console.log(vehicles);
+
   async function fetchUserVehicles() {
     try {
       const response = await api.get('/vehicles/', {
@@ -56,7 +58,7 @@ export function Vechicles() {
                 {vehicles.length > 0 ? (
                   <VStack>
                     {vehicles.map((vehicle) => (
-                      <QuickVehicleCard vehicle={vehicle} />
+                      <QuickVehicleCard vehicle={vehicle} key={vehicle.id} />
                     ))}
                   </VStack>
                 ) : (

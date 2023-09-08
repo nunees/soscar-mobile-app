@@ -268,7 +268,7 @@ export function NewSchedule() {
       <ScrollView showsVerticalScrollIndicator={false} marginBottom={100}>
         <VStack>
           {location ? (
-            <VStack px={5}>
+            <VStack px={5} key={location.id}>
               <VStack>
                 <HStack>
                   <VStack ml={2} mb={3}>
@@ -432,6 +432,7 @@ export function NewSchedule() {
                           source={item}
                           alt="Some thing in the way"
                           resizeMode="cover"
+                          key={item.name}
                         />
                       </HStack>
                     </TouchableOpacity>

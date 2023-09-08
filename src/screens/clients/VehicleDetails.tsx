@@ -58,87 +58,24 @@ export function VehicleDetails() {
           <VStack mb={40}>
             <Heading pb={10}>Detalhes</Heading>
             <Text bold>Montadora</Text>
-            <Input
-              value={vehicle.brand?.name}
-              editable={false}
-              bg={'gray.700'}
-              _focus={{
-                borderColor: 'gray.700',
-                backgroundColor: 'gray.700',
-                caretHidden: true,
-              }}
-            />
+            <Input value={vehicle.brand?.name} editable={false} />
             <Text bold>Modelo</Text>
-            <Input
-              value={vehicle.name?.name}
-              editable={false}
-              bg={'gray.700'}
-              _focus={{
-                borderColor: 'gray.700',
-                backgroundColor: 'gray.700',
-                caretHidden: true,
-              }}
-            />
+            <Input value={vehicle.name?.name} editable={false} />
 
             <Text bold>Cor</Text>
-            <Input
-              value={vehicle.color}
-              editable={false}
-              bg={'gray.700'}
-              _focus={{
-                borderColor: 'gray.700',
-                backgroundColor: 'gray.700',
-                caretHidden: true,
-              }}
-            />
+            <Input value={vehicle.color} editable={false} />
 
             <Text bold>Ano de Fabricação</Text>
-            <Input
-              value={String(vehicle.year)}
-              editable={false}
-              bg={'gray.700'}
-              _focus={{
-                borderColor: 'gray.700',
-                backgroundColor: 'gray.700',
-                caretHidden: true,
-              }}
-            />
+            <Input value={String(vehicle.year)} editable={false} />
 
             <Text bold>Placa</Text>
-            <Input
-              value={vehicle.plate}
-              editable={false}
-              bg={'gray.700'}
-              _focus={{
-                borderColor: 'gray.700',
-                backgroundColor: 'gray.700',
-                caretHidden: true,
-              }}
-            />
+            <Input value={vehicle.plate} editable={false} />
 
             <Text bold>Kilometragen</Text>
-            <Input
-              value={String(vehicle.engineMiles)}
-              editable={false}
-              bg={'gray.700'}
-              _focus={{
-                borderColor: 'gray.700',
-                backgroundColor: 'gray.700',
-                caretHidden: true,
-              }}
-            />
+            <Input value={String(vehicle.engineMiles)} editable={false} />
 
             <Text bold>Total Gasto (R$)</Text>
-            <Input
-              value={'0'}
-              editable={false}
-              bg={'gray.700'}
-              _focus={{
-                borderColor: 'gray.700',
-                backgroundColor: 'gray.700',
-                caretHidden: true,
-              }}
-            />
+            <Input value={'0'} editable={false} />
           </VStack>
         </VStack>
       </ScrollView>

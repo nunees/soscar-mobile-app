@@ -1,3 +1,4 @@
+import ProfilePicture from '@assets/profile.png';
 import { AppHeader } from '@components/AppHeader';
 import { Button } from '@components/Button';
 import { Input } from '@components/Input';
@@ -262,6 +263,7 @@ export function Profile() {
               />
             ) : (
               <UserPhoto
+                defaultSource={ProfilePicture}
                 source={{
                   uri: `${api.defaults.baseURL}/user/avatar/${user.id}/${user.avatar}`,
                 }}

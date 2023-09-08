@@ -77,6 +77,6 @@ export default function getLogoImage(brandName: string) {
     case 'volvo.png':
       return volvo;
     default:
-      return null;
+      return '';
   }
 }

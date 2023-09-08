@@ -7,6 +7,12 @@ type Props = ISelectProps & {
   data: any;
 };
 
+type dataProps = {
+  id: string;
+  label: string;
+  value: string;
+};
+
 export function SelectCar({ label, data, ...rest }: Props) {
   return (
     <SelectNative
@@ -26,7 +32,7 @@ export function SelectCar({ label, data, ...rest }: Props) {
     >
       {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        data.map((item: any) => (
+        data.map((item: dataProps) => (
           <SelectNative.Item
             key={item.id}
             label={item.label}
