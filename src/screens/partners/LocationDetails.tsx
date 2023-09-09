@@ -357,6 +357,70 @@ export function LocationDetails() {
             <HStack>
               <Icon
                 as={Feather}
+                name="calendar"
+                size={5}
+                ml={3}
+                color="amber.600"
+              />
+              <VStack ml={2} w={300}>
+                {location.open_hours_weekend?.map((category) => {
+                  return (
+                    <HStack key={category}>
+                      <VStack>
+                        <HStack ml={2}>
+                          <Text>{category}</Text>
+                        </HStack>
+                      </VStack>
+                    </HStack>
+                  );
+                })}
+              </VStack>
+            </HStack>
+          </HStack>
+        </VStack>
+
+        <VStack px={5} mt={5}>
+          <HStack>
+            <HStack>
+              <Icon
+                as={Feather}
+                name="clock"
+                size={5}
+                ml={3}
+                color="amber.600"
+              />
+              <VStack ml={4} w={300}>
+                <Text>{location.open_hours}</Text>
+              </VStack>
+            </HStack>
+          </HStack>
+        </VStack>
+
+        <VStack px={5} mt={10}>
+          <HStack>
+            <HStack>
+              <Icon
+                as={Feather}
+                name="clock"
+                size={5}
+                ml={3}
+                color="amber.600"
+              />
+              <VStack ml={2}>
+                <Text>
+                  Criado em:{' '}
+                  {new Date(location.created_at!).toLocaleDateString('pt-br')}
+                </Text>
+              </VStack>
+            </HStack>
+          </HStack>
+        </VStack>
+
+        <VStack px={5} mt={5}>
+          <HStack>
+            <HStack>
+              <Icon
+                as={Feather}
                 name="image"
                 size={5}
                 ml={3}
@@ -431,26 +495,6 @@ export function LocationDetails() {
                   onPress={handleUserProfilePictureSelect}
                   h={50}
                 />
-              </VStack>
-            </HStack>
-          </HStack>
-        </VStack>
-
-        <VStack px={5} mt={10}>
-          <HStack>
-            <HStack>
-              <Icon
-                as={Feather}
-                name="clock"
-                size={5}
-                ml={3}
-                color="amber.600"
-              />
-              <VStack ml={2}>
-                <Text>
-                  Criado em:{' '}
-                  {new Date(location.created_at).toLocaleDateString('pt-br')}
-                </Text>
               </VStack>
             </HStack>
           </HStack>

@@ -1,14 +1,12 @@
-import ProfilePicture from '@assets/profile.png';
 import { AppHeader } from '@components/AppHeader';
 import { Button } from '@components/Button';
 import { Input } from '@components/Input';
 import { Select } from '@components/Select';
 import { SelectBusinessCategories } from '@components/SelectBusinessCategories';
 import { TextArea } from '@components/TextArea';
-import { UserPhoto } from '@components/UserPhoto';
 import { ILocation } from '@dtos/ILocation';
 import { IVehicleDTO } from '@dtos/IVechicleDTO';
-import { Entypo, Feather } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
 import { useAuth } from '@hooks/useAuth';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -47,9 +45,9 @@ export function NewSchedule() {
   const [files, setfiles] = useState<any[]>([]);
 
   const [location, setLocation] = useState<ILocation>();
-  const [profilePicture, setProfilePicture] = useState<ImagePickerAsset>();
+
   const [userVehicles, setUserVehicles] = useState<IVehicleDTO[]>();
-  const [choosedVehicle, setChoosedVehicle] = useState<string>();
+  const [vehicle_id, setVehicle_id] = useState<string>();
   const [services, setServices] = useState<number[]>();
 
   const [date, setDate] = useState<string>('');
@@ -57,7 +55,7 @@ export function NewSchedule() {
 
   const [requiredServices, setRequiredServices] = useState<number>();
 
-  const [errorMessage, setErrorMessage] = useState('');
+  const [notes, setNotes] = useState<string>('');
 
   const routes = useRoute();
   const { user } = useAuth();
@@ -204,16 +202,6 @@ export function NewSchedule() {
       }
 
       setUserVehicles(vehicles.data);
-
-      const profilePicture = await api.get(
-        `/user/avatar/${response.data.user_id}/${response.data.users.avatar}`
-      );
-
-      if (!profilePicture.data) {
-        setProfilePicture(ProfilePicture);
-      } else {
-        setProfilePicture(profilePicture.data);
-      }
     } catch (error) {
       toast.show({
         title: 'Erro ao buscar parceiros',
@@ -224,31 +212,49 @@ export function NewSchedule() {
   }
 
   async function handleSubmit() {
-    // const response = await api.post('/schedules', userPhotoUploadForm, {
-    //   headers: {
-    //     id: user.id,
-    //     'Content-Type': 'multipart/form-data',
-    //   },
-    // });
-
     try {
-      files.map(async (file) => {
-        console.log('hit');
-        userPhotoUploadForm.append('document', file);
-        await api.post(
-          '/schedules/documents/asdlasjdlasj',
-          userPhotoUploadForm,
-          {
-            headers: {
-              id: user.id,
-              'Content-Type': 'multipart/form-data',
-            },
-          }
-        );
-      });
+      const response = await api.post(
+        '/schedules',
+        {
+          vehicle_id,
+          location_id: locationId,
+          service_type: Number(requiredServices),
+          date,
+          time,
+          notes,
+        },
+        {
+          headers: {
+            id: user.id,
+          },
+        }
+      );
+
+      try {
+        files.map(async (file) => {
+          console.log('hit');
+          userPhotoUploadForm.append('document', file);
+          await api.post(
+            `/schedules/documents/${response.data.id}`,
+            userPhotoUploadForm,
+            {
+              headers: {
+                id: user.id,
+                'Content-Type': 'multipart/form-data',
+              },
+            }
+          );
+        });
+      } catch (error) {
+        toast.show({
+          title: 'Erro ao anexar arquivos',
+          placement: 'top',
+          bgColor: 'red.500',
+        });
+      }
     } catch (error) {
       toast.show({
-        title: 'Erro ao agendar',
+        title: 'Erro ao agendar serviço',
         placement: 'top',
         bgColor: 'red.500',
       });
@@ -267,33 +273,25 @@ export function NewSchedule() {
 
       <ScrollView showsVerticalScrollIndicator={false} marginBottom={100}>
         <VStack>
-          {location ? (
+          {location && (
             <VStack px={5} key={location.id}>
               <VStack>
-                <HStack>
-                  <VStack ml={2} mb={3}>
-                    <UserPhoto
-                      source={profilePicture}
-                      alt="Profile Picture"
-                      size={10}
-                    />
-                    <Heading>{location.business_name}</Heading>
-                    <Text>100 Avaliações</Text>
-                    <Text>{location.users?.name}</Text>
-                    <Text>Telefone: {location.business_phone}</Text>
-                  </VStack>
-                  <VStack position="relative" left={150} top={10}>
-                    <Icon as={Feather} name="message-square" size={8} />
-                  </VStack>
-                </HStack>
+                <VStack ml={2} mb={3}>
+                  <HStack py={5}>
+                    <VStack>
+                      <Heading>{location.business_name}</Heading>
+                      <Text>100 Avaliações</Text>
+                      <Text>{location.users?.name}</Text>
+                      <Text>Telefone: {location.business_phone}</Text>
+                    </VStack>
+                  </HStack>
+                </VStack>
               </VStack>
             </VStack>
-          ) : (
-            <VStack px={5} py={5}></VStack>
           )}
 
-          <VStack px={5} mt={5}>
-            <HStack px={5}>
+          <VStack px={5}>
+            <HStack mr={5} mb={5}>
               <HStack mt={2}>
                 <Icon
                   as={Feather}
@@ -311,7 +309,7 @@ export function NewSchedule() {
               </HStack>
             </HStack>
 
-            <HStack px={5} mt={5}>
+            <HStack mr={5} mb={5}>
               <HStack mt={2}>
                 <Icon
                   as={Feather}
@@ -332,73 +330,64 @@ export function NewSchedule() {
                       })
                     : []
                 }
-                onValueChange={(value) => setChoosedVehicle(value)}
+                onValueChange={(value) => setVehicle_id(value)}
               />
             </HStack>
 
-            <HStack px={5} mt={5}>
-              <HStack mt={4}>
-                <Icon
-                  as={Entypo}
-                  name="calendar"
-                  color="orange.600"
-                  size={ICON_SIZE}
-                />
+            <HStack mr={5}>
+              <HStack>
+                <VStack mt={3}>
+                  <Icon
+                    as={Feather}
+                    name="calendar"
+                    size={ICON_SIZE}
+                    color="orange.600"
+                  />
+                </VStack>
+                <VStack>
+                  <Input
+                    placeholder={'Data'}
+                    w={120}
+                    editable={false}
+                    value={date}
+                    caretHidden
+                    onPressIn={() => {
+                      DateTimePickerAndroid.open({
+                        mode: 'date',
+                        value: new Date(),
+                        onChange: (event, date) => handleDate(date as Date),
+                      });
+                    }}
+                  />
+                </VStack>
               </HStack>
-              <VStack>
-                <Input
-                  placeholder={'Data'}
-                  w={200}
-                  editable={false}
-                  value={date}
-                  caretHidden
-                  onPressIn={() => {
-                    DateTimePickerAndroid.open({
-                      mode: 'date',
-                      value: new Date(),
-                      onChange: (event, date) => handleDate(date as Date),
-                    });
-                  }}
-                />
-                {errorMessage && (
-                  <Text color="red.500" bold>
-                    {errorMessage}
-                  </Text>
-                )}
-              </VStack>
-            </HStack>
-
-            <HStack px={5} mt={5}>
-              <HStack mt={4}>
-                <Icon
-                  as={Entypo}
-                  name="time-slot"
-                  color="orange.600"
-                  size={ICON_SIZE}
-                />
+              <HStack>
+                <VStack mt={3}>
+                  <Icon
+                    as={Feather}
+                    name="clock"
+                    size={ICON_SIZE}
+                    color="orange.600"
+                  />
+                </VStack>
+                <VStack>
+                  <Input
+                    placeholder={'Horario'}
+                    w={120}
+                    editable={false}
+                    value={time}
+                    caretHidden
+                    onPressIn={() => {
+                      DateTimePickerAndroid.open({
+                        mode: 'time',
+                        is24Hour: true,
+                        value: new Date(),
+                        onChange: (event, date) => handleTime(date as Date),
+                      });
+                    }}
+                  />
+                </VStack>
               </HStack>
-              <VStack>
-                <Input
-                  placeholder={'Horario'}
-                  w={200}
-                  editable={false}
-                  value={time}
-                  caretHidden
-                  onPressIn={() => {
-                    DateTimePickerAndroid.open({
-                      mode: 'time',
-                      is24Hour: true,
-                      value: new Date(),
-                      onChange: (event, date) => handleTime(date as Date),
-                    });
-                  }}
-                />
-                {errorMessage && (
-                  <Text color="red.500" bold>
-                    {errorMessage}
-                  </Text>
-                )}
-              </VStack>
             </HStack>
 
             <VStack>
@@ -406,9 +395,10 @@ export function NewSchedule() {
                 placeholder={'Descreva aqui os problemas apresentados'}
                 w={'full'}
                 h={150}
-                mt={50}
                 fontSize="sm"
                 color="gray.300"
+                mt={5}
+                onChangeText={(text) => setNotes(text)}
               />
             </VStack>
 
@@ -423,7 +413,7 @@ export function NewSchedule() {
               </HStack>
               <VStack maxW={400} flexWrap="wrap">
                 {files.map((item) => (
-                  <HStack>
+                  <HStack key={item.id}>
                     <TouchableOpacity>
                       <HStack mb={5}>
                         <Image
@@ -432,7 +422,6 @@ export function NewSchedule() {
                           source={item}
                           alt="Some thing in the way"
                           resizeMode="cover"
-                          key={item.name}
                         />
                       </HStack>
                     </TouchableOpacity>

@@ -12,7 +12,6 @@ export function Select({ label, data, ...rest }: Props) {
       borderTopWidth={0}
       borderLeftWidth={0}
       borderRightWidth={0}
-      mb={3}
       minWidth={'full'}
       accessibilityLabel={label}
       placeholder={label}

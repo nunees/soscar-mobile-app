@@ -112,12 +112,15 @@ export function SignUp() {
       return;
     }
 
+    const localDate = date.split('/');
+    const serverDate = `${localDate[2]}-${localDate[1]}-${localDate[0]}`;
+
     try {
       await api.post('/user/new', {
         name,
         last_name: lastName,
         cpf,
-        birth_date: new Date(date),
+        birth_date: serverDate,
         email,
         mobile_phone,
         genderId: Number(selectedGender),

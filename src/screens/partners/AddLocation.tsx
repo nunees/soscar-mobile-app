@@ -1,7 +1,6 @@
 import { AppHeader } from '@components/AppHeader';
 import { Button } from '@components/Button';
 import { Input } from '@components/Input';
-import { Loading } from '@components/Loading';
 import { LoadingModal } from '@components/LoadingModal';
 import { TextArea } from '@components/TextArea';
 import { Feather } from '@expo/vector-icons';
@@ -19,11 +18,9 @@ import {
   Checkbox,
   useToast,
   HStack,
-  Heading,
   Icon,
 } from 'native-base';
 import { useState } from 'react';
-import { set } from 'react-hook-form';
 
 export function AddLocation() {
   const [paymentMethods] = useState([
@@ -101,13 +98,14 @@ export function AddLocation() {
   async function handleSubmitBusiness() {
     try {
       setIsUploading(true);
+
       const response = await api.post(
         '/locations',
         {
           cnpj,
           business_name: businessName,
           business_phone: businessPhone,
-          business_email: businessPhone,
+          business_email: businessEmail,
           address_line: addressLine,
           number: Number(number),
           city,
@@ -117,6 +115,8 @@ export function AddLocation() {
           payment_methods: selectedPaymentMethods,
           business_categories: selectedBusinessServices,
           business_description: businessDescription,
+          open_hours: `${openHour}-${closeHour}`,
+          open_hours_weekend: openDays,
         },
         {
           headers: {

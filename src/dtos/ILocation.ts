@@ -29,6 +29,8 @@ export interface ILocation {
     email: string;
     avatar: string;
   };
+  open_hours: string;
+  open_hours_weekend: string[];
   created_at: Date | null;
   updated_at: Date | null;
 }
