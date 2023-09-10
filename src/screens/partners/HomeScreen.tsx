@@ -1,6 +1,9 @@
 import { ReminderBell } from '@components/ReminderBell';
+import { SmallSchedulleCard } from '@components/SmallSchedulleCard';
 import { UserLocation } from '@components/UserLocation';
 import { UserPhoto } from '@components/UserPhoto';
+import { ILocation } from '@dtos/ILocation';
+import { ISchedules } from '@dtos/ISchedules';
 import { Feather } from '@expo/vector-icons';
 import { useAuth } from '@hooks/useAuth';
 import { useProfile } from '@hooks/useProfile';
@@ -16,9 +19,13 @@ import {
   Heading,
   Box,
 } from 'native-base';
+import { useEffect, useState } from 'react';
 import { TouchableOpacity } from 'react-native';
 
 export function HomeScreen() {
+  const [locations, setLocations] = useState<ILocation[]>([]);
+  const [schedules, setSchedules] = useState<ISchedules[]>([]);
+
   const { user } = useAuth();
   const { profile } = useProfile();
   const navigation = useNavigation<PartnerNavigatorRoutesProps>();
@@ -33,6 +40,30 @@ export function HomeScreen() {
     }
     return 'Boa noite';
   }
+
+  async function loadData() {
+    try {
+      const locationsResponse = await api.get('/locations', {
+        headers: {
+          id: user.id,
+        },
+      });
+      setLocations(locationsResponse.data.locations);
+
+      const schedulesResponse = await api.get(`/schedules/locations`);
+
+      const result = schedulesResponse.data.find((schedule) => schedule.id === 1);
+
+      setSchedules(schedulesResponse.data.schedules);
+      console.log(schedulesResponse.data.schedules);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  useEffect(() => {
+    loadData();
+  }, []);
 
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
@@ -73,6 +104,13 @@ export function HomeScreen() {
 
         <VStack mt={10}>
           <Heading>Agendamentos</Heading>
+          <Text>Aguardando</Text>
+          {schedules.map(
+            (schedule) =>
+              schedule.status === 1 && (
+                <SmallSchedulleCard key={schedule.id} data={schedule} />
+              )
+          )}
         </VStack>
       </VStack>
     </ScrollView>

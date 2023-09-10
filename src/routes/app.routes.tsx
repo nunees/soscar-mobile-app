@@ -12,6 +12,7 @@ import { Quotes } from '@screens/clients/quotes/Quotes';
 import { SearchQuote } from '@screens/clients/quotes/SearchQuote';
 import { NewSchedule } from '@screens/clients/schedule/NewSchedule';
 import { Schedules } from '@screens/clients/schedule/Schedules';
+import { SchedulesDetails } from '@screens/clients/schedule/SchedulesDetails';
 import { SearchSchedule } from '@screens/clients/schedule/SearchSchedule';
 import { Services } from '@screens/clients/Services';
 import { VehicleDetails } from '@screens/clients/VehicleDetails';
@@ -33,6 +34,7 @@ type AppRotes = {
   newSchedule: { locationId: string; typeofService: number };
   quotes: undefined;
   searchQuote: { serviceId: string };
+  schedulesDetails: { scheduleId: string };
 };
 
 export type AppNavigatorRoutesProps = BottomTabNavigationProp<AppRotes>;
@@ -108,6 +110,12 @@ export function AppRoutes() {
       <Screen
         name="newSchedule"
         component={NewSchedule}
+        options={{ tabBarButton: () => null }}
+      />
+
+      <Screen
+        name="schedulesDetails"
+        component={SchedulesDetails}
         options={{ tabBarButton: () => null }}
       />
 

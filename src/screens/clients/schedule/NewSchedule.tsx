@@ -245,16 +245,19 @@ export function NewSchedule() {
             }
           );
         });
+        navigation.navigate('schedules');
       } catch (error) {
+        const isAppError = error instanceof AppError;
         toast.show({
-          title: 'Erro ao anexar arquivos',
+          title: isAppError ? error.message : 'Erro ao anexar arquivos',
           placement: 'top',
           bgColor: 'red.500',
         });
       }
     } catch (error) {
+      const isAppError = error instanceof AppError;
       toast.show({
-        title: 'Erro ao agendar serviço',
+        title: isAppError ? error.message : 'Erro ao agendar',
         placement: 'top',
         bgColor: 'red.500',
       });

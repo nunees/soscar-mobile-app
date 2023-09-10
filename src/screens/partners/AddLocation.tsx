@@ -501,7 +501,7 @@ export function AddLocation() {
                 </VStack>
                 <VStack w={100}>
                   <Input
-                    placeholder={'Data'}
+                    placeholder={'até'}
                     editable={false}
                     value={closeHour}
                     caretHidden

@@ -15,6 +15,7 @@ import { ServicesSmallCard } from '@components/ServicesSmallCard';
 import { SmallSchedulleCard } from '@components/SmallSchedulleCard';
 import { UserLocation } from '@components/UserLocation';
 import { UserPhoto } from '@components/UserPhoto';
+import { ISchedules } from '@dtos/ISchedules';
 import { IVehicleDTO } from '@dtos/IVechicleDTO';
 import { Entypo } from '@expo/vector-icons';
 import { useAuth } from '@hooks/useAuth';
@@ -39,6 +40,7 @@ const PHOTO_SIZE = 10;
 
 export function HomeScreen() {
   const [vehicles, setVehicles] = useState<IVehicleDTO[]>([]);
+  const [schedules, setSchedules] = useState<ISchedules[]>([]);
 
   const { user } = useAuth();
   const { profile } = useProfile();
@@ -71,8 +73,22 @@ export function HomeScreen() {
     }
   }
 
+  async function fetchSchedules() {
+    try {
+      const response = await api.get('/schedules/', {
+        headers: {
+          id: user.id,
+        },
+      });
+      setSchedules(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   useEffect(() => {
     fetchUserVehicles();
+    fetchSchedules();
   }, []);
 
   return (
@@ -233,7 +249,7 @@ export function HomeScreen() {
         <VStack>
           <HStack justifyContent={'space-between'} alignContent={'baseline'}>
             <Text bold mb={2}>
-              Próximos agendamentos
+              Agendamentos
             </Text>
             <TouchableOpacity>
               <Icon
@@ -245,9 +261,28 @@ export function HomeScreen() {
               />
             </TouchableOpacity>
           </HStack>
-          <SmallSchedulleCard />
-          <SmallSchedulleCard />
-          <SmallSchedulleCard />
+          {schedules.length > 0 ? (
+            schedules.map((schedule) => (
+              <VStack
+                borderWidth={1}
+                borderColor="gray.700"
+                mb={3}
+                borderRadius={5}
+                shadow={0.8}
+              >
+                <SmallSchedulleCard data={schedule} />
+              </VStack>
+            ))
+          ) : (
+            <VStack px={10} py={5}>
+              <Center>
+                <Text color="gray.400">Você não possui agendamentos</Text>
+                <Text color="orange.600" bold>
+                  Toque aqui para adicionar
+                </Text>
+              </Center>
+            </VStack>
+          )}
         </VStack>
       </VStack>
     </ScrollView>
