@@ -37,6 +37,7 @@ export interface ISchedules {
     id: string;
     name: string;
     last_name: string;
+    email: string;
     cpf: string;
     mobile_phone: string;
     UsersAddresses?: {

@@ -102,7 +102,9 @@ export function HomeScreen() {
             <TouchableOpacity onPress={() => navigation.navigate('profile')}>
               <UserPhoto
                 source={{
-                  uri: `${api.defaults.baseURL}/user/avatar/${user.id}/${user.avatar}`,
+                  uri:
+                    `${api.defaults.baseURL}/user/avatar/${user.id}/${user.avatar}` ||
+                    `https://ui-avatars.com/api/?name=${user.name}&background=random&length=1&rounded=true&size=128`,
                 }}
                 alt="Foto de perfil"
                 size={PHOTO_SIZE}
@@ -277,9 +279,13 @@ export function HomeScreen() {
             <VStack px={10} py={5}>
               <Center>
                 <Text color="gray.400">Você não possui agendamentos</Text>
-                <Text color="orange.600" bold>
-                  Toque aqui para adicionar
-                </Text>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate('schedules')}
+                >
+                  <Text color="orange.600" bold>
+                    Toque aqui para agendar
+                  </Text>
+                </TouchableOpacity>
               </Center>
             </VStack>
           )}

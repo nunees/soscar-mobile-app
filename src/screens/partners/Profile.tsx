@@ -135,9 +135,11 @@ export function Profile() {
           }
         );
 
-        const userUpdated = user;
-        userUpdated.avatar = avatarResponse.data.avatar;
-        updateUserAuth(userUpdated);
+        if (avatarResponse.status === 200 || avatarResponse.status === 201) {
+          const userUpdated = user;
+          userUpdated.avatar = avatarResponse.data.avatar;
+          updateUserAuth(userUpdated);
+        }
 
         toast.show({
           title: 'Foto atualizada',
@@ -213,6 +215,7 @@ export function Profile() {
   }
 
   async function loadData() {
+    console.log({ user });
     if (!profile.last_name) {
       const response = await api.get('/user/profile', {
         headers: {
@@ -263,7 +266,9 @@ export function Profile() {
             ) : (
               <UserPhoto
                 source={{
-                  uri: `${api.defaults.baseURL}/user/avatar/${user.id}/${user.avatar}`,
+                  uri: user.avatar
+                    ? `${api.defaults.baseURL}/user/avatar/${user.id}/${user.avatar}`
+                    : `https://ui-avatars.com/api/?format=png&name=${user.name}+${profile.last_name}&size=512`,
                 }}
                 alt="Foto de perfil"
                 size={PHOTO_SIZE}

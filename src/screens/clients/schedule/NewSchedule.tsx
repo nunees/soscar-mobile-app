@@ -245,7 +245,12 @@ export function NewSchedule() {
             }
           );
         });
-        navigation.navigate('schedules');
+        navigation.navigate('home');
+        toast.show({
+          title: 'Agendamento realizado com sucesso!',
+          placement: 'top',
+          bgColor: 'green.500',
+        });
       } catch (error) {
         const isAppError = error instanceof AppError;
         toast.show({
@@ -394,6 +399,14 @@ export function NewSchedule() {
             </HStack>
 
             <VStack>
+              <Text fontSize="xs" bold color="gray.500" textAlign="justify">
+                O tempo medio de reparo e de 1 hora, no entanto pode ser
+                necessario mais tempo. Nao se preocupe, seu mecanico ira
+                informa-lo se necessario.
+              </Text>
+            </VStack>
+
+            <VStack>
               <TextArea
                 placeholder={'Descreva aqui os problemas apresentados'}
                 w={'full'}
@@ -407,7 +420,7 @@ export function NewSchedule() {
 
             <VStack>
               <HStack mb={5}>
-                <Text fontSize="xs" bold color="gray.500">
+                <Text fontSize="xs" bold color="gray.500" textAlign="justify">
                   Você pode adicionar fotos ou videos adicionais que demonstram
                   os problemas relatados e ajudam o prestador de serviço a ter o
                   melhor entendimento do problema. Você pode adicionar imagens,

@@ -10,7 +10,7 @@ type Props = {
 };
 
 /**
- * 0 - Cancelado
+ * 4 - Cancelado
  * 1 - Agendado
  * 2 - Em andamento
  * 3 - Finalizado
@@ -54,7 +54,7 @@ export function SmallSchedulleCard({ data }: Props) {
               <Text bold fontSize="md">
                 {data.location?.business_name}
               </Text>
-              {data.status === 0 && (
+              {data.status === 4 && (
                 <Text color="red.500" fontSize="md">
                   cancelado
                 </Text>

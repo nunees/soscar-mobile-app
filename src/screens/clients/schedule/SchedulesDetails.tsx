@@ -104,6 +104,18 @@ export function SchedulesDetails() {
         contentContainerStyle={{ paddingBottom: 120 }}
       >
         <VStack flex={1} px={5} py={5}>
+          {schedule!.status === 4 && (
+            <Center mb={10}>
+              <Heading bold color="red.500">
+                Agendamento cancelado!
+              </Heading>
+              <Text color="gray.400" px={5} textAlign="center">
+                O agendamento foi cancelado e por isso não pode ser mais
+                alterado.
+              </Text>
+            </Center>
+          )}
+
           <HStack>
             <VStack>
               <Text fontSize="md" bold>
@@ -125,21 +137,29 @@ export function SchedulesDetails() {
               <VStack ml={3}>
                 <Text bold>Status</Text>
                 <VStack alignItems="center">
-                  {schedule?.status === 0 && (
+                  {schedule?.status === 4 && (
                     <VStack>
-                      <Text color="red.500">cancelado</Text>
+                      <Text color="red.500" bold>
+                        cancelado
+                      </Text>
                     </VStack>
                   )}
                   {schedule?.status === 1 && (
                     <VStack>
-                      <Text color="yellow.400">aguardando confirmacao</Text>
+                      <Text color="yellow.600" bold>
+                        aguardando confirmacao
+                      </Text>
                     </VStack>
                   )}
                   {schedule?.status === 2 && (
-                    <Text color="yellow.500">em andamento</Text>
+                    <Text color="orange.500" bold>
+                      em andamento
+                    </Text>
                   )}
                   {schedule?.status === 3 && (
-                    <Text color="green.500">finalizado</Text>
+                    <Text color="green.500" bold>
+                      finalizado
+                    </Text>
                   )}
                 </VStack>
               </VStack>
@@ -333,17 +353,7 @@ export function SchedulesDetails() {
           </VStack>
 
           <VStack mt={20}>
-            {schedule?.status === 0 ? (
-              <Center>
-                <Text bold fontSize="md">
-                  Agendamento cancelado
-                </Text>
-                <Text color="gray.400">
-                  O agendamento foi cancelado pelo usuário e por isso não pode
-                  ser mais alterado.
-                </Text>
-              </Center>
-            ) : (
+            {schedule?.status !== 4 && (
               <Button
                 title="Cancelar agendamento"
                 onPress={handleCancelSchedule}

@@ -3,21 +3,27 @@ import {
   createBottomTabNavigator,
   BottomTabNavigationProp,
 } from '@react-navigation/bottom-tabs';
-import { Profile } from '@screens/clients/Profile';
 import { AddLocation } from '@screens/partners/AddLocation';
+import { Assistance } from '@screens/partners/Assistance';
 import { EditLocation } from '@screens/partners/EditLocation';
 import { HomeScreen } from '@screens/partners/HomeScreen';
 import { LocationDetails } from '@screens/partners/LocationDetails';
 import { Locations } from '@screens/partners/Locations';
+import { Messaging } from '@screens/partners/Messaging';
+import { Profile } from '@screens/partners/Profile';
+import { ScheduleDetail } from '@screens/partners/schedules/ScheduleDetail';
 import { Icon, useTheme } from 'native-base';
 
 type PartnerRoutes = {
   home: undefined;
   profile: undefined;
   locations: undefined;
+  messaging: undefined;
+  assistance: undefined;
   addLocation: undefined;
   locationDetails: { locationId: string };
   editLocation: { locationId: string };
+  scheduleDetail: { scheduleId: string };
 };
 
 export type PartnerNavigatorRoutesProps =
@@ -61,7 +67,6 @@ export function PartnerRoutes() {
           ),
         }}
       />
-
       <Screen
         name="locations"
         component={Locations}
@@ -69,6 +74,33 @@ export function PartnerRoutes() {
           title: 'Locais',
           tabBarIcon: ({ color }) => (
             <Icon as={Feather} name="map-pin" size={iconSize} color={color} />
+          ),
+        }}
+      />
+
+      <Screen
+        name="messaging"
+        component={Messaging}
+        options={{
+          title: 'Mensagens',
+          tabBarIcon: ({ color }) => (
+            <Icon
+              as={Feather}
+              name="message-square"
+              size={iconSize}
+              color={color}
+            />
+          ),
+        }}
+      />
+
+      <Screen
+        name="assistance"
+        component={Assistance}
+        options={{
+          title: 'Assistencia',
+          tabBarIcon: ({ color }) => (
+            <Icon as={Feather} name="life-buoy" size={iconSize} color={color} />
           ),
         }}
       />
@@ -99,6 +131,13 @@ export function PartnerRoutes() {
       <Screen
         name="editLocation"
         component={EditLocation}
+        options={{ tabBarButton: () => null }}
+      />
+
+      {/* Schedules */}
+      <Screen
+        name="scheduleDetail"
+        component={ScheduleDetail}
         options={{ tabBarButton: () => null }}
       />
     </Navigator>

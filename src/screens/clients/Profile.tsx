@@ -1,4 +1,4 @@
-import ProfilePicture from '@assets/profile.png';
+/* eslint-disable no-nested-ternary */
 import { AppHeader } from '@components/AppHeader';
 import { Button } from '@components/Button';
 import { Input } from '@components/Input';
@@ -137,7 +137,11 @@ export function Profile() {
         );
 
         const userUpdated = user;
-        userUpdated.avatar = avatarResponse.data.avatar;
+        if (avatarResponse.data.avatar) {
+          userUpdated.avatar = avatarResponse.data.avatar;
+        } else {
+          userUpdated.avatar = null;
+        }
         updateUserAuth(userUpdated);
 
         toast.show({
@@ -183,7 +187,9 @@ export function Profile() {
       user.name = response.data.name;
       user.username = response.data.username;
       user.email = response.data.email;
-      user.avatar = response.data.avatar;
+      if (response.data.avatar) {
+        user.avatar = response.data.avatar;
+      }
       await updateUserAuth(userUpdated);
 
       await updateProfile({
@@ -263,9 +269,10 @@ export function Profile() {
               />
             ) : (
               <UserPhoto
-                defaultSource={ProfilePicture}
                 source={{
-                  uri: `${api.defaults.baseURL}/user/avatar/${user.id}/${user.avatar}`,
+                  uri: user.avatar
+                    ? `${api.defaults.baseURL}/user/avatar/${user.id}/${user.avatar}`
+                    : `https://ui-avatars.com/api/?format=png&name=${user.name}+${profile.last_name}&size=512`,
                 }}
                 alt="Foto de perfil"
                 size={PHOTO_SIZE}
@@ -394,7 +401,7 @@ export function Profile() {
             <Input
               placeholder={tempDate}
               editable={false}
-              value={tempDate}
+              value={tempDate || profile?.birth_date?.toString()}
               caretHidden
               onPressIn={() => {
                 DateTimePickerAndroid.open({

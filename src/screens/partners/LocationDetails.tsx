@@ -4,7 +4,9 @@ import { UserPhoto } from '@components/UserPhoto';
 import { ILocation } from '@dtos/ILocation';
 import { Feather } from '@expo/vector-icons';
 import { useAuth } from '@hooks/useAuth';
-import { useRoute } from '@react-navigation/native';
+import { useProfile } from '@hooks/useProfile';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { PartnerNavigatorRoutesProps } from '@routes/partner.routes';
 import { api } from '@services/api';
 import { AppError } from '@utils/AppError';
 import { IFileInfo } from 'expo-file-system';
@@ -56,8 +58,10 @@ export function LocationDetails() {
   const routes = useRoute();
   const toast = useToast();
   const { user } = useAuth();
+  const { profile } = useProfile();
 
   const { locationId } = routes.params as RouteParamsProps;
+  const navigation = useNavigation<PartnerNavigatorRoutesProps>();
 
   async function handleFetchLocationDetails() {
     try {
@@ -187,10 +191,12 @@ export function LocationDetails() {
           <VStack>
             <UserPhoto
               source={{
-                uri: `${api.defaults.baseURL}/user/avatar/${user.id}/${user.avatar}`,
+                uri: user.avatar
+                  ? `${api.defaults.baseURL}/user/avatar/${user.id}/${user.avatar}`
+                  : `https://ui-avatars.com/api/?format=png&name=${user.name}+${profile.last_name}&size=512`,
               }}
               alt="Foto de perfil"
-              size={100}
+              size={20}
             />
           </VStack>
           <VStack>
@@ -390,7 +396,14 @@ export function LocationDetails() {
                 color="amber.600"
               />
               <VStack ml={4} w={300}>
-                <Text>{location.open_hours}</Text>
+                {location.open_hours?.length > 1 ? (
+                  <Text>{location.open_hours}</Text>
+                ) : (
+                  <Text color="red.500">
+                    Voce deve adicionar seus horarios para poder receber
+                    clientes!
+                  </Text>
+                )}
               </VStack>
             </HStack>
           </HStack>
@@ -489,11 +502,23 @@ export function LocationDetails() {
                 <Button
                   title={
                     location.LocationsPhotos?.length === 0
-                      ? 'Adicionar photo'
-                      : 'Adicionar mais fotos'
+                      ? '+ Adicionar photo'
+                      : '+ Adicionar mais fotos'
                   }
                   onPress={handleUserProfilePictureSelect}
                   h={50}
+                  variant={'outline'}
+                />
+
+                <Button
+                  title="Editar Local"
+                  onPress={() =>
+                    navigation.navigate('editLocation', {
+                      locationId: location.id,
+                    })
+                  }
+                  h={50}
+                  mt={100}
                 />
               </VStack>
             </HStack>
