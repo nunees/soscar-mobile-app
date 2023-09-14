@@ -1,12 +1,15 @@
 import { AppHeader } from '@components/AppHeader';
+import { ListEmpty } from '@components/ListEmpty';
 import { PartnerCard } from '@components/PartnerCard';
 import { ILocation } from '@dtos/ILocation';
 import { useAuth } from '@hooks/useAuth';
+import { useProfile } from '@hooks/useProfile';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
 import { api } from '@services/api';
 import { AppError } from '@utils/AppError';
-import { VStack, Text, useToast, Center } from 'native-base';
+import { CalculatePositionDistance } from '@utils/CalculatePositionDistance';
+import { VStack, Text, useToast, Center, FlatList } from 'native-base';
 import { useEffect, useState } from 'react';
 
 type RouteParamsProps = {
@@ -19,6 +22,7 @@ export function SearchSchedule() {
   const navigation = useNavigation<AppNavigatorRoutesProps>();
   const toast = useToast();
   const { user } = useAuth();
+  const { profile } = useProfile();
 
   const routes = useRoute();
   const { serviceId } = routes.params as RouteParamsProps;
@@ -53,9 +57,13 @@ export function SearchSchedule() {
         <AppHeader title="Parceiros disponiveis" />
       </VStack>
 
-      <VStack mb={5} px={5}>
+      {/* <VStack mb={5} px={5}>
         {locations?.length ? (
           locations?.map((location) => {
+            const distance = CalculatePositionDistance(
+              [Number(profile.latitude), Number(profile.longitude)],
+              [Number(location.latitude), Number(location.longitude)]
+            );
             return (
               <PartnerCard
                 onPress={() =>
@@ -67,13 +75,13 @@ export function SearchSchedule() {
                 alt={''}
                 name={location.business_name}
                 image={{
-                  uri: `${api.defaults.baseURL}/user/avatar/${location.user_id}/${location.users?.avatar}`,
+                  uri:
+                    `${api.defaults.baseURL}/user/avatar/${location.user_id}/${location.users?.avatar}` ||
+                    `https://ui-avatars.com/api/?name=${location.business_name}&background=random&length=1&rounded=true&size=128`,
                 }}
                 last_name={''}
                 address={`${location.address_line}, ${location.number} - ${location.district}`}
-                distance={''}
-                specialty={location.business_categories}
-                reviews={0}
+                distance={Math.round(distance)}
                 key={location.id}
               />
             );
@@ -85,6 +93,43 @@ export function SearchSchedule() {
             </Center>
           </VStack>
         )}
+      </VStack> */}
+
+      <VStack>
+        <FlatList
+          data={locations}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => {
+            const distance = CalculatePositionDistance(
+              [Number(profile.latitude), Number(profile.longitude)],
+              [Number(item.latitude), Number(item.longitude)]
+            );
+            return (
+              <PartnerCard
+                onPress={() =>
+                  navigation.navigate('newSchedule', {
+                    locationId: item.id,
+                    typeofService: Number(serviceId),
+                  })
+                }
+                alt={''}
+                name={item.business_name}
+                image={{
+                  uri:
+                    `${api.defaults.baseURL}/user/avatar/${item.user_id}/${item.users?.avatar}` ||
+                    `https://ui-avatars.com/api/?name=${item.business_name}&background=random&length=1&rounded=true&size=128`,
+                }}
+                last_name={''}
+                address={`${item.address_line}, ${item.number} - ${item.district}`}
+                distance={Math.round(distance)}
+                key={item.id}
+              />
+            );
+          }}
+          ListEmptyComponent={() => (
+            <ListEmpty message="Nenhum local encontrado" />
+          )}
+        />
       </VStack>
     </VStack>
   );

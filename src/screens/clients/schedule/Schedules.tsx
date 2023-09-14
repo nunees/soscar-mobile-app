@@ -16,13 +16,16 @@ export function Schedules() {
   const navigation = useNavigation<AppNavigatorRoutesProps>();
 
   return (
-    <VStack pb={10}>
-      <VStack mb={10}>
+    <VStack>
+      <VStack mb={5}>
         <AppHeader title="Agendamento de Serviços" />
       </VStack>
 
-      <ScrollView showsVerticalScrollIndicator={false} marginBottom={100}>
-        <VStack px={5}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 120 }}
+      >
+        <VStack px={3}>
           <ListServices
             image={EngineService}
             alt={'Mecânico'}

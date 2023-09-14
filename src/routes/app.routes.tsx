@@ -44,7 +44,7 @@ const { Screen, Navigator } = createBottomTabNavigator<AppRotes>();
 export function AppRoutes() {
   const { colors, fonts } = useTheme();
 
-  const iconSize = 8;
+  const iconSize = 7;
 
   return (
     <Navigator
@@ -56,14 +56,16 @@ export function AppRoutes() {
           fontSize: 10,
           fontFamily: fonts.body,
           fontWeight: 'bold',
-          paddingBottom: 10,
+          paddingBottom: 5,
         },
         tabBarActiveTintColor: colors.orange[700],
         tabBarInactiveTintColor: colors.gray[500],
         tabBarStyle: {
           backgroundColor: colors.white,
           borderTopWidth: 1,
-          minHeight: 70,
+          shadowColor: colors.gray[600],
+          shadowOpacity: 0.2,
+          minHeight: 60,
         },
       }}
     >

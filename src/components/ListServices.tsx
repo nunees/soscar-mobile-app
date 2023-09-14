@@ -30,7 +30,7 @@ export function ListServices({ image, alt, title, content, ...rest }: Props) {
         <Image source={image} alt={alt} w={20} h={20} {...rest} />
         <VStack px={5}>
           <Heading>{title}</Heading>
-          <Text>{content}</Text>
+          <Text textAlign="justify">{content}</Text>
         </VStack>
       </HStack>
     </Pressable>

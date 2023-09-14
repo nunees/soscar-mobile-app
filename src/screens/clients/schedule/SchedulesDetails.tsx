@@ -37,8 +37,6 @@ type SchedulesFiles = {
 
 export function SchedulesDetails() {
   const [schedule, setSchedule] = useState<ISchedules>();
-  const [schedulesFiles, setSchedulesFiles] = useState<any[]>([]);
-
   const [loadedImages, setLoadedImages] = useState<any[]>([]);
 
   const routes = useRoute();
@@ -52,7 +50,6 @@ export function SchedulesDetails() {
     const response = await api.get(`/schedules/${scheduleId}`);
 
     setSchedule(response.data);
-    setSchedulesFiles(response.data.SchedulesFiles);
 
     response.data.SchedulesFiles.map((file: SchedulesFiles) =>
       setLoadedImages((oldState) => [...oldState, file])
@@ -104,14 +101,13 @@ export function SchedulesDetails() {
         contentContainerStyle={{ paddingBottom: 120 }}
       >
         <VStack flex={1} px={5} py={5}>
-          {schedule!.status === 4 && (
+          {schedule?.status === 4 && (
             <Center mb={10}>
               <Heading bold color="red.500">
                 Agendamento cancelado!
               </Heading>
               <Text color="gray.400" px={5} textAlign="center">
-                O agendamento foi cancelado e por isso não pode ser mais
-                alterado.
+                O agendamento foi cancelado e por isso não pode ser alterado.
               </Text>
             </Center>
           )}

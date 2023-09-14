@@ -10,6 +10,7 @@ import { useNavigation } from '@react-navigation/native';
 import { PartnerNavigatorRoutesProps } from '@routes/partner.routes';
 import { api } from '@services/api';
 import { AppError } from '@utils/AppError';
+import { ConvertAddressToLatLong } from '@utils/CalculatePositionDistance';
 import { GetAddressByCEP } from '@utils/GetAddressByCEP';
 import {
   ScrollView,
@@ -56,6 +57,10 @@ export function AddLocation() {
   const [district, setDistrict] = useState('');
   const [state, setState] = useState('');
   const [zipCode, setZipCode] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
+  const [openDays, setOpenDays] = useState<string[]>([]);
+  const [openHour, setOpenHour] = useState('');
+  const [closeHour, setCloseHour] = useState('');
   const [selectedPaymentMethods, setSelectedPaymentMethods] = useState<
     number[]
   >([]);
@@ -65,15 +70,12 @@ export function AddLocation() {
   const [businessDescription, setBusinessDescription] = useState('');
 
   const [correctZipCode, setCorrectZipCode] = useState(false);
+  const [latitude, setLatitude] = useState(0);
+  const [longitude, setLongitude] = useState(0);
 
   const { user } = useAuth();
   const toast = useToast();
   const navigation = useNavigation<PartnerNavigatorRoutesProps>();
-
-  const [isUploading, setIsUploading] = useState(false);
-  const [openDays, setOpenDays] = useState<string[]>([]);
-  const [openHour, setOpenHour] = useState('');
-  const [closeHour, setCloseHour] = useState('');
 
   function setPaymentMethodsHandler(value: number) {
     setSelectedPaymentMethods((prevState) => {
@@ -117,6 +119,8 @@ export function AddLocation() {
           business_description: businessDescription,
           open_hours: `${openHour}-${closeHour}`,
           open_hours_weekend: openDays,
+          latitude: String(latitude),
+          longitude: String(longitude),
         },
         {
           headers: {
@@ -155,6 +159,11 @@ export function AddLocation() {
         setDistrict(address.data.bairro);
         setCity(address.data.localidade);
         setState(address.data.uf);
+        const location = await ConvertAddressToLatLong(
+          `${address.data.logradouro}, ${address.data.bairro} - ${address.data.uf}`
+        );
+        setLatitude(location!.latitude);
+        setLongitude(location!.longitude);
       } else {
         setCorrectZipCode(true);
       }

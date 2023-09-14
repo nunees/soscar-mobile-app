@@ -17,6 +17,7 @@ import {
   Icon,
   Heading,
   Box,
+  Center,
 } from 'native-base';
 import { useEffect, useState } from 'react';
 import { TouchableOpacity } from 'react-native';
@@ -190,20 +191,102 @@ export function HomeScreen() {
               />
             </TouchableOpacity>
           </HStack>
-          <VStack mt={5}>
-            <Text>Aguardando</Text>
-            {locations.map((location) => (
-              <VStack>
-                {schedules.map((schedule) => {
-                  if (schedule.status === 1) {
-                    return (
-                      <TouchableOpacity
-                        onPress={() =>
-                          navigation.navigate('scheduleDetail', {
-                            scheduleId: String(schedule.id),
-                          })
-                        }
-                      >
+        </VStack>
+
+        {schedules.length > 0 ? (
+          <VStack>
+            <VStack mt={5}>
+              <Text>Aguardando</Text>
+              {locations.map((location) => (
+                <VStack>
+                  {schedules.map((schedule) => {
+                    if (schedule.status === 1) {
+                      return (
+                        <TouchableOpacity
+                          onPress={() =>
+                            navigation.navigate('scheduleDetail', {
+                              scheduleId: String(schedule.id),
+                            })
+                          }
+                        >
+                          <VStack
+                            w={380}
+                            h={50}
+                            borderWidth={1}
+                            borderColor="gray.600"
+                            borderRadius={5}
+                            justifyItems="baseline"
+                            alignItems="center"
+                            mt={2}
+                            key={schedule.id}
+                          >
+                            <VStack p={3}>
+                              <HStack>
+                                <HStack pr={3}>
+                                  <Icon
+                                    as={Feather}
+                                    name="briefcase"
+                                    size={5}
+                                    color="orange.500"
+                                  />
+                                  <Text bold pl={2}>
+                                    {location.business_name}
+                                  </Text>
+                                </HStack>
+                                <HStack pl={3}>
+                                  <Icon
+                                    as={Feather}
+                                    name="calendar"
+                                    size={5}
+                                    color="orange.500"
+                                  />
+                                  <Text bold pl={2}>
+                                    {schedule.date
+                                      .toString()
+                                      .split('T')[0]
+                                      .split('-')
+                                      .reverse()
+                                      .join('/')}
+                                  </Text>
+                                </HStack>
+                                <HStack pl={3}>
+                                  <Icon
+                                    as={Feather}
+                                    name="clock"
+                                    size={5}
+                                    color="orange.500"
+                                  />
+                                  <Text bold pl={2}>
+                                    {schedule.time}
+                                  </Text>
+
+                                  <Icon
+                                    as={Feather}
+                                    name="arrow-right"
+                                    size={7}
+                                    color="orange.500"
+                                    ml={5}
+                                  />
+                                </HStack>
+                              </HStack>
+                            </VStack>
+                          </VStack>
+                        </TouchableOpacity>
+                      );
+                    }
+                    return <VStack></VStack>;
+                  })}
+                </VStack>
+              ))}
+            </VStack>
+
+            <VStack mt={5}>
+              <Text>Em andamento</Text>
+              {locations.map((location) => (
+                <VStack>
+                  {schedules.map((schedule) => {
+                    if (schedule.status === 2) {
+                      return (
                         <VStack
                           w={380}
                           h={50}
@@ -213,7 +296,6 @@ export function HomeScreen() {
                           justifyItems="baseline"
                           alignItems="center"
                           mt={2}
-                          key={schedule.id}
                         >
                           <VStack p={3}>
                             <HStack>
@@ -266,93 +348,21 @@ export function HomeScreen() {
                             </HStack>
                           </VStack>
                         </VStack>
-                      </TouchableOpacity>
-                    );
-                  }
-                  return <VStack></VStack>;
-                })}
-              </VStack>
-            ))}
-          </VStack>
-        </VStack>
-
-        <VStack mt={5}>
-          <Text>Em andamento</Text>
-          {locations.map((location) => (
-            <VStack>
-              {schedules.map((schedule) => {
-                if (schedule.status === 2) {
-                  return (
-                    <VStack
-                      w={380}
-                      h={50}
-                      borderWidth={1}
-                      borderColor="gray.600"
-                      borderRadius={5}
-                      justifyItems="baseline"
-                      alignItems="center"
-                      mt={2}
-                    >
-                      <VStack p={3}>
-                        <HStack>
-                          <HStack pr={3}>
-                            <Icon
-                              as={Feather}
-                              name="briefcase"
-                              size={5}
-                              color="orange.500"
-                            />
-                            <Text bold pl={2}>
-                              {location.business_name}
-                            </Text>
-                          </HStack>
-                          <HStack pl={3}>
-                            <Icon
-                              as={Feather}
-                              name="calendar"
-                              size={5}
-                              color="orange.500"
-                            />
-                            <Text bold pl={2}>
-                              {schedule.date
-                                .toString()
-                                .split('T')[0]
-                                .split('-')
-                                .reverse()
-                                .join('/')}
-                            </Text>
-                          </HStack>
-                          <HStack pl={3}>
-                            <Icon
-                              as={Feather}
-                              name="clock"
-                              size={5}
-                              color="orange.500"
-                            />
-                            <Text bold pl={2}>
-                              {schedule.time}
-                            </Text>
-
-                            <Icon
-                              as={Feather}
-                              name="arrow-right"
-                              size={7}
-                              color="orange.500"
-                              ml={5}
-                            />
-                          </HStack>
-                        </HStack>
-                      </VStack>
-                    </VStack>
-                  );
-                }
-                return null;
-              })}
+                      );
+                    }
+                    return null;
+                  })}
+                </VStack>
+              ))}
             </VStack>
-          ))}
-        </VStack>
-
-        {/** */}
+          </VStack>
+        ) : (
+          <VStack pt={5}>
+            <Center>
+              <Text color="gray.600">Voce nao possui nenhum em aberto</Text>
+            </Center>
+          </VStack>
+        )}
       </VStack>
     </ScrollView>
   );

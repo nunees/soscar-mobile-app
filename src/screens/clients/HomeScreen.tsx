@@ -17,7 +17,6 @@ import { UserLocation } from '@components/UserLocation';
 import { UserPhoto } from '@components/UserPhoto';
 import { ISchedules } from '@dtos/ISchedules';
 import { IVehicleDTO } from '@dtos/IVechicleDTO';
-import { Entypo } from '@expo/vector-icons';
 import { useAuth } from '@hooks/useAuth';
 import { useProfile } from '@hooks/useProfile';
 import { useNavigation } from '@react-navigation/native';
@@ -30,7 +29,6 @@ import {
   VStack,
   Text,
   Box,
-  Icon,
   Center,
 } from 'native-base';
 import { useEffect, useState } from 'react';
@@ -253,15 +251,6 @@ export function HomeScreen() {
             <Text bold mb={2}>
               Agendamentos
             </Text>
-            <TouchableOpacity>
-              <Icon
-                as={Entypo}
-                name="plus"
-                size={8}
-                color={'gray.400'}
-                mr={3}
-              />
-            </TouchableOpacity>
           </HStack>
           {schedules.length > 0 ? (
             schedules.map((schedule) => (

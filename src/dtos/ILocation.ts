@@ -15,6 +15,8 @@ export interface ILocation {
   payment_methods: number[];
   business_categories: number[];
   business_description: string | null;
+  latitude: string;
+  longitude: string;
   photos: string[];
   LocationsPhotos?: {
     id?: string;

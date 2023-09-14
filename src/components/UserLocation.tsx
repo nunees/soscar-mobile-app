@@ -13,6 +13,7 @@ export function UserLocation() {
   async function displayAddress() {
     try {
       const address = await reverseGeocodeAsync(coords);
+
       setAddress(`${address[0].street}, ${address[0].district}`);
     } catch (error) {
       throw new AppError('Não foi possível obter a localização do usuário.');
