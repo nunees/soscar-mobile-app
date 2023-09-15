@@ -7,6 +7,7 @@ import { useAuth } from '@hooks/useAuth';
 import { useNavigation } from '@react-navigation/native';
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
 import { api } from '@services/api';
+import { AppError } from '@utils/AppError';
 import { Text, ScrollView, VStack, Icon, Fab } from 'native-base';
 import { useEffect, useState } from 'react';
 
@@ -17,8 +18,6 @@ export function Vechicles() {
 
   const navigation = useNavigation<AppNavigatorRoutesProps>();
 
-  console.log(vehicles);
-
   async function fetchUserVehicles() {
     try {
       const response = await api.get('/vehicles/', {
@@ -27,10 +26,8 @@ export function Vechicles() {
         },
       });
       setVehicles(response.data);
-
-      console.log(vehicles);
     } catch (error) {
-      console.log(error);
+      throw new AppError('Erro ao buscar veículos');
     }
   }
 

@@ -20,4 +20,8 @@ export interface IVehicleDTO {
     name: string;
     brand_id: number;
   };
+  InsuranceCompanies?: {
+    id: string;
+    name: string;
+  };
 }

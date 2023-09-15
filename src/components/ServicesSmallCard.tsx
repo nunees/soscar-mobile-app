@@ -10,13 +10,22 @@ type Props = IIconProps &
 
 export function ServicesSmallCard({ image, alt, title, ...rest }: Props) {
   return (
-    <Box mr={5} alignItems={'center'}>
+    <Box
+      mr={2}
+      w={100}
+      h={100}
+      alignItems={'center'}
+      backgroundColor="white"
+      borderRadius={5}
+      p={3}
+      shadow={1}
+    >
       <TouchableOpacity {...rest}>
-        <VStack w={70} h={70} bg={'transparent'} rounded={5}>
-          <Image source={image} alt={alt} w={70} h={70} {...rest} />
+        <VStack bg={'transparent'}>
+          <Image source={image} alt={alt} w={50} h={50} {...rest} />
         </VStack>
       </TouchableOpacity>
-      <Text mt={2} textAlign={'center'}>
+      <Text mt={2} textAlign={'center'} bold>
         {title}
       </Text>
     </Box>

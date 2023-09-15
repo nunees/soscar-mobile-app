@@ -14,7 +14,6 @@ import { ReminderBell } from '@components/ReminderBell';
 import { ServicesSmallCard } from '@components/ServicesSmallCard';
 import { SmallSchedulleCard } from '@components/SmallSchedulleCard';
 import { UserLocation } from '@components/UserLocation';
-import { UserPhoto } from '@components/UserPhoto';
 import { ISchedules } from '@dtos/ISchedules';
 import { IVehicleDTO } from '@dtos/IVechicleDTO';
 import { useAuth } from '@hooks/useAuth';
@@ -22,6 +21,7 @@ import { useProfile } from '@hooks/useProfile';
 import { useNavigation } from '@react-navigation/native';
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
 import { api } from '@services/api';
+import { AppError } from '@utils/AppError';
 import {
   HStack,
   Heading,
@@ -30,11 +30,10 @@ import {
   Text,
   Box,
   Center,
+  Pressable,
 } from 'native-base';
 import { useEffect, useState } from 'react';
 import { TouchableOpacity } from 'react-native';
-
-const PHOTO_SIZE = 10;
 
 export function HomeScreen() {
   const [vehicles, setVehicles] = useState<IVehicleDTO[]>([]);
@@ -42,8 +41,6 @@ export function HomeScreen() {
 
   const { user } = useAuth();
   const { profile } = useProfile();
-
-  console.log({ profile });
 
   const navigation = useNavigation<AppNavigatorRoutesProps>();
 
@@ -67,7 +64,7 @@ export function HomeScreen() {
       });
       setVehicles(response.data);
     } catch (error) {
-      console.log(error);
+      throw new AppError('Erro ao buscar veículos');
     }
   }
 
@@ -80,7 +77,7 @@ export function HomeScreen() {
       });
       setSchedules(response.data);
     } catch (error) {
-      console.log(error);
+      throw new AppError('Erro ao buscar agendamentos');
     }
   }
 
@@ -91,28 +88,18 @@ export function HomeScreen() {
 
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
-      <VStack py={10} px={19}>
+      <VStack>
         <HStack mb={5} justifyContent={'center'}>
           <UserLocation />
         </HStack>
         <HStack justifyContent={'space-between'}>
           <HStack justifyItems={'baseline'}>
-            <TouchableOpacity onPress={() => navigation.navigate('profile')}>
-              <UserPhoto
-                source={{
-                  uri:
-                    `${api.defaults.baseURL}/user/avatar/${user.id}/${user.avatar}` ||
-                    `https://ui-avatars.com/api/?name=${user.name}&background=random&length=1&rounded=true&size=128`,
-                }}
-                alt="Foto de perfil"
-                size={PHOTO_SIZE}
-              />
-            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('profile')}
+            ></TouchableOpacity>
             <Box ml={2} pb={10}>
-              <Heading color="gray.200" fontSize="lg">
-                {`${greeting()},`}
-              </Heading>
               <Text>{`${user.name}`}</Text>
+              <Heading color="gray.200">{`${greeting()}!`}</Heading>
             </Box>
           </HStack>
           <HStack mt={3}>
@@ -122,15 +109,18 @@ export function HomeScreen() {
 
         <VStack>
           <HStack justifyContent={'space-between'}>
-            <Text bold mb={2} color="gray.200">
+            <Text bold mb={2} ml={5} color="gray.200">
               Meus Veículos
             </Text>
 
-            <TouchableOpacity onPress={() => navigation.navigate('vehicles')}>
+            <Pressable
+              onPress={() => navigation.navigate('vehicles')}
+              bg="white"
+            >
               <Text mb={2} color="gray.400">
                 Ver todos
               </Text>
-            </TouchableOpacity>
+            </Pressable>
           </HStack>
         </VStack>
 
@@ -141,13 +131,15 @@ export function HomeScreen() {
           snapToInterval={400}
         >
           {vehicles.length > 0 ? (
-            vehicles.map((vehicle) => <FavoriteCars vehicle={vehicle} />)
+            vehicles.map((vehicle) => (
+              <FavoriteCars vehicle={vehicle} key={vehicle.id} />
+            ))
           ) : (
             <VStack px={10} py={5}>
               <TouchableOpacity
                 onPress={() => navigation.navigate('addVehicle')}
               >
-                <Center>
+                <Center bg="white">
                   <Text color="gray.400">
                     Você não possui veículos cadastrados
                   </Text>
@@ -162,7 +154,7 @@ export function HomeScreen() {
 
         <VStack>
           <HStack justifyContent={'space-between'}>
-            <Text bold mb={2}>
+            <Text bold mb={2} ml={5}>
               Escolha um serviço
             </Text>
 
@@ -173,7 +165,11 @@ export function HomeScreen() {
             </TouchableOpacity>
           </HStack>
 
-          <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+          <ScrollView
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}
+            ml={3}
+          >
             <ServicesSmallCard
               image={EngineService}
               alt="mecânico"
@@ -237,16 +233,16 @@ export function HomeScreen() {
           </ScrollView>
         </VStack>
 
-        <VStack py={10}>
-          <Text bold mb={2}>
+        <VStack mt={5} px={5}>
+          <Text bold mb={2} ml={3}>
             Parceiros Recomendados
           </Text>
           <TouchableOpacity>
-            <Box w={346} h={176} bg={'gray.700'} rounded={5}></Box>
+            <VStack w={370} h={100} bg="white" rounded={5}></VStack>
           </TouchableOpacity>
         </VStack>
 
-        <VStack>
+        <VStack px={5}>
           <HStack justifyContent={'space-between'} alignContent={'baseline'}>
             <Text bold mb={2}>
               Agendamentos
@@ -260,8 +256,9 @@ export function HomeScreen() {
                 mb={3}
                 borderRadius={5}
                 shadow={0.8}
+                key={schedule.id}
               >
-                <SmallSchedulleCard data={schedule} />
+                <SmallSchedulleCard data={schedule} key={schedule.id} />
               </VStack>
             ))
           ) : (

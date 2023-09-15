@@ -88,7 +88,7 @@ export function AddVehicle() {
           year: Number(year),
           plate,
           notes,
-          insuranceId: Number(insuranceId) || 12,
+          insurance_id: Number(insuranceId) || 12,
           isPrimary: isMainVehicle,
         },
         {
@@ -97,6 +97,7 @@ export function AddVehicle() {
           },
         }
       );
+
       setShowModal(false);
       navigation.navigate('vehicles');
     } catch (error) {

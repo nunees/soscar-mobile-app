@@ -1,5 +1,7 @@
 import * as Location from 'expo-location';
 
+import { AppError } from './AppError';
+
 function toRad(angle: number) {
   return (angle * Math.PI) / 180;
 }
@@ -9,8 +11,6 @@ export function CalculatePositionDistance([prevLat, prevLong], [lat, long]) {
   const prevLongInRad = toRad(prevLong);
   const latInRad = toRad(lat);
   const longInRad = toRad(long);
-
-  console.log(prevLatInRad, prevLongInRad, latInRad, longInRad);
 
   return (
     // In kilometers
@@ -35,7 +35,6 @@ export async function ConvertAddressToLatLong(address: string) {
 
     // Obter as coordenadas do endereço
     const location = await Location.geocodeAsync(address);
-    console.log(location);
 
     if (location && location.length > 0) {
       const primeiraCoordenada = location[0];
@@ -47,6 +46,6 @@ export async function ConvertAddressToLatLong(address: string) {
     console.error('Não foi possível obter as coordenadas do endereço');
     return null;
   } catch (error) {
-    console.log(error);
+    throw new AppError('Não foi possível obter as coordenadas do endereço');
   }
 }

@@ -16,12 +16,8 @@ export default function App() {
   const [fontsLoaded] = useFonts({ Poppins_400Regular, Poppins_700Bold });
 
   return (
-    <NativeBaseProvider theme={THEME}>
-      <StatusBar
-        barStyle="dark-content"
-        backgroundColor="transparent"
-        translucent
-      />
+    <NativeBaseProvider theme={THEME} isSSR={false}>
+      <StatusBar barStyle="dark-content" backgroundColor="white" />
       <AuthContextProvider>
         <ProfileContextProvider>
           {fontsLoaded ? <Routes /> : <Loading />}

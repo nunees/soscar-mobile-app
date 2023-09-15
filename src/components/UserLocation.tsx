@@ -6,17 +6,17 @@ import { Text, HStack, Icon } from 'native-base';
 import { useEffect, useState } from 'react';
 
 export function UserLocation() {
-  const [address, setAddress] = useState<string>('');
-
   const { coords } = useGPS();
+  const [address, setAddress] = useState<string>('');
 
   async function displayAddress() {
     try {
+      console.log(coords);
       const address = await reverseGeocodeAsync(coords);
 
       setAddress(`${address[0].street}, ${address[0].district}`);
     } catch (error) {
-      throw new AppError('Não foi possível obter a localização do usuário.');
+      throw new AppError('Erro ao buscar endereço');
     }
   }
 

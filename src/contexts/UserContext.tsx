@@ -4,6 +4,7 @@ import {
   storageUserProfileRemove,
   storageUserProfileSave,
 } from '@storage/storageUser';
+import { AppError } from '@utils/AppError';
 import { ReactNode, createContext, useEffect, useState } from 'react';
 
 export type ProfileContextDataProps = {
@@ -41,9 +42,11 @@ export function ProfileContextProvider({ children }: AuthContextProviderProps) {
   }
 
   async function removeProfile() {
-    setIsLoadingProfileStorageData(true);
-    await storageUserProfileRemove();
-    setIsLoadingProfileStorageData(false);
+    try {
+      await storageUserProfileRemove();
+    } catch (error) {
+      throw new AppError('Erro ao remover perfil');
+    }
   }
 
   async function loadProfile() {

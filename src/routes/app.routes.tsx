@@ -8,7 +8,10 @@ import { ChangePassword } from '@screens/clients/ChangePassword';
 import { HomeScreen } from '@screens/clients/HomeScreen';
 import { PartnerDetails } from '@screens/clients/PartnerDetails';
 import { Profile } from '@screens/clients/Profile';
+import { NewQuote } from '@screens/clients/quotes/NewQuote';
+import { QuoteDetails } from '@screens/clients/quotes/QuoteDetails';
 import { Quotes } from '@screens/clients/quotes/Quotes';
+import { QuotesList } from '@screens/clients/quotes/QuotesList';
 import { SearchQuote } from '@screens/clients/quotes/SearchQuote';
 import { NewSchedule } from '@screens/clients/schedule/NewSchedule';
 import { Schedules } from '@screens/clients/schedule/Schedules';
@@ -33,6 +36,9 @@ type AppRotes = {
   partnerDetails: { partnerId: string; typeofService: string };
   newSchedule: { locationId: string; typeofService: number };
   quotes: undefined;
+  newQuote: { locationId: string; serviceId: string };
+  quotesList: undefined;
+  quoteDetails: { quoteId: string; hashId: string };
   searchQuote: { serviceId: string };
   schedulesDetails: { scheduleId: string };
 };
@@ -94,7 +100,7 @@ export function AppRoutes() {
       <Screen
         name="schedules"
         component={Schedules}
-        options={{ tabBarButton: () => null }}
+        options={{ tabBarButton: () => null, tabBarStyle: { display: 'none' } }}
       />
 
       <Screen
@@ -174,9 +180,27 @@ export function AppRoutes() {
       />
 
       <Screen
+        name="newQuote"
+        component={NewQuote}
+        options={{ tabBarButton: () => null }}
+      />
+
+      <Screen
         name="searchQuote"
         component={SearchQuote}
         options={{ tabBarButton: () => null }}
+      />
+
+      <Screen
+        name="quotesList"
+        component={QuotesList}
+        options={{ tabBarButton: () => null, tabBarStyle: { display: 'none' } }}
+      />
+
+      <Screen
+        name="quoteDetails"
+        component={QuoteDetails}
+        options={{ tabBarButton: () => null, tabBarStyle: { display: 'none' } }}
       />
     </Navigator>
   );

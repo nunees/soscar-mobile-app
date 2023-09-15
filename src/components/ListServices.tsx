@@ -3,7 +3,6 @@ import {
   Text,
   Image,
   IImageProps,
-  Heading,
   HStack,
   IPressableProps,
 } from 'native-base';
@@ -20,17 +19,15 @@ type Props = IImageProps &
 export function ListServices({ image, alt, title, content, ...rest }: Props) {
   return (
     <Pressable {...rest}>
-      <HStack
-        w={330}
-        mb={10}
-        pb={5}
-        borderBottomWidth={1}
-        borderBottomColor="gray.600"
-      >
+      <HStack w={390} mb={2} backgroundColor="white" p={5} borderRadius={10}>
         <Image source={image} alt={alt} w={20} h={20} {...rest} />
-        <VStack px={5}>
-          <Heading>{title}</Heading>
-          <Text textAlign="justify">{content}</Text>
+        <VStack pl={3} w={280}>
+          <Text bold fontSize="md">
+            {title}
+          </Text>
+          <Text textAlign="justify" color="gray.400">
+            {content}
+          </Text>
         </VStack>
       </HStack>
     </Pressable>

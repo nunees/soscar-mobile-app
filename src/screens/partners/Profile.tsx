@@ -215,7 +215,6 @@ export function Profile() {
   }
 
   async function loadData() {
-    console.log({ user });
     if (!profile.last_name) {
       const response = await api.get('/user/profile', {
         headers: {

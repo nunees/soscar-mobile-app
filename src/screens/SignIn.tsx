@@ -69,92 +69,98 @@ export function SignIn() {
   }
 
   return (
-    <ScrollView flex={1}>
-      <HStack pl={100} width={200} height={80}>
-        <LoginHeaderSVG width={200} />
-      </HStack>
-      <VStack px={10} mt={-10}>
-        <Heading pb={2}>Bem-vindo!</Heading>
-        <Text>Faça login para continuar</Text>
-      </VStack>
-      <VStack flex={1}>
+    <VStack backgroundColor="white">
+      <ScrollView>
         <VStack>
-          <VStack ml={5}></VStack>
-          <Center px={10} mt={5}>
-            <Controller
-              control={control}
-              name="email"
-              rules={{ required: 'Informe seu e-mail' }}
-              render={({ field: { onChange, value } }) => (
-                <Input
-                  borderTopWidth={0}
-                  borderLeftWidth={0}
-                  borderRightWidth={0}
-                  fontSize="md"
-                  placeholder="Email"
-                  autoCapitalize="none"
-                  keyboardType="email-address"
-                  onChangeText={onChange}
-                  value={value}
-                  errorMessage={errors.email?.message}
-                />
-              )}
-            />
-
-            <Controller
-              control={control}
-              name="password"
-              rules={{ required: 'Informe sua senha' }}
-              render={({ field: { onChange, value } }) => (
-                <Input
-                  borderTopWidth={0}
-                  borderLeftWidth={0}
-                  borderRightWidth={0}
-                  fontSize="md"
-                  placeholder="Senha"
-                  autoCapitalize="none"
-                  secureTextEntry
-                  onChangeText={onChange}
-                  value={value}
-                  errorMessage={errors.password?.message}
-                />
-              )}
-            />
-
-            <HStack justifyContent={'space-between'}>
-              <Checkbox
-                colorScheme="orange"
-                value={''}
-                onChange={() => {}}
-                mr={10}
-              >
-                <Text fontSize="xs">Salvar credenciais</Text>
-              </Checkbox>
-              <TouchableOpacity>
-                <Text fontWeight={'bold'} color="orange.700" fontSize="xs">
-                  Esqueci minha senha
-                </Text>
-              </TouchableOpacity>
-            </HStack>
-
-            <Button
-              title="Acessar"
-              mt={20}
-              onPress={handleSubmit(handleSignIn)}
-              isLoading={isLoading}
-            />
-
-            <HStack mt={5}>
-              <Text fontSize="xs">Não tem uma conta?</Text>
-              <Pressable onPress={handleSignUp}>
-                <Text color="orange.700" pl={1} fontSize="xs">
-                  Registre-se
-                </Text>
-              </Pressable>
-            </HStack>
-          </Center>
+          <HStack pl={100} width={200} height={80}>
+            <LoginHeaderSVG width={200} />
+          </HStack>
         </VStack>
-      </VStack>
-    </ScrollView>
+        <VStack>
+          <VStack px={10}>
+            <Heading pb={2}>Bem-vindo!</Heading>
+            <Text>Faça login para continuar</Text>
+          </VStack>
+          <VStack flex={1}>
+            <VStack>
+              <VStack ml={5}></VStack>
+              <Center px={10} mt={5}>
+                <Controller
+                  control={control}
+                  name="email"
+                  rules={{ required: 'Informe seu e-mail' }}
+                  render={({ field: { onChange, value } }) => (
+                    <Input
+                      borderTopWidth={0}
+                      borderLeftWidth={0}
+                      borderRightWidth={0}
+                      fontSize="md"
+                      placeholder="Email"
+                      autoCapitalize="none"
+                      keyboardType="email-address"
+                      onChangeText={onChange}
+                      value={value}
+                      errorMessage={errors.email?.message}
+                    />
+                  )}
+                />
+
+                <Controller
+                  control={control}
+                  name="password"
+                  rules={{ required: 'Informe sua senha' }}
+                  render={({ field: { onChange, value } }) => (
+                    <Input
+                      borderTopWidth={0}
+                      borderLeftWidth={0}
+                      borderRightWidth={0}
+                      fontSize="md"
+                      placeholder="Senha"
+                      autoCapitalize="none"
+                      secureTextEntry
+                      onChangeText={onChange}
+                      value={value}
+                      errorMessage={errors.password?.message}
+                    />
+                  )}
+                />
+
+                <HStack justifyContent={'space-between'}>
+                  <Checkbox
+                    colorScheme="orange"
+                    value={''}
+                    onChange={() => {}}
+                    mr={10}
+                  >
+                    <Text fontSize="xs">Salvar credenciais</Text>
+                  </Checkbox>
+                  <TouchableOpacity>
+                    <Text fontWeight={'bold'} color="orange.700" fontSize="xs">
+                      Esqueci minha senha
+                    </Text>
+                  </TouchableOpacity>
+                </HStack>
+
+                <Button
+                  title="Acessar"
+                  mt={20}
+                  onPress={handleSubmit(handleSignIn)}
+                  isLoading={isLoading}
+                />
+
+                <HStack mt={5}>
+                  <Text fontSize="xs">Não tem uma conta?</Text>
+                  <Pressable onPress={handleSignUp}>
+                    <Text color="orange.700" pl={1} fontSize="xs">
+                      Registre-se
+                    </Text>
+                  </Pressable>
+                </HStack>
+              </Center>
+            </VStack>
+          </VStack>
+        </VStack>
+      </ScrollView>
+    </VStack>
   );
 }

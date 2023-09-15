@@ -3,12 +3,12 @@ import {
   createBottomTabNavigator,
   BottomTabNavigationProp,
 } from '@react-navigation/bottom-tabs';
-import { AddLocation } from '@screens/partners/AddLocation';
 import { Assistance } from '@screens/partners/Assistance';
-import { EditLocation } from '@screens/partners/EditLocation';
 import { HomeScreen } from '@screens/partners/HomeScreen';
-import { LocationDetails } from '@screens/partners/LocationDetails';
-import { Locations } from '@screens/partners/Locations';
+import { AddLocation } from '@screens/partners/locations/AddLocation';
+import { EditLocation } from '@screens/partners/locations/EditLocation';
+import { LocationDetails } from '@screens/partners/locations/LocationDetails';
+import { Locations } from '@screens/partners/locations/Locations';
 import { Messaging } from '@screens/partners/Messaging';
 import { Profile } from '@screens/partners/Profile';
 import { ScheduleDetail } from '@screens/partners/schedules/ScheduleDetail';
@@ -79,6 +79,24 @@ export function PartnerRoutes() {
       />
 
       <Screen
+        name="addLocation"
+        component={AddLocation}
+        options={{ tabBarButton: () => null }}
+      />
+
+      <Screen
+        name="locationDetails"
+        component={LocationDetails}
+        options={{ tabBarButton: () => null }}
+      />
+
+      <Screen
+        name="editLocation"
+        component={EditLocation}
+        options={{ tabBarButton: () => null }}
+      />
+
+      <Screen
         name="messaging"
         component={Messaging}
         options={{
@@ -114,24 +132,6 @@ export function PartnerRoutes() {
             <Icon as={Feather} name="user" size={iconSize} color={color} />
           ),
         }}
-      />
-
-      <Screen
-        name="addLocation"
-        component={AddLocation}
-        options={{ tabBarButton: () => null }}
-      />
-
-      <Screen
-        name="locationDetails"
-        component={LocationDetails}
-        options={{ tabBarButton: () => null }}
-      />
-
-      <Screen
-        name="editLocation"
-        component={EditLocation}
-        options={{ tabBarButton: () => null }}
       />
 
       {/* Schedules */}

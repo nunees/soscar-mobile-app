@@ -17,7 +17,7 @@ export function Schedules() {
 
   return (
     <VStack>
-      <VStack mb={5}>
+      <VStack>
         <AppHeader title="Agendamento de Serviços" />
       </VStack>
 
@@ -25,7 +25,7 @@ export function Schedules() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 120 }}
       >
-        <VStack px={3}>
+        <VStack px={3} pt={3}>
           <ListServices
             image={EngineService}
             alt={'Mecânico'}

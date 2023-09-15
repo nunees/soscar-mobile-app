@@ -13,8 +13,8 @@ export function AppHeader({ title, icon }: Props) {
   const navigation = useNavigation<AppNavigatorRoutesProps>();
 
   return (
-    <VStack mt={10} px={5} w="full">
-      <HStack justifyContent={'flex-start'}>
+    <VStack px={5} w="full" h={50} backgroundColor="white" shadow={2}>
+      <HStack pt={2} justifyContent={'flex-start'}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Icon
             as={Feather}

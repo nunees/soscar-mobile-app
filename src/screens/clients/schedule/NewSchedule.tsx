@@ -232,7 +232,6 @@ export function NewSchedule() {
 
       try {
         files.map(async (file) => {
-          console.log('hit');
           userPhotoUploadForm.append('document', file);
           await api.post(
             `/schedules/documents/${response.data.id}`,

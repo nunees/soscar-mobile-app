@@ -9,6 +9,7 @@ import { useProfile } from '@hooks/useProfile';
 import { useNavigation } from '@react-navigation/native';
 import { PartnerNavigatorRoutesProps } from '@routes/partner.routes';
 import { api } from '@services/api';
+import { AppError } from '@utils/AppError';
 import {
   Text,
   ScrollView,
@@ -76,7 +77,6 @@ export function HomeScreen() {
   }
 
   async function loadData() {
-    console.log(user.name, { profile });
     try {
       const profileResponse = await api.get('/user/profile', {
         headers: {
@@ -119,7 +119,7 @@ export function HomeScreen() {
       countFinishedSchedules();
       countCanceledSchedules();
     } catch (error) {
-      console.log(error);
+      throw new AppError('Erro ao buscar agendamentos');
     }
   }
 

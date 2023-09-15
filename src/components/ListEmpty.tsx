@@ -1,4 +1,4 @@
-import { VStack, Text } from 'native-base';
+import { VStack, Text, Center } from 'native-base';
 
 type Props = {
   message: string;
@@ -7,7 +7,9 @@ type Props = {
 export function ListEmpty({ message }: Props) {
   return (
     <VStack>
-      <Text>{message}</Text>
+      <Center>
+        <Text>{message}</Text>
+      </Center>
     </VStack>
   );
 }

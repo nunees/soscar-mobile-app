@@ -34,7 +34,13 @@ export function SmallSchedulleCard({ data }: Props) {
         })
       }
     >
-      <HStack w={300} p={5} justifyContent="space-between">
+      <HStack
+        w={370}
+        p={5}
+        justifyContent="space-between"
+        backgroundColor="white"
+        borderRadius={5}
+      >
         <VStack>
           <HStack>
             <HStack>
@@ -63,13 +69,15 @@ export function SmallSchedulleCard({ data }: Props) {
                 color={'orange.800'}
               />
               <Text pl={2} pt={1}>
-                {data.location?.business_name}
+                {data.location!.business_name.length > 6
+                  ? `${data.location?.business_name.substring(0, 6)}...`
+                  : data.location?.business_name}
               </Text>
             </HStack>
           </HStack>
         </VStack>
 
-        <VStack ml={5}>
+        <VStack>
           {data.status === 4 && (
             <Icon as={Feather} name="x" color="red.500" size={7} />
           )}

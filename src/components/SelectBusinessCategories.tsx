@@ -1,4 +1,5 @@
-import { Select as SelectNative, ISelectProps } from 'native-base';
+import { Feather } from '@expo/vector-icons';
+import { Select as SelectNative, ISelectProps, Icon } from 'native-base';
 
 type Props = ISelectProps & {
   label: string;
@@ -85,18 +86,16 @@ export function SelectBusinessCategories({
   return (
     <SelectNative
       mb={3}
-      borderTopWidth={0}
-      borderLeftWidth={0}
-      borderRightWidth={0}
       minWidth={'full'}
       accessibilityLabel={label}
       placeholder={label}
-      borderWidth={2}
-      fontSize="md"
+      borderWidth={1}
+      fontSize="xs"
       color="gray.100"
       fontFamily={'body'}
       placeholderTextColor="gray.400"
       {...rest}
+      dropdownIcon={<Icon as={Feather} name="chevron-down" size={5} mr={5} />}
     >
       {
         // eslint-disable-next-line array-callback-return
@@ -110,6 +109,7 @@ export function SelectBusinessCategories({
               />
             );
           }
+          return null;
         })
       }
     </SelectNative>

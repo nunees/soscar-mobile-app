@@ -1,4 +1,5 @@
 import { IUserDTO } from '@dtos/IUserDTO';
+import { useProfile } from '@hooks/useProfile';
 import { api } from '@services/api';
 import {
   storageAuthTokenSave,
@@ -30,6 +31,8 @@ export const AuthContext = createContext<AuthContextDataProps>(
 );
 
 export function AuthContextProvider({ children }: AuthContextProviderProps) {
+  const { removeProfile } = useProfile();
+
   const [user, setUser] = useState<IUserDTO>({} as IUserDTO);
   const [isLoadingUserStorageData, setIsLoadingUserStorageData] =
     useState(true);
@@ -75,11 +78,17 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
   }
 
   async function signOut() {
-    setIsLoadingUserStorageData(true);
-    setUser({} as IUserDTO);
-    await storageUserRemove();
-    await storageAuthTokenRemove();
-    setIsLoadingUserStorageData(false);
+    try {
+      setIsLoadingUserStorageData(true);
+      setUser({} as IUserDTO);
+      await storageUserRemove();
+      await storageAuthTokenRemove();
+      await removeProfile();
+    } catch (error) {
+      throw new AppError('Erro ao deslogar usuário');
+    } finally {
+      setIsLoadingUserStorageData(false);
+    }
   }
 
   async function updateUserAuth(userUpdated: IUserDTO) {

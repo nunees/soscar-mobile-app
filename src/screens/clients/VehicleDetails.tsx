@@ -29,15 +29,12 @@ export function VehicleDetails() {
         },
       });
       setVehicle(response.data as IVehicleDTO);
-      console.log(vehicle);
     } catch {
       toast.show({
         title: 'Erro ao buscar detalhes do veículo',
         placement: 'top',
         bgColor: 'red.500',
       });
-    } finally {
-      console.log(vehicle);
     }
   }
 

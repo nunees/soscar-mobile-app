@@ -86,8 +86,6 @@ api.registerInterceptTokenManager = (singOut) => {
                 request.onSuccess(data.token);
               });
 
-              console.log('TOKEN ATUALIZADO');
-
               resolve(api(originalRequestConfig));
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
             } catch (error: any) {
