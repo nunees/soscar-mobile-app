@@ -19,8 +19,13 @@ export function FavoriteCars({ vehicle }: QuickVehicleCardProps) {
           navigation.navigate('vehicleDetails', { vehicleId: vehicle.id })
         }
       >
-        <VStack px={5} py={3}>
-          <HStack px={5} justifyContent="space-between">
+        <VStack py={3}>
+          <HStack
+            px={5}
+            justifyContent="space-between"
+            backgroundColor="white"
+            borderRadius={10}
+          >
             <VStack mt={5}>
               <Text bold fontSize={'lg'}>
                 {vehicle.brand.name}

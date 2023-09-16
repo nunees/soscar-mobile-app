@@ -65,7 +65,7 @@ export function PartnerCard({ image, location, ...rest }: Props) {
       alignSelf="center"
       mb={5}
       background="white"
-      borderRadius={5}
+      borderRadius={10}
       shadow={1}
     >
       <TouchableOpacity {...rest}>
@@ -122,12 +122,12 @@ export function PartnerCard({ image, location, ...rest }: Props) {
         position={'absolute'}
         top={100}
         right={5}
-        width={100}
-        height={10}
+        width={70}
+        height={8}
         colorScheme={'orange'}
         onPress={() => Linking.openURL(functionMapsNavigate() as string)}
       >
-        <Icon name="map" as={Feather} size={5} color="white" />
+        <Icon name="navigation" as={Feather} size={5} color="white" />
       </Button>
     </VStack>
   );

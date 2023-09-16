@@ -31,6 +31,8 @@ export interface ISchedules {
     open_hours: string;
     open_hours_weekend: string[];
     user_id: string;
+    latitude: string;
+    longitude: string;
     created_at?: Date;
   };
   users?: {

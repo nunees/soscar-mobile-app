@@ -9,7 +9,8 @@ import { LogBox } from 'react-native';
 
 export function Routes() {
   const theme = DefaultTheme;
-  theme.colors.background = '#F0F0F0';
+  // theme.colors.background = '#F0F0F0';
+  theme.colors.background = '#FFFFFF';
 
   const { user, isLoadingUserStorageData } = useAuth();
 

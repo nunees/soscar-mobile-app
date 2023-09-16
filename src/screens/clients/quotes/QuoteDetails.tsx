@@ -6,6 +6,7 @@ import { IQuotesDocumentDTO } from '@dtos/IQuoteDocumentDTO';
 import { IQuoteList } from '@dtos/IQuoteList';
 import { IVehicleDTO } from '@dtos/IVechicleDTO';
 import { useAuth } from '@hooks/useAuth';
+import { useMapsLinking } from '@hooks/useMapsLinking';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
 import { api } from '@services/api';
@@ -35,6 +36,7 @@ export function QuoteDetails() {
   const route = useRoute();
   const toast = useToast();
   const { quoteId, hashId } = route.params as RouteParamsProps;
+  const { deviceMapNavigation } = useMapsLinking();
 
   async function fetchData() {
     try {

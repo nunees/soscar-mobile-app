@@ -11,6 +11,7 @@ type ButtonProps = IButtonProps & {
   variant?: 'solid' | 'outline';
   hasIcon?: boolean;
   iconName?: string;
+  iconSize?: number;
 };
 
 export function Button({
@@ -18,6 +19,7 @@ export function Button({
   variant = 'solid',
   hasIcon,
   iconName,
+  iconSize = 8,
   ...rest
 }: ButtonProps) {
   return (
@@ -36,7 +38,9 @@ export function Button({
           {title}
         </Text>
       )}
-      {hasIcon && <Icon as={Feather} name={iconName} size={8} color="white" />}
+      {hasIcon && (
+        <Icon as={Feather} name={iconName} size={iconSize} color="white" />
+      )}
     </ButtonNativeBase>
   );
 }

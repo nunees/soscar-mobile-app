@@ -3,7 +3,6 @@ import {
   createBottomTabNavigator,
   BottomTabNavigationProp,
 } from '@react-navigation/bottom-tabs';
-import { AddVehicle } from '@screens/clients/AddVehicle';
 import { ChangePassword } from '@screens/clients/ChangePassword';
 import { HomeScreen } from '@screens/clients/HomeScreen';
 import { PartnerDetails } from '@screens/clients/PartnerDetails';
@@ -18,8 +17,9 @@ import { Schedules } from '@screens/clients/schedule/Schedules';
 import { SchedulesDetails } from '@screens/clients/schedule/SchedulesDetails';
 import { SearchSchedule } from '@screens/clients/schedule/SearchSchedule';
 import { Services } from '@screens/clients/Services';
-import { VehicleDetails } from '@screens/clients/VehicleDetails';
-import { Vechicles } from '@screens/clients/Vehicles';
+import { AddVehicle } from '@screens/clients/vehicles/AddVehicle';
+import { VehicleDetails } from '@screens/clients/vehicles/VehicleDetails';
+import { Vechicles } from '@screens/clients/vehicles/Vehicles';
 import { Icon, useTheme } from 'native-base';
 
 type AppRotes = {

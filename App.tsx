@@ -1,11 +1,12 @@
 import { Loading } from '@components/Loading';
 import { AuthContextProvider } from '@contexts/AuthContext';
 import { ProfileContextProvider } from '@contexts/UserContext';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import {
   useFonts,
-  Poppins_400Regular,
-  Poppins_700Bold,
-} from '@expo-google-fonts/poppins';
+  Nunito_400Regular,
+  Nunito_700Bold,
+} from '@expo-google-fonts/nunito';
 import { Routes } from '@routes/index';
 import { NativeBaseProvider } from 'native-base';
 import { StatusBar } from 'react-native';
@@ -13,7 +14,7 @@ import { StatusBar } from 'react-native';
 import { THEME } from './src/theme';
 
 export default function App() {
-  const [fontsLoaded] = useFonts({ Poppins_400Regular, Poppins_700Bold });
+  const [fontsLoaded] = useFonts({ Nunito_400Regular, Nunito_700Bold });
 
   return (
     <NativeBaseProvider theme={THEME} isSSR={false}>

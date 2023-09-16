@@ -1,40 +1,33 @@
-import { Feather } from '@expo/vector-icons';
 import { useGPS } from '@hooks/useGPS';
-import { AppError } from '@utils/AppError';
-import { reverseGeocodeAsync } from 'expo-location';
-import { Text, HStack, Icon } from 'native-base';
+import { LocationObjectCoords, reverseGeocodeAsync } from 'expo-location';
+import { Text, HStack } from 'native-base';
 import { useEffect, useState } from 'react';
+
+async function displayAddress(coords: LocationObjectCoords) {
+  const address = await reverseGeocodeAsync(coords);
+  return address;
+}
 
 export function UserLocation() {
   const { coords } = useGPS();
   const [address, setAddress] = useState<string>('');
 
-  async function displayAddress() {
-    try {
-      console.log(coords);
-      const address = await reverseGeocodeAsync(coords);
-
-      setAddress(`${address[0].street}, ${address[0].district}`);
-    } catch (error) {
-      throw new AppError('Erro ao buscar endereço');
-    }
-  }
-
   useEffect(() => {
-    displayAddress();
+    displayAddress(coords)
+      .then((response) =>
+        setAddress(`${response[0].street}, ${response[0].district}`)
+      )
+      .catch((error) => console.log(error));
   }, [coords]);
 
   return (
     <HStack>
-      <Icon as={Feather} name="map-pin" size={5} />
       {address ? (
-        <Text bold fontSize="sm" pl={1}>
+        <Text fontSize="xs" numberOfLines={1} width={180}>
           {address}
         </Text>
       ) : (
-        <Text bold fontSize="sm" pl={1}>
-          localização não encontrada
-        </Text>
+        <Text fontSize="xs">localização não encontrada</Text>
       )}
     </HStack>
   );

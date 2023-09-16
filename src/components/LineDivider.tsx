@@ -4,7 +4,7 @@ type Props = IBoxProps & {
   color?: string;
 };
 
-export function LineDivider({ color = 'gray.700', ...rest }: Props) {
+export function LineDivider({ color = 'gray.900', ...rest }: Props) {
   return (
     <HStack>
       <Box

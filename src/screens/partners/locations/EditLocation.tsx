@@ -11,6 +11,7 @@ import { useProfile } from '@hooks/useProfile';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import {
   useFocusEffect,
+  useIsFocused,
   useNavigation,
   useRoute,
 } from '@react-navigation/native';
@@ -31,7 +32,7 @@ import {
   Checkbox,
   Image,
 } from 'native-base';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import {
   ImageBackground,
   Pressable,
@@ -65,6 +66,20 @@ const servicesCategories = [
   { id: 10, name: 'Vidros' },
   { id: 11, name: 'Outros' },
 ];
+
+async function handleFetchLocationDetails(locationId: string, user_id: string) {
+  try {
+    const response = await api.get(`/locations/${locationId}`, {
+      headers: {
+        id: user_id,
+      },
+    });
+
+    return response;
+  } catch (error) {
+    throw new AppError('Erro ao carregar detalhes do local');
+  }
+}
 
 export function EditLocation() {
   const [paymentMethods] = useState([
@@ -111,6 +126,10 @@ export function EditLocation() {
   const [district, setDistrict] = useState('');
   const [state, setState] = useState('');
   const [zipCode, setZipCode] = useState('');
+
+  const [profilePicture, setProfilePicture] = useState('');
+  const [coverPhoto, setCoverPhoto] = useState('');
+
   const [selectedPaymentMethods, setSelectedPaymentMethods] = useState<
     number[]
   >([]);
@@ -336,27 +355,11 @@ export function EditLocation() {
     return null;
   }
 
-  async function handleFetchLocationDetails() {
-    try {
-      const response = await api.get(`/locations/${locationId}`, {
-        headers: {
-          id: user.id,
-        },
-      });
-
-      setLocation(response.data);
-    } catch (error) {
-      toast.show({
-        title: 'Erro ao carregar detalhes da localização',
-        placement: 'top',
-        bgColor: 'red.500',
-      });
-    }
-  }
-
   useFocusEffect(
     useCallback(() => {
-      handleFetchLocationDetails();
+      handleFetchLocationDetails(locationId, user.id).then((response) =>
+        setLocation(response.data)
+      );
     }, [])
   );
 
@@ -384,41 +387,43 @@ export function EditLocation() {
           <VStack px={5}>
             <VStack backgroundColor="white" borderRadius={10} mb={20}>
               <VStack w={'full'} height={150} borderRadius={10}>
-                <VStack>
+                <VStack w={'full'} height={150}>
                   <Image
                     source={{
-                      uri: `${api.defaults.baseURL}/locations/cover/${location?.id}/${location?.cover_photo}`,
+                      uri: location.avatar
+                        ? `${api.defaults.baseURL}/locations/coverimage/${locationId}/${location.cover_photo}`
+                        : `https://ui-avatars.com/api/?format=png&name=${user.name}+${profile.last_name}`,
                     }}
-                    alt="Foto de capa"
-                    resizeMode="cover"
+                    alt="Foto de perfil"
                   />
-                  <HStack
-                    width={30}
-                    height={30}
-                    borderRadius={100}
-                    backgroundColor="orange.500"
-                    alignItems="center"
-                    justifyContent="center"
-                    position="absolute"
-                    bottom={-10}
-                    right={0}
-                    shadow={1}
-                  >
-                    <TouchableOpacity
-                      onPress={() =>
-                        handleUserProfilePictureSelect('cover_photo')
-                      }
-                    >
-                      <Icon as={Entypo} name="camera" size={4} color="white" />
-                    </TouchableOpacity>
-                  </HStack>
                 </VStack>
+                <HStack
+                  width={30}
+                  height={30}
+                  borderRadius={100}
+                  backgroundColor="orange.500"
+                  alignItems="center"
+                  justifyContent="center"
+                  position="absolute"
+                  bottom={-10}
+                  right={0}
+                  shadow={1}
+                >
+                  <TouchableOpacity
+                    onPress={() =>
+                      handleUserProfilePictureSelect('cover_photo')
+                    }
+                  >
+                    <Icon as={Entypo} name="camera" size={4} color="white" />
+                  </TouchableOpacity>
+                </HStack>
+
                 <VStack h={120} position={'absolute'}>
                   <HStack position="absolute" top={10} left={120}>
                     <UserPhoto
                       source={{
                         uri: location.avatar
-                          ? `${api.defaults.baseURL}/locations/avatar/${location?.id}/${location?.avatar}`
+                          ? `${api.defaults.baseURL}/locations/avatar/${location.id}/${location.avatar}`
                           : `https://ui-avatars.com/api/?format=png&name=${user.name}+${profile.last_name}`,
                       }}
                       alt="Foto de perfil"

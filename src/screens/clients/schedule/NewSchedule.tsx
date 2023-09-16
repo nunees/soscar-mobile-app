@@ -1,6 +1,8 @@
 import { AppHeader } from '@components/AppHeader';
 import { Button } from '@components/Button';
 import { Input } from '@components/Input';
+import { LoadingModal } from '@components/LoadingModal';
+import { PartnerCard } from '@components/PartnerCard';
 import { Select } from '@components/Select';
 import { SelectBusinessCategories } from '@components/SelectBusinessCategories';
 import { TextArea } from '@components/TextArea';
@@ -13,6 +15,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
 import { api } from '@services/api';
 import { AppError } from '@utils/AppError';
+import { handleDate, handleTime } from '@utils/DateTime';
 import { IFileInfo } from 'expo-file-system';
 import * as FileSystem from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';
@@ -25,6 +28,7 @@ import {
   useToast,
   Icon,
   Image,
+  Center,
 } from 'native-base';
 import { useEffect, useState } from 'react';
 import { Alert, TouchableOpacity } from 'react-native';
@@ -39,9 +43,10 @@ type VehicleSelect = {
   value: string;
 };
 
-const ICON_SIZE = 5;
-
 export function NewSchedule() {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [message, setMessage] = useState<string>('');
+
   const [files, setfiles] = useState<any[]>([]);
 
   const [location, setLocation] = useState<ILocation>();
@@ -147,19 +152,6 @@ export function NewSchedule() {
         bgColor: 'red.500',
       });
     }
-  }
-
-  function handleDate(date: Date) {
-    const day = date.getDate();
-    const month = date.getMonth() + 1;
-    const year = date.getFullYear();
-    setDate(`${day}/${month}/${year}`);
-  }
-
-  function handleTime(date: Date) {
-    const fullHours = date.toLocaleTimeString('pt-BR');
-    const currentTime = fullHours.split(':');
-    setTime(`${currentTime[0]}:${currentTime[1]}`);
   }
 
   async function fetchData() {
@@ -273,58 +265,56 @@ export function NewSchedule() {
   }, []);
 
   return (
-    <VStack pb={10}>
+    <VStack>
       <VStack>
         <AppHeader title="Novo agendamento" />
       </VStack>
+      {isLoading && (
+        <LoadingModal
+          showModal={isLoading}
+          setShowModal={setIsLoading}
+          message={message}
+        />
+      )}
 
-      <ScrollView showsVerticalScrollIndicator={false} marginBottom={100}>
-        <VStack>
+      <VStack pt={3} px={5}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{
+            paddingBottom: 130,
+          }}
+        >
           {location && (
-            <VStack px={5} key={location.id}>
-              <VStack>
-                <VStack ml={2} mb={3}>
-                  <HStack py={5}>
-                    <VStack>
-                      <Heading>{location.business_name}</Heading>
-                      <Text>100 Avaliações</Text>
-                      <Text>{location.users?.name}</Text>
-                      <Text>Telefone: {location.business_phone}</Text>
-                    </VStack>
-                  </HStack>
-                </VStack>
-              </VStack>
-            </VStack>
+            <PartnerCard
+              image={{
+                uri:
+                  `${api.defaults.baseURL}/locations/avatar/${location.id}/${location.avatar}` ||
+                  `https://ui-avatars.com/api/?name=${location.business_name}&background=random&length=1&rounded=true&size=128`,
+              }}
+              location={location}
+            />
           )}
 
-          <VStack px={5}>
-            <HStack mr={5} mb={5}>
-              <HStack mt={2}>
-                <Icon
-                  as={Feather}
-                  name="tool"
-                  color="orange.600"
-                  size={ICON_SIZE}
-                />
-              </HStack>
-              <HStack>
-                <SelectBusinessCategories
-                  label={'Tipo de Serviço'}
-                  categoryOfService={typeofService}
-                  onValueChange={(value) => setRequiredServices(Number(value))}
-                />
-              </HStack>
-            </HStack>
+          <VStack p={5} mb={5} backgroundColor="white" borderRadius={10}>
+            <VStack>
+              <Text bold pb={1}>
+                Tipo de servico
+              </Text>
+            </VStack>
+            <VStack>
+              <SelectBusinessCategories
+                label={'Tipo de Serviço'}
+                categoryOfService={typeofService}
+                onValueChange={(value) => setRequiredServices(Number(value))}
+              />
+            </VStack>
+          </VStack>
 
-            <HStack mr={5} mb={5}>
-              <HStack mt={2}>
-                <Icon
-                  as={Feather}
-                  name="truck"
-                  color="orange.600"
-                  size={ICON_SIZE}
-                />
-              </HStack>
+          <VStack p={5} mb={5} backgroundColor="white" borderRadius={10}>
+            <VStack>
+              <Text bold pb={1}>
+                Veículo
+              </Text>
               <Select
                 label={'Selecione um veículo'}
                 data={
@@ -339,72 +329,85 @@ export function NewSchedule() {
                 }
                 onValueChange={(value) => setVehicle_id(value)}
               />
-            </HStack>
+            </VStack>
+          </VStack>
 
-            <HStack mr={5}>
-              <HStack>
-                <VStack mt={3}>
-                  <Icon
-                    as={Feather}
-                    name="calendar"
-                    size={ICON_SIZE}
-                    color="orange.600"
-                  />
-                </VStack>
-                <VStack>
-                  <Input
-                    placeholder={'Data'}
-                    w={120}
-                    editable={false}
-                    value={date}
-                    caretHidden
-                    onPressIn={() => {
-                      DateTimePickerAndroid.open({
-                        mode: 'date',
-                        value: new Date(),
-                        onChange: (event, date) => handleDate(date as Date),
-                      });
-                    }}
-                  />
-                </VStack>
-              </HStack>
-              <HStack>
-                <VStack mt={3}>
-                  <Icon
-                    as={Feather}
-                    name="clock"
-                    size={ICON_SIZE}
-                    color="orange.600"
-                  />
-                </VStack>
-                <VStack>
-                  <Input
-                    placeholder={'Horario'}
-                    w={120}
-                    editable={false}
-                    value={time}
-                    caretHidden
-                    onPressIn={() => {
-                      DateTimePickerAndroid.open({
-                        mode: 'time',
-                        is24Hour: true,
-                        value: new Date(),
-                        onChange: (event, date) => handleTime(date as Date),
-                      });
-                    }}
-                  />
-                </VStack>
-              </HStack>
+          <HStack
+            p={5}
+            mb={5}
+            backgroundColor="white"
+            borderRadius={10}
+            justifyContent="space-between"
+          >
+            <HStack alignItems="center">
+              <VStack>
+                <Text bold pb={1}>
+                  Data
+                </Text>
+                <Input
+                  placeholder={'Data'}
+                  w={120}
+                  editable={false}
+                  value={date}
+                  caretHidden
+                  onPressIn={() => {
+                    DateTimePickerAndroid.open({
+                      mode: 'date',
+                      value: new Date(),
+                      onChange: (event, date) =>
+                        setDate(handleDate(date as Date)),
+                    });
+                  }}
+                />
+              </VStack>
             </HStack>
+            <HStack>
+              <VStack>
+                <Text bold pb={1}>
+                  Hora
+                </Text>
+                <Input
+                  placeholder={'Horario'}
+                  w={120}
+                  editable={false}
+                  value={time}
+                  caretHidden
+                  onPressIn={() => {
+                    DateTimePickerAndroid.open({
+                      mode: 'time',
+                      is24Hour: true,
+                      value: new Date(),
+                      onChange: (event, date) =>
+                        setTime(handleTime(date as Date)),
+                    });
+                  }}
+                />
+              </VStack>
+            </HStack>
+          </HStack>
 
-            <VStack>
-              <Text fontSize="xs" bold color="gray.500" textAlign="justify">
+          <VStack p={5} mb={5} backgroundColor="white" borderRadius={10}>
+            <HStack>
+              <Icon
+                as={Feather}
+                name="info"
+                size={38}
+                color="orange.400"
+                mr={1}
+                mt={1}
+              />
+              <Text fontSize="xs" bold color="gray.600" textAlign="justify">
                 O tempo medio de reparo e de 1 hora, no entanto pode ser
                 necessario mais tempo. Nao se preocupe, seu mecanico ira
                 informa-lo se necessario.
               </Text>
-            </VStack>
+            </HStack>
+          </VStack>
 
+          <VStack p={5} mb={5} backgroundColor="white" borderRadius={10}>
+            <VStack>
+              <Text bold>Informacoes adicionais</Text>
+            </VStack>
             <VStack>
               <TextArea
                 placeholder={'Descreva aqui os problemas apresentados'}
@@ -416,45 +419,45 @@ export function NewSchedule() {
                 onChangeText={(text) => setNotes(text)}
               />
             </VStack>
-
-            <VStack>
-              <HStack mb={5}>
-                <Text fontSize="xs" bold color="gray.500" textAlign="justify">
-                  Você pode adicionar fotos ou videos adicionais que demonstram
-                  os problemas relatados e ajudam o prestador de serviço a ter o
-                  melhor entendimento do problema. Você pode adicionar imagens,
-                  videos ou documentos.
-                </Text>
-              </HStack>
-              <VStack maxW={400} flexWrap="wrap">
-                {files.map((item) => (
-                  <HStack key={item.id}>
-                    <TouchableOpacity>
-                      <HStack mb={5}>
-                        <Image
-                          w={'full'}
-                          height={200}
-                          source={item}
-                          alt="Some thing in the way"
-                          resizeMode="cover"
-                        />
-                      </HStack>
-                    </TouchableOpacity>
-                  </HStack>
-                ))}
-
-                <Button
-                  title="Carregar foto"
-                  variant="outline"
-                  onPress={handleUserProfilePictureSelect}
-                />
-              </VStack>
-            </VStack>
-
-            <Button title="Agendar" mt={100} onPress={handleSubmit} />
           </VStack>
-        </VStack>
-      </ScrollView>
+
+          <VStack p={5} mb={5} backgroundColor="white" borderRadius={10}>
+            <HStack mb={5}>
+              <Text fontSize="xs" bold color="gray.500" textAlign="justify">
+                Você pode adicionar fotos ou videos adicionais que demonstram os
+                problemas relatados e ajudam o prestador de serviço a ter o
+                melhor entendimento do problema. Você pode adicionar imagens,
+                videos ou documentos.
+              </Text>
+            </HStack>
+            <VStack maxW={400} flexWrap="wrap">
+              {files.map((item) => (
+                <HStack key={item.id}>
+                  <TouchableOpacity>
+                    <HStack mb={5}>
+                      <Image
+                        w={'full'}
+                        height={200}
+                        source={item}
+                        alt="Some thing in the way"
+                        resizeMode="cover"
+                      />
+                    </HStack>
+                  </TouchableOpacity>
+                </HStack>
+              ))}
+
+              <Button
+                title="Carregar foto"
+                variant="outline"
+                onPress={handleUserProfilePictureSelect}
+              />
+            </VStack>
+          </VStack>
+
+          <Button title="Agendar" onPress={handleSubmit} />
+        </ScrollView>
+      </VStack>
     </VStack>
   );
 }

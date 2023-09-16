@@ -8,6 +8,8 @@ export interface ILocationScheduleDTO {
   time: string;
   description?: string | null;
   status: number;
+  latitude: string;
+  longitude: string;
   partner_notes?: string | null;
   created_at?: Date | null;
   updated_at?: Date | null;

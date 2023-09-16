@@ -15,7 +15,7 @@ export function QuickVehicleCard({ vehicle, ...rest }: QuickVehicleCardProps) {
   const navigation = useNavigation<AppNavigatorRoutesProps>();
 
   return (
-    <VStack px={19} mb={5}>
+    <VStack px={5} pb={5}>
       {vehicle && (
         <TouchableOpacity
           onPress={() =>
@@ -23,7 +23,7 @@ export function QuickVehicleCard({ vehicle, ...rest }: QuickVehicleCardProps) {
           }
           key={vehicle.id}
         >
-          <VStack shadow={1} h={130} {...rest}>
+          <VStack shadow={1} h={100} {...rest}>
             <HStack
               style={{
                 position: 'absolute',

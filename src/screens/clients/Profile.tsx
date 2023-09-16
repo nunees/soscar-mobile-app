@@ -303,8 +303,6 @@ export function Profile() {
             </Pressable>
           </Center>
 
-          <LineDivider />
-
           <VStack>
             <Text bold fontSize="xs">
               Nome
