@@ -99,7 +99,6 @@ export function PartnerCard({ image, location, ...rest }: Props) {
                 <Icon name="map-pin" as={Feather} size={4} color="orange.400" />
                 <Text>
                   {' '}
-                  a mais ou menos{' '}
                   {getDistanceFromLatLonInKm(
                     [Number(profile.latitude), Number(profile.longitude)],
                     [Number(location?.latitude), Number(location?.longitude)]

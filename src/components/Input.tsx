@@ -14,13 +14,10 @@ export function Input({ errorMessage = null, isInvalid, ...rest }: Props) {
   return (
     <FormControl isInvalid={invalid} mb={4}>
       <NativeBaseInput
-        borderTopWidth={0}
-        borderLeftWidth={0}
-        borderRightWidth={0}
         h={14}
         px={4}
-        borderWidth={2}
         fontSize="md"
+        borderWidth={1}
         color="gray.200"
         fontFamily={'body'}
         placeholderTextColor="gray.500"

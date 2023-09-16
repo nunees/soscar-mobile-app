@@ -15,6 +15,24 @@ import { AppError } from '@utils/AppError';
 import { VStack, ScrollView, useToast, Checkbox, Text } from 'native-base';
 import { useEffect, useState } from 'react';
 
+const vehiclesColors = [
+  'Amarelo',
+  'Azul',
+  'Branco',
+  'Cinza',
+  'Dourado',
+  'Laranja',
+  'Marrom',
+  'Prata',
+  'Preto',
+  'Rosa',
+  'Roxo',
+  'Verde',
+  'Vermelho',
+  'Vinho',
+  'Outra',
+];
+
 export function AddVehicle() {
   const [showModal, setShowModal] = useState(false);
   const [brands, setBrands] = useState<IBrandDTO[]>([{}] as IBrandDTO[]);
@@ -173,7 +191,17 @@ export function AddVehicle() {
               keyboardType="numeric"
             />
             <Input placeholder="Placa" value={plate} onChangeText={setPlate} />
-            <Input placeholder="Cor" value={color} onChangeText={setColor} />
+            {/* <Input placeholder="Cor" value={color} onChangeText={setColor} /> */}
+            <SelectCar
+              data={vehiclesColors.map((color) => {
+                return {
+                  label: color,
+                  value: color,
+                };
+              })}
+              label={'Cor'}
+              onValueChange={(value) => setColor(value)}
+            />
 
             <Checkbox
               colorScheme="orange"

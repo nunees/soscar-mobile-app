@@ -16,6 +16,7 @@ import {
   Heading,
   HStack,
   useToast,
+  Badge,
 } from 'native-base';
 import { useCallback, useState } from 'react';
 import { TouchableOpacity, Alert } from 'react-native';
@@ -119,30 +120,39 @@ export function Locations() {
                 locations.map((location) => (
                   <VStack
                     width="full"
-                    borderWidth={1}
-                    borderColor="gray.700"
-                    borderRadius={5}
+                    shadow={2}
+                    borderRadius={10}
+                    backgroundColor="white"
                     p={5}
                     mb={5}
                     key={location.id}
                   >
                     <HStack
-                      bg="green.500"
-                      width={10}
                       justifyContent="center"
-                      rounded={10}
                       position="absolute"
                       top={6}
                       right={3}
                     >
-                      <Text
-                        textAlign="center"
-                        bold
-                        color="gray.700"
-                        fontSize="xs"
-                      >
-                        Ativo
-                      </Text>
+                      {location.active ? (
+                        <Badge
+                          w={50}
+                          variant="solid"
+                          colorScheme="green"
+                          px={2}
+                          borderRadius={5}
+                        >
+                          Ativo
+                        </Badge>
+                      ) : (
+                        <Badge
+                          w={60}
+                          variant="solid"
+                          colorScheme="red"
+                          borderRadius={5}
+                        >
+                          Inativo
+                        </Badge>
+                      )}
                     </HStack>
                     <Heading pb={5}>{location.business_name}</Heading>
                     <Text pb={2}>

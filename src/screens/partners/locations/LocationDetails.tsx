@@ -180,350 +180,368 @@ export function LocationDetails() {
   }, []);
 
   return (
-    <VStack pb={10}>
-      <VStack mb={10}>
+    <VStack>
+      <VStack>
         <AppHeader title="Detalhes" />
       </VStack>
 
-      <ScrollView showsVerticalScrollIndicator={false} marginBottom={100}>
-        <HStack px={5}>
-          <VStack>
-            <UserPhoto
-              source={{
-                uri: user.avatar
-                  ? `${api.defaults.baseURL}/user/avatar/${user.id}/${user.avatar}`
-                  : `https://ui-avatars.com/api/?format=png&name=${user.name}+${profile.last_name}&size=512`,
-              }}
-              alt="Foto de perfil"
-              size={20}
-            />
+      <VStack px={5} py={5}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{
+            paddingBottom: 120,
+          }}
+        >
+          <VStack backgroundColor="white" borderRadius={10} p={5}>
+            <HStack>
+              <VStack>
+                <UserPhoto
+                  source={{
+                    uri: user.avatar
+                      ? `${api.defaults.baseURL}/user/avatar/${user.id}/${user.avatar}`
+                      : `https://ui-avatars.com/api/?format=png&name=${user.name}+${profile.last_name}&size=512`,
+                  }}
+                  alt="Foto de perfil"
+                  size={20}
+                />
+              </VStack>
+              <VStack>
+                <VStack position={'absolute'} left={220} bottom={60}>
+                  <Icon
+                    as={Feather}
+                    name="message-square"
+                    size={5}
+                    ml={3}
+                    mt={5}
+                    color="amber.600"
+                  />
+                </VStack>
+                <VStack ml={3} mt={2}>
+                  <Text bold>{user.name}</Text>
+                  <Text>0 avaliacoes</Text>
+                  <Text>{location.business_name}</Text>
+                  <Text>{location.business_phone}</Text>
+                </VStack>
+              </VStack>
+            </HStack>
           </VStack>
-          <VStack>
-            <VStack ml={3} mt={2}>
-              <Text bold>{user.name}</Text>
-              <Text>100 Avaliações</Text>
-              <Text>{location.business_name}</Text>
-              <Text>{location.business_phone}</Text>
-            </VStack>
+
+          <VStack px={5} mt={10}>
+            <HStack>
+              <HStack>
+                <Icon
+                  as={Feather}
+                  name="briefcase"
+                  size={5}
+                  ml={3}
+                  color="amber.600"
+                />
+                <VStack ml={2}>
+                  <Text>CNPJ/CPF: {location.cnpj}</Text>
+                </VStack>
+              </HStack>
+            </HStack>
           </VStack>
-          <VStack position="relative" left={120}>
-            <Icon
-              as={Feather}
-              name="message-circle"
-              size={8}
-              color="orange.600"
-            />
-          </VStack>
-        </HStack>
 
-        <VStack px={5} mt={10}>
-          <HStack>
+          <VStack px={5} mt={5}>
             <HStack>
-              <Icon
-                as={Feather}
-                name="briefcase"
-                size={5}
-                ml={3}
-                color="amber.600"
-              />
-              <VStack ml={2}>
-                <Text>CNPJ/CPF: {location.cnpj}</Text>
-              </VStack>
-            </HStack>
-          </HStack>
-        </VStack>
-
-        <VStack px={5} mt={5}>
-          <HStack>
-            <HStack>
-              <Icon
-                as={Feather}
-                name="map-pin"
-                size={5}
-                ml={3}
-                mt={5}
-                color="amber.600"
-              />
-              <VStack ml={2}>
-                <Text>
-                  {location.address_line},{location.number}-{location.district}
-                </Text>
-                <Text>
-                  {location.city}-{location.state}
-                </Text>
-                <Text>{location.zipcode}</Text>
-              </VStack>
-            </HStack>
-          </HStack>
-        </VStack>
-
-        <VStack px={5} mt={5}>
-          <HStack>
-            <HStack>
-              <Icon
-                as={Feather}
-                name="mail"
-                size={5}
-                ml={3}
-                color="amber.600"
-              />
-              <VStack ml={2}>
-                <Text>{location.business_email}</Text>
-              </VStack>
-            </HStack>
-          </HStack>
-        </VStack>
-
-        <VStack px={5} mt={5}>
-          <HStack>
-            <HStack>
-              <Icon
-                as={Feather}
-                name="info"
-                size={5}
-                ml={3}
-                color="amber.600"
-              />
-              <VStack ml={2} w={300}>
-                <Text textAlign="justify">{location.business_description}</Text>
-              </VStack>
-            </HStack>
-          </HStack>
-        </VStack>
-
-        <VStack px={5} mt={5}>
-          <HStack>
-            <HStack>
-              <Icon
-                as={Feather}
-                name="dollar-sign"
-                size={5}
-                ml={3}
-                color="amber.600"
-              />
-              <VStack ml={2} w={300}>
-                {location.payment_methods?.map((payment) => {
-                  return (
-                    <HStack key={payment}>
-                      <HStack>
-                        <VStack ml={2}>
-                          <Text>
-                            {
-                              paymentMethods.find((method) =>
-                                method.id === payment ? method.name : ''
-                              )?.name
-                            }
-                          </Text>
-                        </VStack>
-                      </HStack>
-                    </HStack>
-                  );
-                })}
-              </VStack>
-            </HStack>
-          </HStack>
-        </VStack>
-
-        <VStack px={5} mt={5}>
-          <HStack>
-            <HStack>
-              <Icon
-                as={Feather}
-                name="tool"
-                size={5}
-                ml={3}
-                color="amber.600"
-              />
-              <VStack ml={2} w={300}>
-                {location.business_categories?.map((category) => {
-                  return (
-                    <HStack key={category}>
-                      <HStack>
-                        <VStack ml={2}>
-                          <Text>
-                            {
-                              servicesCategories.find((service) =>
-                                service.id === category ? service.name : ''
-                              )?.name
-                            }
-                          </Text>
-                        </VStack>
-                      </HStack>
-                    </HStack>
-                  );
-                })}
-              </VStack>
-            </HStack>
-          </HStack>
-        </VStack>
-
-        <VStack px={5} mt={5}>
-          <HStack>
-            <HStack>
-              <Icon
-                as={Feather}
-                name="calendar"
-                size={5}
-                ml={3}
-                color="amber.600"
-              />
-              <VStack ml={2} w={300}>
-                {location.open_hours_weekend?.map((category) => {
-                  return (
-                    <HStack key={category}>
-                      <VStack>
-                        <HStack ml={2}>
-                          <Text>{category}</Text>
-                        </HStack>
-                      </VStack>
-                    </HStack>
-                  );
-                })}
-              </VStack>
-            </HStack>
-          </HStack>
-        </VStack>
-
-        <VStack px={5} mt={5}>
-          <HStack>
-            <HStack>
-              <Icon
-                as={Feather}
-                name="clock"
-                size={5}
-                ml={3}
-                color="amber.600"
-              />
-              <VStack ml={4} w={300}>
-                {location.open_hours?.length > 1 ? (
-                  <Text>{location.open_hours}</Text>
-                ) : (
-                  <Text color="red.500">
-                    Voce deve adicionar seus horarios para poder receber
-                    clientes!
+              <HStack>
+                <Icon
+                  as={Feather}
+                  name="map-pin"
+                  size={5}
+                  ml={3}
+                  mt={5}
+                  color="amber.600"
+                />
+                <VStack ml={2}>
+                  <Text>
+                    {location.address_line},{location.number}-
+                    {location.district}
                   </Text>
-                )}
-              </VStack>
+                  <Text>
+                    {location.city}-{location.state}
+                  </Text>
+                  <Text>{location.zipcode}</Text>
+                </VStack>
+              </HStack>
             </HStack>
-          </HStack>
-        </VStack>
+          </VStack>
 
-        <VStack px={5} mt={10}>
-          <HStack>
+          <VStack px={5} mt={5}>
             <HStack>
-              <Icon
-                as={Feather}
-                name="clock"
-                size={5}
-                ml={3}
-                color="amber.600"
-              />
-              <VStack ml={2}>
-                <Text>
-                  Criado em:{' '}
-                  {new Date(location.created_at!).toLocaleDateString('pt-br')}
-                </Text>
-              </VStack>
+              <HStack>
+                <Icon
+                  as={Feather}
+                  name="mail"
+                  size={5}
+                  ml={3}
+                  color="amber.600"
+                />
+                <VStack ml={2}>
+                  <Text>{location.business_email}</Text>
+                </VStack>
+              </HStack>
             </HStack>
-          </HStack>
-        </VStack>
+          </VStack>
 
-        <VStack px={5} mt={5}>
-          <HStack>
+          <VStack px={5} mt={5}>
             <HStack>
-              <Icon
-                as={Feather}
-                name="image"
-                size={5}
-                ml={3}
-                color="amber.600"
-              />
-              <VStack ml={2} w={300}>
-                {location.photos &&
-                  location.photos.map((photo) => {
+              <HStack>
+                <Icon
+                  as={Feather}
+                  name="info"
+                  size={5}
+                  ml={3}
+                  color="amber.600"
+                />
+                <VStack ml={2} w={300}>
+                  <Text textAlign="justify">
+                    {location.business_description}
+                  </Text>
+                </VStack>
+              </HStack>
+            </HStack>
+          </VStack>
+
+          <VStack px={5} mt={5}>
+            <HStack>
+              <HStack>
+                <Icon
+                  as={Feather}
+                  name="dollar-sign"
+                  size={5}
+                  ml={3}
+                  color="amber.600"
+                />
+                <VStack ml={2} w={300}>
+                  {location.payment_methods?.map((payment) => {
                     return (
-                      <HStack key={photo}>
+                      <HStack key={payment}>
                         <HStack>
                           <VStack ml={2}>
-                            <Text>{photo}</Text>
+                            <Text>
+                              {
+                                paymentMethods.find((method) =>
+                                  method.id === payment ? method.name : ''
+                                )?.name
+                              }
+                            </Text>
                           </VStack>
                         </HStack>
                       </HStack>
                     );
                   })}
-
-                {location.LocationsPhotos?.length === 0 ? (
-                  <VStack mb={5}>
-                    <Text>
-                      Adicione fotos ao seu local e atraia mais clientes
-                    </Text>
-                  </VStack>
-                ) : (
-                  <VStack mb={5}>
-                    {location.LocationsPhotos?.map((photo) => (
-                      <VStack mb={5} borderWidth={2} borderColor={'orange.700'}>
-                        <Image
-                          key={photo.id}
-                          source={{
-                            uri: `${api.defaults.baseURL}/locations/photo/${location.id}/${photo.photo}`,
-                          }}
-                          alt="local"
-                          w={400}
-                          h={400}
-                        />
-                        <VStack
-                          w={60}
-                          h={8}
-                          position={'absolute'}
-                          bottom={0}
-                          left={0}
-                          borderTopRightRadius={10}
-                          borderTopLeftRadius={0}
-                          bg={'orange.900'}
-                          alignItems={'center'}
-                          justifyItems={'center'}
-                        >
-                          <TouchableOpacity
-                            onPress={() => deletePhoto(photo.id!)}
-                          >
-                            <Icon
-                              as={Feather}
-                              name="trash-2"
-                              size={7}
-                              color="white"
-                            />
-                          </TouchableOpacity>
-                        </VStack>
-                      </VStack>
-                    ))}
-                  </VStack>
-                )}
-                <Button
-                  title={
-                    location.LocationsPhotos?.length === 0
-                      ? '+ Adicionar photo'
-                      : '+ Adicionar mais fotos'
-                  }
-                  onPress={handleUserProfilePictureSelect}
-                  h={50}
-                  variant={'outline'}
-                />
-
-                <Button
-                  title="Editar Local"
-                  onPress={() =>
-                    navigation.navigate('editLocation', {
-                      locationId: location.id,
-                    })
-                  }
-                  h={50}
-                  mt={100}
-                />
-              </VStack>
+                </VStack>
+              </HStack>
             </HStack>
-          </HStack>
-        </VStack>
-      </ScrollView>
+          </VStack>
+
+          <VStack px={5} mt={5}>
+            <HStack>
+              <HStack>
+                <Icon
+                  as={Feather}
+                  name="tool"
+                  size={5}
+                  ml={3}
+                  color="amber.600"
+                />
+                <VStack ml={2} w={300}>
+                  {location.business_categories?.map((category) => {
+                    return (
+                      <HStack key={category}>
+                        <HStack>
+                          <VStack ml={2}>
+                            <Text>
+                              {
+                                servicesCategories.find((service) =>
+                                  service.id === category ? service.name : ''
+                                )?.name
+                              }
+                            </Text>
+                          </VStack>
+                        </HStack>
+                      </HStack>
+                    );
+                  })}
+                </VStack>
+              </HStack>
+            </HStack>
+          </VStack>
+
+          <VStack px={5} mt={5}>
+            <HStack>
+              <HStack>
+                <Icon
+                  as={Feather}
+                  name="calendar"
+                  size={5}
+                  ml={3}
+                  color="amber.600"
+                />
+                <VStack ml={2} w={300}>
+                  {location.open_hours_weekend?.map((category) => {
+                    return (
+                      <HStack key={category}>
+                        <VStack>
+                          <HStack ml={2}>
+                            <Text>{category}</Text>
+                          </HStack>
+                        </VStack>
+                      </HStack>
+                    );
+                  })}
+                </VStack>
+              </HStack>
+            </HStack>
+          </VStack>
+
+          <VStack px={5} mt={5}>
+            <HStack>
+              <HStack>
+                <Icon
+                  as={Feather}
+                  name="clock"
+                  size={5}
+                  ml={3}
+                  color="amber.600"
+                />
+                <VStack ml={4} w={300}>
+                  {location.open_hours?.length > 1 ? (
+                    <Text>{location.open_hours}</Text>
+                  ) : (
+                    <Text color="red.500">
+                      Voce deve adicionar seus horarios para poder receber
+                      clientes!
+                    </Text>
+                  )}
+                </VStack>
+              </HStack>
+            </HStack>
+          </VStack>
+
+          <VStack px={5} mt={10}>
+            <HStack>
+              <HStack>
+                <Icon
+                  as={Feather}
+                  name="clock"
+                  size={5}
+                  ml={3}
+                  color="amber.600"
+                />
+                <VStack ml={2}>
+                  <Text>
+                    Criado em:{' '}
+                    {new Date(location.created_at!).toLocaleDateString('pt-br')}
+                  </Text>
+                </VStack>
+              </HStack>
+            </HStack>
+          </VStack>
+
+          <VStack px={5} mt={5}>
+            <HStack>
+              <HStack>
+                <Icon
+                  as={Feather}
+                  name="image"
+                  size={5}
+                  ml={3}
+                  color="amber.600"
+                />
+                <VStack ml={2} w={300}>
+                  {location.photos &&
+                    location.photos.map((photo) => {
+                      return (
+                        <HStack key={photo}>
+                          <HStack>
+                            <VStack ml={2}>
+                              <Text>{photo}</Text>
+                            </VStack>
+                          </HStack>
+                        </HStack>
+                      );
+                    })}
+
+                  {location.LocationsPhotos?.length === 0 ? (
+                    <VStack mb={5}>
+                      <Text>
+                        Adicione fotos ao seu local e atraia mais clientes
+                      </Text>
+                    </VStack>
+                  ) : (
+                    <VStack mb={5}>
+                      {location.LocationsPhotos?.map((photo) => (
+                        <VStack
+                          mb={5}
+                          borderWidth={2}
+                          borderColor={'orange.700'}
+                        >
+                          <Image
+                            key={photo.id}
+                            source={{
+                              uri: `${api.defaults.baseURL}/locations/photo/${location.id}/${photo.photo}`,
+                            }}
+                            alt="local"
+                            w={400}
+                            h={400}
+                          />
+                          <VStack
+                            w={60}
+                            h={8}
+                            position={'absolute'}
+                            bottom={0}
+                            left={0}
+                            borderTopRightRadius={10}
+                            borderTopLeftRadius={0}
+                            bg={'orange.900'}
+                            alignItems={'center'}
+                            justifyItems={'center'}
+                          >
+                            <TouchableOpacity
+                              onPress={() => deletePhoto(photo.id!)}
+                            >
+                              <Icon
+                                as={Feather}
+                                name="trash-2"
+                                size={7}
+                                color="white"
+                              />
+                            </TouchableOpacity>
+                          </VStack>
+                        </VStack>
+                      ))}
+                    </VStack>
+                  )}
+                  <Button
+                    title={
+                      location.LocationsPhotos?.length === 0
+                        ? '+ Adicionar photo'
+                        : '+ Adicionar mais fotos'
+                    }
+                    onPress={handleUserProfilePictureSelect}
+                    h={50}
+                    variant={'outline'}
+                  />
+
+                  <Button
+                    title="Editar Local"
+                    onPress={() =>
+                      navigation.navigate('editLocation', {
+                        locationId: location.id,
+                      })
+                    }
+                    h={50}
+                    mt={100}
+                  />
+                </VStack>
+              </HStack>
+            </HStack>
+          </VStack>
+        </ScrollView>
+      </VStack>
     </VStack>
   );
 }

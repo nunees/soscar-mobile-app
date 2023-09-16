@@ -6,7 +6,7 @@ import { TextArea } from '@components/TextArea';
 import { Feather } from '@expo/vector-icons';
 import { useAuth } from '@hooks/useAuth';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { PartnerNavigatorRoutesProps } from '@routes/partner.routes';
 import { api } from '@services/api';
 import { AppError } from '@utils/AppError';
@@ -21,7 +21,7 @@ import {
   HStack,
   Icon,
 } from 'native-base';
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 
 export function AddLocation() {
   const [paymentMethods] = useState([
@@ -140,21 +140,7 @@ export function AddLocation() {
     });
   }
 
-  // const handleOpenDays = useCallback((event: any, value: string) => {
-  //   if (event.target.checked) {
-  //     setOpenDays((prevState) => {
-  //       const alreadySelected = prevState.includes(value);
-  //       if (!alreadySelected) {
-  //         return [...prevState, value];
-  //       }
-  //       return prevState.filter((item) => item !== value);
-  //     });
-  //   } else {
-  //     setOpenDays((prevState) => prevState.filter((item) => item !== value));
-  //   }
-  // }, []);
-
-  function handleHour(date: Date, state: string) {
+  function handleHour(date: Date | undefined, state: string) {
     if (date) {
       const tempDate = date
         .toLocaleTimeString()
@@ -217,13 +203,13 @@ export function AddLocation() {
           },
         }
       );
+      resetFields();
+      setIsUploading(false);
       toast.show({
         title: response.data.message,
         placement: 'top',
         bgColor: 'green.500',
       });
-      setIsUploading(false);
-      resetFields();
       navigation.navigate('locations');
     } catch (error) {
       const isAppError = error instanceof AppError;
@@ -255,162 +241,146 @@ export function AddLocation() {
       <VStack>
         <ScrollView
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 120 }}
+          contentContainerStyle={{ paddingBottom: 100 }}
         >
           <VStack py={10} px={19}>
-            <Text fontSize="md" bold mb={3}>
-              Informacoes pessoais
-            </Text>
-            <Input
-              placeholder="CNPJ ou CPF"
-              value={cnpj}
-              onChangeText={setCnpj}
-              InputRightElement={
-                <Icon
-                  as={Feather}
-                  name={!cnpj ? 'x' : 'check'}
-                  size={8}
-                  ml="2"
-                  color={!cnpj ? 'red.500' : 'green.500'}
-                />
-              }
-            />
-            <Input
-              placeholder="Nome Fantasia"
-              value={businessName}
-              onChangeText={setBusinessName}
-              InputRightElement={
-                <Icon
-                  as={Feather}
-                  name={!businessName ? 'x' : 'check'}
-                  size={8}
-                  ml="2"
-                  color={!businessName ? 'red.500' : 'green.500'}
-                />
-              }
-            />
-            <Input
-              placeholder="Telefone"
-              value={businessPhone}
-              onChangeText={setBusinessPhone}
-              InputRightElement={
-                <Icon
-                  as={Feather}
-                  name={!businessPhone ? 'x' : 'check'}
-                  size={8}
-                  ml="2"
-                  color={!businessPhone ? 'red.500' : 'green.500'}
-                />
-              }
-            />
-            <Input
-              placeholder="Email"
-              value={businessEmail}
-              onChangeText={setBusinessEmail}
-              InputRightElement={
-                <Icon
-                  as={Feather}
-                  name={!businessEmail ? 'x' : 'check'}
-                  size={8}
-                  ml="2"
-                  color={!businessEmail ? 'red.500' : 'green.500'}
-                />
-              }
-            />
+            <VStack p={5} mb={5} borderRadius={10} backgroundColor="white">
+              <Text fontSize="md" bold mb={3}>
+                Informacoes pessoais
+              </Text>
+              <Input
+                placeholder="CNPJ ou CPF"
+                value={cnpj}
+                onChangeText={setCnpj}
+                InputRightElement={
+                  <Icon
+                    as={Feather}
+                    name={!cnpj ? 'x' : 'check'}
+                    size={4}
+                    mr={2}
+                    color={!cnpj ? 'red.500' : 'green.500'}
+                  />
+                }
+              />
+              <Input
+                placeholder="Nome Fantasia"
+                value={businessName}
+                onChangeText={setBusinessName}
+                InputRightElement={
+                  <Icon
+                    as={Feather}
+                    name={!businessName ? 'x' : 'check'}
+                    size={4}
+                    mr={2}
+                    color={!businessName ? 'red.500' : 'green.500'}
+                  />
+                }
+              />
+              <Input
+                placeholder="Telefone"
+                value={businessPhone}
+                onChangeText={setBusinessPhone}
+                InputRightElement={
+                  <Icon
+                    as={Feather}
+                    name={!businessPhone ? 'x' : 'check'}
+                    size={4}
+                    mr={2}
+                    color={!businessPhone ? 'red.500' : 'green.500'}
+                  />
+                }
+              />
+              <Input
+                placeholder="Email"
+                value={businessEmail}
+                onChangeText={setBusinessEmail}
+                InputRightElement={
+                  <Icon
+                    as={Feather}
+                    name={!businessEmail ? 'x' : 'check'}
+                    size={4}
+                    mr={2}
+                    color={!businessEmail ? 'red.500' : 'green.500'}
+                  />
+                }
+              />
+            </VStack>
 
-            <Text fontSize="md" bold py={5}>
-              Localizaçao
-            </Text>
+            <VStack mb={5} p={5} backgroundColor="white" borderRadius={10}>
+              <Text fontSize="md" bold mb={3}>
+                Localizaçao
+              </Text>
 
-            <Input
-              w={200}
-              placeholder="CEP"
-              value={zipCode}
-              onChangeText={(value) => handleCEP(value)}
-              InputRightElement={
-                <Icon
-                  as={Feather}
-                  name={correctZipCode ? 'x' : 'check'}
-                  size={8}
-                  ml="2"
-                  color={correctZipCode ? 'red.500' : 'green.500'}
-                />
-              }
-            />
+              <Input
+                w={200}
+                placeholder="CEP"
+                value={zipCode}
+                onChangeText={(value) => handleCEP(value)}
+                InputRightElement={
+                  <Icon
+                    as={Feather}
+                    name={correctZipCode ? 'x' : 'check'}
+                    size={4}
+                    mr={2}
+                    color={correctZipCode ? 'red.500' : 'green.500'}
+                  />
+                }
+              />
 
-            <Input
-              placeholder="Endereço"
-              value={addressLine}
-              onChangeText={setAddressLine}
-              InputRightElement={
-                <Icon
-                  as={Feather}
-                  name={!addressLine ? 'x' : 'check'}
-                  size={8}
-                  ml="2"
-                  color={!addressLine ? 'red.500' : 'green.500'}
-                />
-              }
-            />
-            <Input
-              placeholder="Número"
-              onChangeText={setNumber}
-              value={number}
-              InputRightElement={
-                <Icon
-                  as={Feather}
-                  name={!number ? 'x' : 'check'}
-                  size={8}
-                  ml="2"
-                  color={!number ? 'red.500' : 'green.500'}
-                />
-              }
-            />
-            <Input
-              placeholder="Bairro"
-              value={district}
-              onChangeText={setDistrict}
-              InputRightElement={
-                <Icon
-                  as={Feather}
-                  name={!district ? 'x' : 'check'}
-                  size={8}
-                  ml="2"
-                  color={!district ? 'red.500' : 'green.500'}
-                />
-              }
-            />
-            <Input
-              placeholder="Cidade"
-              value={city}
-              onChangeText={setCity}
-              InputRightElement={
-                <Icon
-                  as={Feather}
-                  name={!city ? 'x' : 'check'}
-                  size={8}
-                  ml="2"
-                  color={!city ? 'red.500' : 'green.500'}
-                />
-              }
-            />
-            <Input
-              placeholder="Estado"
-              value={state}
-              onChangeText={setState}
-              InputRightElement={
-                <Icon
-                  as={Feather}
-                  name={!state ? 'x' : 'check'}
-                  size={8}
-                  ml="2"
-                  color={!state ? 'red.500' : 'green.500'}
-                />
-              }
-            />
+              <Input
+                placeholder="Endereço"
+                value={addressLine}
+                onChangeText={setAddressLine}
+                editable={false}
+                isDisabled={true}
+                caretHidden={true}
+                showSoftInputOnFocus={false}
+              />
+              <Input
+                placeholder="Número"
+                onChangeText={setNumber}
+                value={number}
+                InputRightElement={
+                  <Icon
+                    as={Feather}
+                    name={!number ? 'x' : 'check'}
+                    size={4}
+                    mr={2}
+                    color={!number ? 'red.500' : 'green.500'}
+                  />
+                }
+              />
+              <Input
+                placeholder="Bairro"
+                value={district}
+                onChangeText={setDistrict}
+                editable={false}
+                isDisabled={true}
+                caretHidden={true}
+                showSoftInputOnFocus={false}
+              />
+              <Input
+                placeholder="Cidade"
+                value={city}
+                onChangeText={setCity}
+                editable={false}
+                isDisabled={true}
+                caretHidden={true}
+                showSoftInputOnFocus={false}
+              />
+              <Input
+                placeholder="Estado"
+                value={state}
+                onChangeText={setState}
+                editable={false}
+                isDisabled={true}
+                caretHidden={true}
+                showSoftInputOnFocus={false}
+              />
+            </VStack>
 
-            <VStack mb={5} py={5}>
-              <Text fontSize="md" pb={5} bold>
+            <VStack backgroundColor="white" p={5} borderRadius={10} mb={5}>
+              <Text fontSize="md" mb={3} bold>
                 Meios de pagamentos oferecidos
               </Text>
               <VStack>
@@ -430,8 +400,8 @@ export function AddLocation() {
               </VStack>
             </VStack>
 
-            <VStack py={5}>
-              <Text fontSize="md" pb={5} bold>
+            <VStack backgroundColor="white" p={5} borderRadius={10} mb={5}>
+              <Text fontSize="md" mb={3} bold>
                 Tipos de serviços oferecidos
               </Text>
               <VStack flexGrow={1}>
@@ -440,8 +410,8 @@ export function AddLocation() {
                     <Checkbox
                       value={item.id.toString()}
                       colorScheme="orange"
-                      mb={5}
                       key={item.id}
+                      mb={5}
                       onChange={() => setServicesHandler(item.id)}
                     >
                       <Text fontSize="md">{item.name}</Text>
@@ -451,7 +421,7 @@ export function AddLocation() {
               </VStack>
             </VStack>
 
-            <VStack py={5}>
+            <VStack backgroundColor="white" p={5} borderRadius={10} mb={5}>
               <Text fontSize="md" bold pb={5}>
                 Aberto nos dias
               </Text>
@@ -517,7 +487,7 @@ export function AddLocation() {
               </VStack>
             </VStack>
 
-            <VStack py={5}>
+            <VStack backgroundColor="white" p={5} borderRadius={10} mb={5}>
               <Text fontSize="md" bold pb={5}>
                 Horário de funcionamento
               </Text>
@@ -528,6 +498,7 @@ export function AddLocation() {
                     editable={false}
                     value={openHour}
                     caretHidden
+                    textAlign="center"
                     onPressIn={() => {
                       DateTimePickerAndroid.open({
                         mode: 'time',
@@ -547,6 +518,7 @@ export function AddLocation() {
                     editable={false}
                     value={closeHour}
                     caretHidden
+                    textAlign="center"
                     onPressIn={() => {
                       DateTimePickerAndroid.open({
                         mode: 'time',
@@ -560,22 +532,21 @@ export function AddLocation() {
               </HStack>
             </VStack>
 
-            <VStack py={5}>
+            <VStack backgroundColor="white" p={5} borderRadius={10} mb={5}>
               <Text bold pb={5}>
-                Bio
+                Conte nos um pouco sobre o seu negócio
               </Text>
               <TextArea
-                placeholder="Conte nos um pouco sobre o seu negócio,
-              ele pode ser o diferencial para o cliente escolher o seu estabelecimento."
+                placeholder="Ele pode ser o diferencial para o cliente escolher o seu estabelecimento."
                 h={150}
                 value={businessDescription}
                 onChangeText={setBusinessDescription}
                 fontSize="sm"
-                borderRadius={10}
+                borderRadius={5}
               />
             </VStack>
 
-            <Button title="Salvar" onPress={handleSubmitBusiness} mt={150} />
+            <Button title="Criar local" onPress={handleSubmitBusiness} />
           </VStack>
         </ScrollView>
       </VStack>

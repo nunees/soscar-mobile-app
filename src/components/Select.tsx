@@ -13,10 +13,9 @@ export function Select({ label, data, ...rest }: Props) {
       accessibilityLabel={label}
       placeholder={label}
       borderWidth={1}
-      fontSize="xs"
       color="gray.100"
       fontFamily={'body'}
-      placeholderTextColor="gray.400"
+      placeholderTextColor="gray.500"
       dropdownIcon={<Icon as={Feather} name="chevron-down" size={5} mr={5} />}
       {...rest}
     >

@@ -6,7 +6,7 @@ import { ILocationScheduleDTO } from '@dtos/ILocationSchedule.DTO';
 import { Feather } from '@expo/vector-icons';
 import { useAuth } from '@hooks/useAuth';
 import { useProfile } from '@hooks/useProfile';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { PartnerNavigatorRoutesProps } from '@routes/partner.routes';
 import { api } from '@services/api';
 import { AppError } from '@utils/AppError';
@@ -20,7 +20,7 @@ import {
   Box,
   Center,
 } from 'native-base';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { TouchableOpacity } from 'react-native';
 
 /**
@@ -126,6 +126,12 @@ export function HomeScreen() {
   useEffect(() => {
     loadData();
   }, []);
+
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     loadData();
+  //   }, [])
+  // );
 
   return (
     <ScrollView showsVerticalScrollIndicator={false}>

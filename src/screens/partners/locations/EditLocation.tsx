@@ -3,16 +3,24 @@ import { Button } from '@components/Button';
 import { Input } from '@components/Input';
 import { LoadingModal } from '@components/LoadingModal';
 import { TextArea } from '@components/TextArea';
+import { UserPhoto } from '@components/UserPhoto';
 import { ILocation } from '@dtos/ILocation';
-import { Feather } from '@expo/vector-icons';
+import { Entypo, Feather } from '@expo/vector-icons';
 import { useAuth } from '@hooks/useAuth';
 import { useProfile } from '@hooks/useProfile';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import { PartnerNavigatorRoutesProps } from '@routes/partner.routes';
 import { api } from '@services/api';
 import { AppError } from '@utils/AppError';
 import { GetAddressByCEP } from '@utils/GetAddressByCEP';
+import { IFileInfo } from 'expo-file-system';
+import * as FileSystem from 'expo-file-system';
+import * as ImagePicker from 'expo-image-picker';
 import {
   VStack,
   Text,
@@ -21,8 +29,15 @@ import {
   HStack,
   Icon,
   Checkbox,
+  Image,
 } from 'native-base';
-import { useState, useEffect } from 'react';
+import { useState, useCallback } from 'react';
+import {
+  ImageBackground,
+  Pressable,
+  Touchable,
+  TouchableOpacity,
+} from 'react-native';
 
 type RouteParamProps = {
   locationId: string;
@@ -111,6 +126,95 @@ export function EditLocation() {
   const [openHour, setOpenHour] = useState('');
   const [closeHour, setCloseHour] = useState('');
 
+  async function handleUserProfilePictureSelect(field: string) {
+    try {
+      setIsLoading(true);
+      const photoSelected = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        quality: 1,
+        aspect: [8, 8],
+        allowsEditing: true,
+      });
+
+      if (photoSelected.canceled) {
+        return;
+      }
+
+      if (photoSelected.assets[0].uri) {
+        const photoInfo = (await FileSystem.getInfoAsync(
+          photoSelected.assets[0].uri
+        )) as IFileInfo;
+
+        if (photoInfo?.size && photoInfo.size / 1021 / 1024 > 5) {
+          toast.show({
+            title: 'A imagem deve ter no máximo 5MB',
+            placement: 'top',
+            bgColor: 'red.500',
+          });
+        }
+
+        const fileExtension = photoSelected.assets[0].uri.split('.').pop();
+
+        const file = {
+          name: `${user.username}.${fileExtension}`.toLowerCase(),
+          uri: photoSelected.assets[0].uri,
+          type: `${photoSelected.assets[0].type}/${fileExtension}`,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any;
+
+        const userPhotoUploadForm = new FormData();
+
+        if (field === 'avatar') {
+          userPhotoUploadForm.append('avatar', file);
+
+          await api.put(
+            `/locations/avatar/${location.id}`,
+            userPhotoUploadForm,
+            {
+              headers: {
+                id: user.id,
+                'Content-Type': 'multipart/form-data',
+              },
+            }
+          );
+        } else if (field === 'cover_photo') {
+          console.log('cover_photo');
+          userPhotoUploadForm.append('cover', file);
+          await api.put(
+            `/locations/cover/${location.id}`,
+            userPhotoUploadForm,
+            {
+              headers: {
+                id: user.id,
+                'Content-Type': 'multipart/form-data',
+              },
+            }
+          );
+        } else {
+          throw new AppError('Erro ao atualizar foto');
+        }
+
+        toast.show({
+          title: 'Foto atualizada',
+          placement: 'top',
+          bgColor: 'green.500',
+        });
+        setIsLoading(false);
+      }
+    } catch (error) {
+      console.log(error);
+      const isAppError = error instanceof AppError;
+      const title = isAppError ? error.message : 'Erro na atualização';
+      toast.show({
+        title,
+        placement: 'top',
+        bgColor: 'red.500',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   function setPaymentMethodsHandler(value: number) {
     setSelectedPaymentMethods((prevState) => {
       const alreadySelected = prevState.includes(value);
@@ -135,8 +239,8 @@ export function EditLocation() {
     try {
       setIsUploading(true);
 
-      const response = await api.post(
-        '/locations',
+      const response = await api.patch(
+        `/locations/${location.id}`,
         {
           cnpj,
           business_name: businessName,
@@ -250,19 +354,21 @@ export function EditLocation() {
     }
   }
 
-  useEffect(() => {
-    handleFetchLocationDetails();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      handleFetchLocationDetails();
+    }, [])
+  );
 
   return (
-    <VStack pb={10}>
-      <VStack mb={10}>
+    <VStack>
+      <VStack>
         <AppHeader title="Editar local" />
       </VStack>
-      {isLoading && (
+      {isUploading && (
         <LoadingModal
-          showModal={isLoading}
-          setShowModal={setIsLoading}
+          showModal={isUploading}
+          setShowModal={setIsUploading}
           message="Aguarde..."
         />
       )}
@@ -270,167 +376,226 @@ export function EditLocation() {
       <VStack>
         <ScrollView
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 120 }}
+          contentContainerStyle={{ paddingBottom: 200 }}
+          style={{
+            paddingTop: 20,
+          }}
         >
-          <VStack py={10} px={19}>
-            <Text fontSize="md" bold mb={3}>
-              Informacoes pessoais
-            </Text>
-            <Input
-              placeholder="CNPJ"
-              value={cnpj}
-              onChangeText={setCnpj}
-              InputRightElement={
-                <Icon
-                  as={Feather}
-                  name={!cnpj ? 'x' : 'check'}
-                  size={8}
-                  ml="2"
-                  color={!cnpj ? 'red.500' : 'green.500'}
-                />
-              }
-            />
-            <Input
-              placeholder="Nome Fantasia"
-              value={businessName}
-              onChangeText={setBusinessName}
-              InputRightElement={
-                <Icon
-                  as={Feather}
-                  name={!businessName ? 'x' : 'check'}
-                  size={8}
-                  ml="2"
-                  color={!businessName ? 'red.500' : 'green.500'}
-                />
-              }
-            />
-            <Input
-              placeholder="Telefone"
-              value={businessPhone}
-              onChangeText={setBusinessPhone}
-              InputRightElement={
-                <Icon
-                  as={Feather}
-                  name={!businessPhone ? 'x' : 'check'}
-                  size={8}
-                  ml="2"
-                  color={!businessPhone ? 'red.500' : 'green.500'}
-                />
-              }
-            />
-            <Input
-              placeholder="Email"
-              value={businessEmail}
-              onChangeText={setBusinessEmail}
-              InputRightElement={
-                <Icon
-                  as={Feather}
-                  name={!businessEmail ? 'x' : 'check'}
-                  size={8}
-                  ml="2"
-                  color={!businessEmail ? 'red.500' : 'green.500'}
-                />
-              }
-            />
+          <VStack px={5}>
+            <VStack backgroundColor="white" borderRadius={10} mb={20}>
+              <VStack w={'full'} height={150} borderRadius={10}>
+                <VStack>
+                  <Image
+                    source={{
+                      uri: `${api.defaults.baseURL}/locations/cover/${location?.id}/${location?.cover_photo}`,
+                    }}
+                    alt="Foto de capa"
+                    resizeMode="cover"
+                  />
+                  <HStack
+                    width={30}
+                    height={30}
+                    borderRadius={100}
+                    backgroundColor="orange.500"
+                    alignItems="center"
+                    justifyContent="center"
+                    position="absolute"
+                    bottom={-10}
+                    right={0}
+                    shadow={1}
+                  >
+                    <TouchableOpacity
+                      onPress={() =>
+                        handleUserProfilePictureSelect('cover_photo')
+                      }
+                    >
+                      <Icon as={Entypo} name="camera" size={4} color="white" />
+                    </TouchableOpacity>
+                  </HStack>
+                </VStack>
+                <VStack h={120} position={'absolute'}>
+                  <HStack position="absolute" top={10} left={120}>
+                    <UserPhoto
+                      source={{
+                        uri: location.avatar
+                          ? `${api.defaults.baseURL}/locations/avatar/${location?.id}/${location?.avatar}`
+                          : `https://ui-avatars.com/api/?format=png&name=${user.name}+${profile.last_name}`,
+                      }}
+                      alt="Foto de perfil"
+                      size={150}
+                      borderRadius={100}
+                    />
 
-            <Text fontSize="md" bold py={5}>
-              Localizaçao
-            </Text>
+                    <VStack
+                      width={30}
+                      height={30}
+                      borderRadius={100}
+                      backgroundColor="orange.500"
+                      position="absolute"
+                      bottom={0}
+                      left={100}
+                      alignItems="center"
+                      justifyContent="center"
+                      shadow={1}
+                    >
+                      <TouchableOpacity
+                        onPress={() => handleUserProfilePictureSelect('avatar')}
+                      >
+                        <Icon
+                          as={Entypo}
+                          name="camera"
+                          size={4}
+                          color="white"
+                        />
+                      </TouchableOpacity>
+                    </VStack>
+                  </HStack>
+                </VStack>
+              </VStack>
+            </VStack>
 
-            <Input
-              w={200}
-              placeholder="CEP"
-              value={zipCode}
-              onChangeText={(value) => handleCEP(value)}
-              InputRightElement={
-                <Icon
-                  as={Feather}
-                  name={correctZipCode ? 'x' : 'check'}
-                  size={8}
-                  ml="2"
-                  color={correctZipCode ? 'red.500' : 'green.500'}
-                />
-              }
-            />
+            <VStack p={5} mb={5} borderRadius={10} backgroundColor="white">
+              <Text fontSize="md" bold mb={3}>
+                Informacoes pessoais
+              </Text>
+              <Input
+                placeholder="CNPJ ou CPF"
+                value={location.cnpj || cnpj}
+                onChangeText={setCnpj}
+                InputRightElement={
+                  <Icon
+                    as={Feather}
+                    name={!cnpj ? 'x' : 'check'}
+                    size={4}
+                    mr={2}
+                    color={!cnpj ? 'red.500' : 'green.500'}
+                  />
+                }
+              />
+              <Input
+                placeholder="Nome Fantasia"
+                value={location.business_name || businessName}
+                onChangeText={setBusinessName}
+                InputRightElement={
+                  <Icon
+                    as={Feather}
+                    name={!businessName ? 'x' : 'check'}
+                    size={4}
+                    mr={2}
+                    color={!businessName ? 'red.500' : 'green.500'}
+                  />
+                }
+              />
+              <Input
+                placeholder="Telefone"
+                value={location.business_phone || businessPhone}
+                onChangeText={setBusinessPhone}
+                InputRightElement={
+                  <Icon
+                    as={Feather}
+                    name={!businessPhone ? 'x' : 'check'}
+                    size={4}
+                    mr={2}
+                    color={!businessPhone ? 'red.500' : 'green.500'}
+                  />
+                }
+              />
+              <Input
+                placeholder="Email"
+                value={location.business_email || businessEmail}
+                onChangeText={setBusinessEmail}
+                InputRightElement={
+                  <Icon
+                    as={Feather}
+                    name={!businessEmail ? 'x' : 'check'}
+                    size={4}
+                    mr={2}
+                    color={!businessEmail ? 'red.500' : 'green.500'}
+                  />
+                }
+              />
+            </VStack>
 
-            <Input
-              placeholder="Endereço"
-              value={addressLine}
-              onChangeText={setAddressLine}
-              InputRightElement={
-                <Icon
-                  as={Feather}
-                  name={!addressLine ? 'x' : 'check'}
-                  size={8}
-                  ml="2"
-                  color={!addressLine ? 'red.500' : 'green.500'}
-                />
-              }
-            />
-            <Input
-              placeholder="Número"
-              onChangeText={setNumber}
-              value={number}
-              InputRightElement={
-                <Icon
-                  as={Feather}
-                  name={!number ? 'x' : 'check'}
-                  size={8}
-                  ml="2"
-                  color={!number ? 'red.500' : 'green.500'}
-                />
-              }
-            />
-            <Input
-              placeholder="Bairro"
-              value={district}
-              onChangeText={setDistrict}
-              InputRightElement={
-                <Icon
-                  as={Feather}
-                  name={!district ? 'x' : 'check'}
-                  size={8}
-                  ml="2"
-                  color={!district ? 'red.500' : 'green.500'}
-                />
-              }
-            />
-            <Input
-              placeholder="Cidade"
-              value={city}
-              onChangeText={setCity}
-              InputRightElement={
-                <Icon
-                  as={Feather}
-                  name={!city ? 'x' : 'check'}
-                  size={8}
-                  ml="2"
-                  color={!city ? 'red.500' : 'green.500'}
-                />
-              }
-            />
-            <Input
-              placeholder="Estado"
-              value={state}
-              onChangeText={setState}
-              InputRightElement={
-                <Icon
-                  as={Feather}
-                  name={!state ? 'x' : 'check'}
-                  size={8}
-                  ml="2"
-                  color={!state ? 'red.500' : 'green.500'}
-                />
-              }
-            />
+            <VStack mb={5} p={5} backgroundColor="white" borderRadius={10}>
+              <Text fontSize="md" bold mb={3}>
+                Localizaçao
+              </Text>
 
-            <VStack mb={5} py={5}>
-              <Text fontSize="md" pb={5} bold>
+              <Input
+                w={200}
+                placeholder="CEP"
+                value={location.zipcode || zipCode}
+                onChangeText={(value) => handleCEP(value)}
+                InputRightElement={
+                  <Icon
+                    as={Feather}
+                    name={correctZipCode ? 'x' : 'check'}
+                    size={4}
+                    mr={2}
+                    color={correctZipCode ? 'red.500' : 'green.500'}
+                  />
+                }
+              />
+
+              <Input
+                placeholder="Endereço"
+                value={location.address_line || addressLine}
+                onChangeText={setAddressLine}
+                editable={false}
+                isDisabled={true}
+                caretHidden={true}
+                showSoftInputOnFocus={false}
+              />
+              <Input
+                placeholder="Número"
+                onChangeText={setNumber}
+                value={String(location.number) || number}
+                InputRightElement={
+                  <Icon
+                    as={Feather}
+                    name={!number ? 'x' : 'check'}
+                    size={4}
+                    mr={2}
+                    color={!number ? 'red.500' : 'green.500'}
+                  />
+                }
+              />
+              <Input
+                placeholder="Bairro"
+                value={location.district || district}
+                onChangeText={setDistrict}
+                editable={false}
+                isDisabled={true}
+                caretHidden={true}
+                showSoftInputOnFocus={false}
+              />
+              <Input
+                placeholder="Cidade"
+                value={location.city || city}
+                onChangeText={setCity}
+                editable={false}
+                isDisabled={true}
+                caretHidden={true}
+                showSoftInputOnFocus={false}
+              />
+              <Input
+                placeholder="Estado"
+                value={location.state || state}
+                onChangeText={setState}
+                editable={false}
+                isDisabled={true}
+                caretHidden={true}
+                showSoftInputOnFocus={false}
+              />
+            </VStack>
+
+            <VStack backgroundColor="white" p={5} borderRadius={10} mb={5}>
+              <Text fontSize="md" mb={3} bold>
                 Meios de pagamentos oferecidos
               </Text>
               <VStack>
-                <Checkbox.Group>
-                  {paymentMethods.map((item) => (
+                {paymentMethods.map((item) => (
+                  <Checkbox.Group>
                     <Checkbox
                       value={item.id.toString()}
                       colorScheme="orange"
@@ -440,13 +605,13 @@ export function EditLocation() {
                     >
                       <Text fontSize="md">{item.name}</Text>
                     </Checkbox>
-                  ))}
-                </Checkbox.Group>
+                  </Checkbox.Group>
+                ))}
               </VStack>
             </VStack>
 
-            <VStack py={5}>
-              <Text fontSize="md" pb={5} bold>
+            <VStack backgroundColor="white" p={5} borderRadius={10} mb={5}>
+              <Text fontSize="md" mb={3} bold>
                 Tipos de serviços oferecidos
               </Text>
               <VStack flexGrow={1}>
@@ -455,8 +620,8 @@ export function EditLocation() {
                     <Checkbox
                       value={item.id.toString()}
                       colorScheme="orange"
-                      mb={5}
                       key={item.id}
+                      mb={5}
                       onChange={() => setServicesHandler(item.id)}
                     >
                       <Text fontSize="md">{item.name}</Text>
@@ -466,7 +631,7 @@ export function EditLocation() {
               </VStack>
             </VStack>
 
-            <VStack py={5}>
+            <VStack backgroundColor="white" p={5} borderRadius={10} mb={5}>
               <Text fontSize="md" bold pb={5}>
                 Aberto nos dias
               </Text>
@@ -532,17 +697,18 @@ export function EditLocation() {
               </VStack>
             </VStack>
 
-            <VStack py={5}>
+            <VStack backgroundColor="white" p={5} borderRadius={10} mb={5}>
               <Text fontSize="md" bold pb={5}>
                 Horário de funcionamento
               </Text>
               <HStack>
                 <VStack w={100}>
                   <Input
-                    placeholder={'Das'}
+                    placeholder={'Abre'}
                     editable={false}
-                    value={openHour}
+                    value={location?.open_hours?.split('-')[0] || openHour}
                     caretHidden
+                    textAlign="center"
                     onPressIn={() => {
                       DateTimePickerAndroid.open({
                         mode: 'time',
@@ -554,14 +720,15 @@ export function EditLocation() {
                   />
                 </VStack>
                 <VStack px={5} py={5}>
-                  <Text>as</Text>
+                  <Text>-</Text>
                 </VStack>
                 <VStack w={100}>
                   <Input
-                    placeholder={'até'}
+                    placeholder={'Fecha'}
                     editable={false}
-                    value={closeHour}
+                    value={location.open_hours?.split('-')[1] || closeHour}
                     caretHidden
+                    textAlign="center"
                     onPressIn={() => {
                       DateTimePickerAndroid.open({
                         mode: 'time',
@@ -575,66 +742,21 @@ export function EditLocation() {
               </HStack>
             </VStack>
 
-            <VStack py={5}>
+            <VStack backgroundColor="white" p={5} borderRadius={10} mb={5}>
               <Text bold pb={5}>
-                Bio
+                Conte nos um pouco sobre o seu negócio
               </Text>
               <TextArea
-                placeholder="Conte nos um pouco sobre o seu negócio,
-              ele pode ser o diferencial para o cliente escolher o seu estabelecimento."
+                placeholder="Ele pode ser o diferencial para o cliente escolher o seu estabelecimento."
                 h={150}
-                value={businessDescription}
+                value={location.business_description || businessDescription}
                 onChangeText={setBusinessDescription}
                 fontSize="sm"
-                borderRadius={10}
+                borderRadius={5}
               />
             </VStack>
-            {/* <VStack>
-              <Text fontSize="md" pb={5} bold>
-                Adicione fotos do local
-              </Text>
-              <VStack maxW={400} flexWrap="wrap">
-                {photos.map((photo) => (
-                  <HStack>
-                    <TouchableOpacity onPress={() => setShowModal(true)}>
-                      <HStack mb={5}>
-                        <Image
-                          w={'full'}
-                          height={200}
-                          source={photo}
-                          alt="Some thing in the way"
-                          resizeMode="cover"
-                        />
-                      </HStack>
-                    </TouchableOpacity>
 
-                    <HStack>
-                      <Modal
-                        isOpen={showModal}
-                        onClose={() => setShowModal(false)}
-                      >
-                        <Modal.Content>
-                          <Modal.Body>
-                            <Image
-                              source={photo}
-                              alt="Photo"
-                              resizeMode="contain"
-                            />
-                          </Modal.Body>
-                        </Modal.Content>
-                      </Modal>
-                    </HStack>
-                  </HStack>
-                ))}
-
-                <Button
-                  title="Carregar foto"
-                  variant="outline"
-                  onPress={handleUserProfilePictureSelect}
-                />
-              </VStack>
-            </VStack> */}
-            <Button title="Salvar" onPress={handleSubmitBusiness} mt={150} />
+            <Button title="Salvar alteracoes" onPress={handleSubmitBusiness} />
           </VStack>
         </ScrollView>
       </VStack>

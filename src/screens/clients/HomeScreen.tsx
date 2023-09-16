@@ -18,7 +18,7 @@ import { ISchedules } from '@dtos/ISchedules';
 import { IVehicleDTO } from '@dtos/IVechicleDTO';
 import { useAuth } from '@hooks/useAuth';
 import { useProfile } from '@hooks/useProfile';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
 import { api } from '@services/api';
 import { AppError } from '@utils/AppError';
@@ -32,7 +32,7 @@ import {
   Center,
   Pressable,
 } from 'native-base';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { TouchableOpacity } from 'react-native';
 
 export function HomeScreen() {
@@ -81,10 +81,12 @@ export function HomeScreen() {
     }
   }
 
-  useEffect(() => {
-    fetchUserVehicles();
-    fetchSchedules();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchUserVehicles();
+      fetchSchedules();
+    }, [])
+  );
 
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
@@ -93,7 +95,7 @@ export function HomeScreen() {
           <UserLocation />
         </HStack>
         <HStack justifyContent={'space-between'}>
-          <HStack justifyItems={'baseline'}>
+          <HStack justifyItems={'baseline'} mb={2}>
             <TouchableOpacity
               onPress={() => navigation.navigate('profile')}
             ></TouchableOpacity>

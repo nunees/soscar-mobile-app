@@ -17,9 +17,6 @@ export function SelectCar({ label, data, ...rest }: Props) {
   return (
     <SelectNative
       mb={3}
-      borderTopWidth={0}
-      borderLeftWidth={0}
-      borderRightWidth={0}
       minWidth={'full'}
       accessibilityLabel={label}
       placeholder={label}

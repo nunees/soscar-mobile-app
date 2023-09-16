@@ -3,18 +3,24 @@ import { ListEmpty } from '@components/ListEmpty';
 import { PartnerCard } from '@components/PartnerCard';
 import { ILocation } from '@dtos/ILocation';
 import { useAuth } from '@hooks/useAuth';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
 import { api } from '@services/api';
 import { AppError } from '@utils/AppError';
 import { VStack, useToast, FlatList } from 'native-base';
-import { useEffect, useState } from 'react';
+import { useFocus } from 'native-base/lib/typescript/components/primitives';
+import { useCallback, useEffect, useState } from 'react';
 
 type RouteParamsProps = {
   serviceId: string;
 };
 
 export function SearchSchedule() {
+  const [isActive, setIsActive] = useState(true);
   const [locations, setLocations] = useState<ILocation[]>();
 
   const navigation = useNavigation<AppNavigatorRoutesProps>();
@@ -31,7 +37,7 @@ export function SearchSchedule() {
           id: user.id,
         },
       });
-      console.table(response.data);
+
       setLocations(response.data);
     } catch (error) {
       const title =
@@ -44,9 +50,21 @@ export function SearchSchedule() {
     }
   }
 
-  useEffect(() => {
-    findLocations(serviceId);
-  }, []);
+  // useEffect(() => {
+  //   findLocations(serviceId);
+  // }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (isActive) {
+        findLocations(serviceId);
+      }
+
+      return () => {
+        setIsActive(false);
+      };
+    }, [locations])
+  );
 
   return (
     <VStack pb={10}>

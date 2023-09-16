@@ -14,7 +14,6 @@ import {
   useToast,
   HStack,
   ScrollView,
-  Checkbox,
 } from 'native-base';
 import { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
@@ -69,7 +68,7 @@ export function SignIn() {
   }
 
   return (
-    <VStack backgroundColor="white">
+    <VStack flex={1} backgroundColor="white">
       <ScrollView>
         <VStack>
           <HStack pl={100} width={200} height={80}>
@@ -91,9 +90,6 @@ export function SignIn() {
                   rules={{ required: 'Informe seu e-mail' }}
                   render={({ field: { onChange, value } }) => (
                     <Input
-                      borderTopWidth={0}
-                      borderLeftWidth={0}
-                      borderRightWidth={0}
                       fontSize="md"
                       placeholder="Email"
                       autoCapitalize="none"
@@ -111,9 +107,6 @@ export function SignIn() {
                   rules={{ required: 'Informe sua senha' }}
                   render={({ field: { onChange, value } }) => (
                     <Input
-                      borderTopWidth={0}
-                      borderLeftWidth={0}
-                      borderRightWidth={0}
                       fontSize="md"
                       placeholder="Senha"
                       autoCapitalize="none"
@@ -126,14 +119,14 @@ export function SignIn() {
                 />
 
                 <HStack justifyContent={'space-between'}>
-                  <Checkbox
+                  {/* <Checkbox
                     colorScheme="orange"
                     value={''}
                     onChange={() => {}}
                     mr={10}
                   >
                     <Text fontSize="xs">Salvar credenciais</Text>
-                  </Checkbox>
+                  </Checkbox> */}
                   <TouchableOpacity>
                     <Text fontWeight={'bold'} color="orange.700" fontSize="xs">
                       Esqueci minha senha

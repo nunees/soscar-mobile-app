@@ -1,7 +1,7 @@
 export interface ILocation {
   id: string;
   user_id?: string;
-  location_id?: string;
+  location_id: string;
   cnpj: string;
   business_name: string;
   business_phone: string;
@@ -11,12 +11,15 @@ export interface ILocation {
   city: string;
   district: string;
   state: string;
+  active: boolean;
   zipcode: string;
   payment_methods: number[];
   business_categories: number[];
   business_description: string | null;
   latitude: string;
   longitude: string;
+  cover_photo: string;
+  avatar: string;
   photos: string[];
   LocationsPhotos?: {
     id?: string;

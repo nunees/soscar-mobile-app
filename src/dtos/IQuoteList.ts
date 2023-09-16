@@ -1,9 +1,12 @@
+import { IQuotesDocumentDTO } from './IQuoteDocumentDTO';
+
 export interface IQuoteList {
   id: string;
   hashId: string;
   is_juridical: boolean;
   user_id: string;
   vehicle_id: string;
+  location_id: string;
   insurance_company_id?: number | null;
   service_type_id: number | null;
   franchise_price: number | null;
@@ -12,10 +15,11 @@ export interface IQuoteList {
   partner_notes: string | null;
   created_at: Date | null;
   updated_at: Date | null;
-  UserQuotesDocuments: {
-    document_type_id: number;
-    document_url: string | null;
-  };
+  // UserQuotesDocuments: {
+  //   document_type_id: number;
+  //   document_url: string | null;
+  // }[];
+  UserQuotesDocuments: IQuotesDocumentDTO[];
   users: {
     name: string;
     email: string;

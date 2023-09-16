@@ -10,6 +10,7 @@ import { useProfile } from '@hooks/useProfile';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
+import { AuthRoutes } from '@routes/auth.routes';
 import { api } from '@services/api';
 import { AppError } from '@utils/AppError';
 import {
@@ -68,7 +69,7 @@ export function SignUp() {
 
   const toast = useToast();
 
-  const navigation = useNavigation<AppNavigatorRoutesProps>();
+  const navigation = useNavigation<AuthRoutes>();
 
   const { signIn } = useAuth();
   const { saveProfile } = useProfile();
@@ -186,8 +187,8 @@ export function SignUp() {
         </VStack>
       )}
       {showForm && (
-        <VStack px={10} py={10}>
-          <VStack mt={60}>
+        <VStack px={5} py={5}>
+          <VStack p={5} backgroundColor="white">
             <Center>
               <Heading fontSize="xlg" color="gray.100">
                 Registrar-se
@@ -199,7 +200,7 @@ export function SignUp() {
                 fontSize="md"
                 pb={5}
               >
-                Precisamos de seus dados de acesso.
+                Seus dados pessoais
               </Text>
 
               <Controller
@@ -259,6 +260,23 @@ export function SignUp() {
                 )}
               />
 
+              <Select
+                fontSize="md"
+                width={'full'}
+                mb={5}
+                data={allGenders.map((item) => {
+                  return { label: item.name, value: item.id };
+                })}
+                label={
+                  selectedGender
+                    ? allGenders.find((item) => item.id === selectedGender)
+                        ?.name
+                    : 'Gênero'
+                }
+                onValueChange={(value) => setSelectedGender(Number(value))}
+                key={allGenders.find((item) => item.id === selectedGender)?.id}
+              />
+
               <Input
                 placeholder="Data de nascimento"
                 editable={false}
@@ -273,6 +291,8 @@ export function SignUp() {
                 }}
               />
 
+              <Text mb={5}>Seus dados de acesso</Text>
+
               <Controller
                 control={control}
                 name="email"
@@ -285,20 +305,6 @@ export function SignUp() {
                     errorMessage={errors.email?.message}
                   />
                 )}
-              />
-
-              <Select
-                data={allGenders.map((item) => {
-                  return { label: item.name, value: item.id };
-                })}
-                label={
-                  selectedGender
-                    ? allGenders.find((item) => item.id === selectedGender)
-                        ?.name
-                    : 'Gênero'
-                }
-                onValueChange={(value) => setSelectedGender(Number(value))}
-                key={allGenders.find((item) => item.id === selectedGender)?.id}
               />
 
               <Controller
@@ -358,7 +364,7 @@ export function SignUp() {
                     do aplicativo que estão disponíveis abaixo.
                   </Text>
                 </Checkbox>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => navigation.navigate('terms')}>
                   <Text fontWeight="bold" textAlign="center">
                     Termos e condições de uso
                   </Text>
