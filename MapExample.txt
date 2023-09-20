@@ -1,0 +1,152 @@
+import { GOOGLE_MAPS_APIKEY } from '@env';
+import { useProfile } from '@hooks/useProfile';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { AppNavigatorRoutesProps } from '@routes/app.routes';
+import axios from 'axios';
+import {
+  LocationAccuracy,
+  LocationObject,
+  getCurrentPositionAsync,
+  requestForegroundPermissionsAsync,
+  watchPositionAsync,
+} from 'expo-location';
+import { VStack, Text } from 'native-base';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
+import MapView, { Marker } from 'react-native-maps';
+import MapViewDirections from 'react-native-maps-directions';
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  map: {
+    width: '100%',
+    height: '100%',
+  },
+});
+
+export function Assistance() {
+  const [currentPosition, setCurrentPosition] = useState<LocationObject | null>(
+    null
+  );
+
+  const [currentDestination, setCurrentDestination] = useState({
+    latitude: -23.5505199,
+    longitude: -46.6333094,
+  });
+
+  const { profile } = useProfile();
+
+  async function requestLocationPermissions() {
+    const { granted } = await requestForegroundPermissionsAsync();
+    if (granted) {
+      const currentPosition = await getCurrentPositionAsync();
+      setCurrentPosition(currentPosition);
+    }
+  }
+
+  const navigation = useNavigation<AppNavigatorRoutesProps>();
+
+  const mapRef = useRef<MapView>(null);
+
+  useFocusEffect(
+    useCallback(() => {
+      requestLocationPermissions();
+      navigation.getParent()?.setOptions({
+        tabBarStyle: { display: 'none' },
+        tabBarVisible: false,
+      });
+      return () =>
+        navigation
+          .getParent()
+          ?.setOptions({ tabBarStyle: undefined, tabBarVisible: undefined });
+    }, [navigation])
+  );
+
+  // useEffect(() => {
+  //   watchPositionAsync(
+  //     {
+  //       accuracy: LocationAccuracy.Highest,
+  //       timeInterval: 1000,
+  //       distanceInterval: 1,
+  //     },
+  //     (location) => {
+  //       console.log('NOVA LOCALIZACAO');
+  //       if (location) {
+  //         setCurrentPosition(location);
+  //         mapRef.current?.fitToSuppliedMarkers({
+  //           []
+  //         });
+  //       }
+  //     }
+  //   );
+  // }, []);
+
+  useEffect(() => {
+    mapRef.current?.fitToSuppliedMarkers(['origin', 'destination'], {
+      edgePadding: { top: 50, right: 50, bottom: 50, left: 50 },
+    });
+  }, [currentPosition, currentDestination]);
+
+  useEffect(() => {
+    const getTravelTime = async () => {
+      axios
+        .get(
+          `https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=${currentPosition?.coords.latitude},${currentPosition?.coords.longitude}&destinations=${currentDestination.latitude},${currentDestination.longitude}&key=${GOOGLE_MAPS_APIKEY}`
+        )
+        .then((response) => {
+          console.log(response.data.rows[0].elements[0].duration.text);
+        });
+    };
+
+    getTravelTime();
+  }, [currentPosition, currentDestination, GOOGLE_MAPS_APIKEY]);
+
+  return (
+    <View style={styles.container}>
+      <MapView
+        ref={mapRef}
+        mapType="mutedStandard"
+        style={styles.map}
+        initialRegion={{
+          latitude: currentPosition?.coords.latitude || profile.latitude,
+          longitude: currentPosition?.coords.longitude || profile.longitude,
+          latitudeDelta: 0.005,
+          longitudeDelta: 0.005,
+        }}
+      >
+        <MapViewDirections
+          origin={currentPosition?.coords}
+          destination={currentDestination}
+          apikey={GOOGLE_MAPS_APIKEY}
+          strokeWidth={5}
+          strokeColor="orange"
+        />
+
+        <Marker
+          coordinate={{
+            latitude: currentDestination?.latitude,
+            longitude: currentDestination?.longitude,
+          }}
+          title="Você"
+          description="Sua localização atual"
+          identifier="destination"
+        />
+
+        <Marker
+          coordinate={{
+            latitude: currentPosition?.coords.latitude || profile.latitude,
+            longitude: currentPosition?.coords.longitude || profile.longitude,
+          }}
+          title="Socorro"
+          description="Localizacao do profissional"
+          identifier="origin"
+        />
+      </MapView>
+      <VStack width={50} h={50} backgroundColor="white">
+        <Text>Some thing</Text>
+      </VStack>
+    </View>
+  );
+}
