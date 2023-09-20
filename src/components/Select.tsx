@@ -10,12 +10,19 @@ type Props = ISelectProps & {
 export function Select({ label, data, ...rest }: Props) {
   return (
     <SelectNative
+      h={14}
+      px={4}
+      borderRadius={8}
+      fontSize="md"
+      fontFamily={'body'}
+      borderWidth={1}
+      color="gray.200"
+      _selectedItem={{
+        color: 'gray.200',
+      }}
+      placeholderTextColor="gray.500"
       accessibilityLabel={label}
       placeholder={label}
-      borderWidth={1}
-      color="gray.100"
-      fontFamily={'body'}
-      placeholderTextColor="gray.500"
       dropdownIcon={<Icon as={Feather} name="chevron-down" size={5} mr={5} />}
       {...rest}
     >

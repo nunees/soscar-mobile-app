@@ -1,4 +1,11 @@
-import { VStack, IIconProps, Image, IImageProps, Box, Text } from 'native-base';
+import {
+  VStack,
+  IIconProps,
+  Image,
+  IImageProps,
+  Text,
+  HStack,
+} from 'native-base';
 import { ImageSourcePropType, TouchableOpacity } from 'react-native';
 
 type Props = IIconProps &
@@ -10,24 +17,27 @@ type Props = IIconProps &
 
 export function ServicesSmallCard({ image, alt, title, ...rest }: Props) {
   return (
-    <Box
+    <HStack
       mr={2}
-      w={100}
+      w={120}
       h={100}
       alignItems={'center'}
+      justifyContent={'center'}
+      borderWidth={1}
+      borderRadius={10}
+      borderColor={'gray.700'}
       backgroundColor="white"
-      borderRadius={5}
-      p={3}
-      shadow={1}
     >
-      <TouchableOpacity {...rest}>
-        <VStack bg={'transparent'}>
-          <Image source={image} alt={alt} w={50} h={50} {...rest} />
-        </VStack>
-      </TouchableOpacity>
-      <Text mt={2} textAlign={'center'} bold>
-        {title}
-      </Text>
-    </Box>
+      <VStack shadow={1} justifyItems="center">
+        <TouchableOpacity {...rest}>
+          <VStack bg={'transparent'}>
+            <Image source={image} alt={alt} w={50} h={50} {...rest} />
+          </VStack>
+        </TouchableOpacity>
+        <Text mt={2} textAlign={'center'} bold>
+          {title}
+        </Text>
+      </VStack>
+    </HStack>
   );
 }

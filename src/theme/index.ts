@@ -30,8 +30,8 @@ export const THEME = extendTheme({
     },
   },
   fonts: {
-    heading: 'Poppins_700Bold',
-    body: 'Poppins_400Regular',
+    heading: 'Nunito_700Bold',
+    body: 'Nunito_400Regular',
   },
   fontSizes: {
     xs: 12,

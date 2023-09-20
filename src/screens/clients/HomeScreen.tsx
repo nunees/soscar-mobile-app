@@ -18,7 +18,7 @@ import { UserLocation } from '@components/UserLocation';
 import { UserPhoto } from '@components/UserPhoto';
 import { ISchedules } from '@dtos/ISchedules';
 import { IVehicleDTO } from '@dtos/IVechicleDTO';
-import { Fontisto } from '@expo/vector-icons';
+import { Feather, Fontisto } from '@expo/vector-icons';
 import { useAuth } from '@hooks/useAuth';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
@@ -33,6 +33,7 @@ import {
   FlatList,
   Icon,
   Image,
+  Heading,
 } from 'native-base';
 import { useCallback, useState } from 'react';
 import { TouchableOpacity } from 'react-native';
@@ -90,14 +91,8 @@ export function HomeScreen() {
           <VStack justifyContent={'space-between'} px={3}>
             <HStack justifyItems={'baseline'} mb={2}>
               <HStack ml={2} pt={5}>
-                <Icon
-                  as={Fontisto}
-                  name="map-marker-alt"
-                  size={30}
-                  color="orange.600"
-                />
-                <VStack>
-                  <Text bold>Olá, {`${user.name}`}</Text>
+                <Icon as={Feather} name="map-pin" size={5} color="gray.200" />
+                <VStack ml={1}>
                   <UserLocation />
                 </VStack>
               </HStack>
@@ -105,13 +100,26 @@ export function HomeScreen() {
           </VStack>
 
           <VStack alignItems="center" justifyContent="center" mt={5} mr={5}>
-            <Icon as={Fontisto} name="bell" size={5} color="orange.600" />
+            <UserPhoto
+              source={{
+                uri: user.avatar
+                  ? `${api.defaults.baseURL}/user/avatar/${user.id}/${user.avatar}`
+                  : `https://ui-avatars.com/api/?format=png&name=${user.name}W&size=512`,
+              }}
+              alt="Foto de perfil"
+              size={10}
+            />
           </VStack>
         </HStack>
-      </VStack>
 
-      <VStack width={400} height={200}>
-        <Image source={ImageHeaderPng} alt="header" resizeMethod="resize" />
+        <VStack backgroundColor="white" p={5} m={5} borderRadius={8}>
+          <VStack>
+            <Heading>Ola, {user.name}</Heading>
+            <Text fontFamily="body" fontSize="xs" color="gray.400">
+              Bem-vinda de novo!
+            </Text>
+          </VStack>
+        </VStack>
       </VStack>
 
       {/* <VStack mt={10}>
@@ -147,19 +155,13 @@ export function HomeScreen() {
             </Text>
           </Center>
         )}
-      />
+      /> } */}
 
       <VStack>
         <HStack justifyContent={'space-between'}>
           <Text bold mb={2} ml={5}>
-            Escolha um serviço
+            Agendamento rapido
           </Text>
-
-          <TouchableOpacity>
-            <Text mb={2} mr={5} color="gray.400">
-              Ver todos
-            </Text>
-          </TouchableOpacity>
         </HStack>
 
         <ScrollView
@@ -180,7 +182,7 @@ export function HomeScreen() {
           <ServicesSmallCard
             image={WashService}
             alt="limpeza"
-            title="limpeza"
+            title="Limpeza"
           />
           <ServicesSmallCard image={GearService} alt="cambio" title="Cambio" />
           <ServicesSmallCard
@@ -206,7 +208,7 @@ export function HomeScreen() {
 
           <ServicesSmallCard
             image={SuspensionService}
-            alt="suspensão"
+            alt="Suspensão"
             title="Suspensão"
           />
 
@@ -219,14 +221,30 @@ export function HomeScreen() {
       </VStack>
 
       <VStack mt={5} px={5}>
-        <Text bold mb={2} ml={3}>
+        <Text bold mb={2}>
           Parceiros Recomendados
         </Text>
+
         <TouchableOpacity>
-          <VStack w={370} h={100} bg="white" rounded={5}></VStack>
+          <VStack h={100} bg="white" borderRadius={10}>
+            <Text>Some partner</Text>
+          </VStack>
         </TouchableOpacity>
       </VStack>
 
+      <VStack mt={5} px={5}>
+        <Text bold mb={2}>
+          Informacoes e ofertas
+        </Text>
+
+        <TouchableOpacity>
+          <VStack h={200} bg="white" borderRadius={10}>
+            <Text>Some partner</Text>
+          </VStack>
+        </TouchableOpacity>
+      </VStack>
+
+      {/*
       <VStack px={5}>
         <HStack justifyContent={'space-between'} alignContent={'baseline'}>
           <Text bold mb={2}>

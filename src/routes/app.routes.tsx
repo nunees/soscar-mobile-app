@@ -1,8 +1,9 @@
-import { FontAwesome, Feather, Entypo } from '@expo/vector-icons';
+import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import {
   createBottomTabNavigator,
   BottomTabNavigationProp,
 } from '@react-navigation/bottom-tabs';
+import { Assistance } from '@screens/clients/Assistance';
 import { ChangePassword } from '@screens/clients/ChangePassword';
 import { HomeScreen } from '@screens/clients/HomeScreen';
 import { PartnerDetails } from '@screens/clients/PartnerDetails';
@@ -48,7 +49,7 @@ export type AppNavigatorRoutesProps = BottomTabNavigationProp<AppRotes>;
 const { Screen, Navigator } = createBottomTabNavigator<AppRotes>();
 
 export function AppRoutes() {
-  const { colors, fonts } = useTheme();
+  const { colors } = useTheme();
 
   const iconSize = 7;
 
@@ -56,22 +57,21 @@ export function AppRoutes() {
     <Navigator
       screenOptions={{
         headerShown: false,
-        tabBarShowLabel: true,
-        tabBarLabelPosition: 'below-icon',
-        tabBarLabelStyle: {
-          fontSize: 10,
-          fontFamily: fonts.body,
-          fontWeight: 'bold',
-          paddingBottom: 5,
-        },
+        tabBarShowLabel: false,
+        // tabBarLabelPosition: 'below-icon',
+        // tabBarLabelStyle: {
+        //   fontSize: 10,
+        //   fontFamily: fonts.body,
+        //   fontWeight: 'bold',
+        //   paddingBottom: 5,
+        // },
         tabBarActiveTintColor: colors.orange[700],
         tabBarInactiveTintColor: colors.gray[500],
         tabBarStyle: {
-          backgroundColor: colors.white,
-          borderTopWidth: 1,
-          shadowColor: colors.gray[600],
-          shadowOpacity: 0.2,
+          backgroundColor: '#f5f4f5',
           minHeight: 60,
+          borderTopWidth: 0,
+          borderTopColor: '#f5f4f5',
         },
       }}
     >
@@ -82,7 +82,7 @@ export function AppRoutes() {
         options={{
           title: 'Início',
           tabBarIcon: ({ color }) => (
-            <Icon as={Feather} name="home" size={iconSize} color={color} />
+            <Icon as={FontAwesome5} name="home" size={iconSize} color={color} />
           ),
         }}
       />
@@ -92,7 +92,28 @@ export function AppRoutes() {
         options={{
           title: 'Serviços',
           tabBarIcon: ({ color }) => (
-            <Icon as={Feather} name="clipboard" size={iconSize} color={color} />
+            <Icon
+              as={FontAwesome5}
+              name="clipboard-list"
+              size={iconSize}
+              color={color}
+            />
+          ),
+        }}
+      />
+
+      <Screen
+        name="vehicles"
+        component={Vechicles}
+        options={{
+          title: 'Veiculos',
+          tabBarIcon: ({ color }) => (
+            <Icon
+              as={Ionicons}
+              name="md-car-sport"
+              size={iconSize}
+              color={color}
+            />
           ),
         }}
       />
@@ -129,11 +150,16 @@ export function AppRoutes() {
 
       <Screen
         name="assistance"
-        component={Schedules}
+        component={Assistance}
         options={{
           title: 'Assistência',
           tabBarIcon: ({ color }) => (
-            <Icon as={Entypo} name="lifebuoy" size={iconSize} color={color} />
+            <Icon
+              as={FontAwesome5}
+              name="hands-helping"
+              size={iconSize}
+              color={color}
+            />
           ),
         }}
       />
@@ -144,15 +170,14 @@ export function AppRoutes() {
         options={{
           title: 'Perfil',
           tabBarIcon: ({ color }) => (
-            <Icon as={FontAwesome} name="user" size={iconSize} color={color} />
+            <Icon
+              as={FontAwesome5}
+              name="user-circle"
+              size={iconSize}
+              color={color}
+            />
           ),
         }}
-      />
-
-      <Screen
-        name="vehicles"
-        component={Vechicles}
-        options={{ tabBarButton: () => null }}
       />
 
       <Screen

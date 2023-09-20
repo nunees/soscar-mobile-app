@@ -6,7 +6,10 @@ function toRad(angle: number) {
   return (angle * Math.PI) / 180;
 }
 
-export function CalculatePositionDistance([prevLat, prevLong], [lat, long]) {
+export function CalculatePositionDistance(
+  [prevLat, prevLong]: number[],
+  [lat, long]: number[]
+) {
   const prevLatInRad = toRad(prevLat);
   const prevLongInRad = toRad(prevLong);
   const latInRad = toRad(lat);

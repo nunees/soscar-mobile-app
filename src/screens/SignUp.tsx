@@ -9,8 +9,7 @@ import { useAuth } from '@hooks/useAuth';
 import { useProfile } from '@hooks/useProfile';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
-import { AppNavigatorRoutesProps } from '@routes/app.routes';
-import { AuthRoutes } from '@routes/auth.routes';
+import { AuthNavigatorRoutesProps } from '@routes/auth.routes';
 import { api } from '@services/api';
 import { AppError } from '@utils/AppError';
 import {
@@ -20,11 +19,10 @@ import {
   Text,
   Center,
   useToast,
-  Checkbox,
 } from 'native-base';
 import { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { Alert, TouchableOpacity } from 'react-native';
+import { TouchableOpacity } from 'react-native';
 import * as yup from 'yup';
 
 import { genders } from '../data/genders';
@@ -62,14 +60,13 @@ export function SignUp() {
 
   const [date, setDate] = useState('');
 
-  const [isTermsAccepted, setIsTermsAccepted] = useState(false);
   const [isPartner, setIsPartner] = useState(false);
 
   const [showForm, setShowForm] = useState(false);
 
   const toast = useToast();
 
-  const navigation = useNavigation<AuthRoutes>();
+  const navigation = useNavigation<AuthNavigatorRoutesProps>();
 
   const { signIn } = useAuth();
   const { saveProfile } = useProfile();
@@ -104,15 +101,6 @@ export function SignUp() {
   }: FormDataProps) {
     setIsLoading(true);
 
-    if (!isTermsAccepted) {
-      setIsLoading(false);
-      Alert.alert(
-        'Erro',
-        'Você precisa aceitar os termos de uso para continuar'
-      );
-      return;
-    }
-
     const localDate = date.split('/');
     const serverDate = `${localDate[2]}-${localDate[1]}-${localDate[0]}`;
 
@@ -128,7 +116,7 @@ export function SignUp() {
         username,
         password,
         isPartner,
-        isTermsAccepted,
+        isTermsAccepted: true,
       });
       await saveProfile({
         name,
@@ -191,7 +179,7 @@ export function SignUp() {
           <VStack p={5} backgroundColor="white">
             <Center>
               <Heading fontSize="xlg" color="gray.100">
-                Registrar-se
+                Registre-se gratuitamente
               </Heading>
               <Text
                 color="gray.100"
@@ -210,6 +198,7 @@ export function SignUp() {
                   <Input
                     placeholder="Nome"
                     autoCapitalize="none"
+                    keyboardType="default"
                     onChangeText={onChange}
                     value={value}
                     errorMessage={errors.name?.message}
@@ -225,6 +214,7 @@ export function SignUp() {
                     placeholder="Sobrenome"
                     autoCapitalize="none"
                     onChangeText={onChange}
+                    keyboardType="default"
                     value={value}
                     errorMessage={errors.lastName?.message}
                   />
@@ -237,8 +227,8 @@ export function SignUp() {
                 render={({ field: { onChange, value } }) => (
                   <Input
                     placeholder="CPF"
-                    autoCapitalize="none"
                     keyboardType="numeric"
+                    autoCapitalize="none"
                     onChangeText={onChange}
                     value={value}
                     errorMessage={errors.cpf?.message}
@@ -291,7 +281,9 @@ export function SignUp() {
                 }}
               />
 
-              <Text mb={5}>Seus dados de acesso</Text>
+              <Text mb={5} fontFamily="body" fontSize="md">
+                Seus dados de acesso
+              </Text>
 
               <Controller
                 control={control}
@@ -351,25 +343,23 @@ export function SignUp() {
                 )}
               />
 
-              <Center px={5} mr={5}>
-                <Checkbox
-                  colorScheme="orange"
-                  value="Concordo com os termos de uso"
-                  accessibilityLabel="Lembrar-me"
-                  onChange={() => setIsTermsAccepted(!isTermsAccepted)}
-                  mt={5}
+              <VStack>
+                <Text
+                  color="gray.100"
+                  fontFamily="body"
+                  fontSize="sm"
+                  textAlign="justify"
                 >
-                  <Text color="gray.100" fontSize="sm" textAlign="justify">
-                    Ao prosseguir você concorda com os termos e condições de uso
-                    do aplicativo que estão disponíveis abaixo.
-                  </Text>
-                </Checkbox>
+                  Ao prosseguir você concorda com os termos e condições de uso
+                  do aplicativo que estão disponíveis abaixo.
+                </Text>
+
                 <TouchableOpacity onPress={() => navigation.navigate('terms')}>
                   <Text fontWeight="bold" textAlign="center">
                     Termos e condições de uso
                   </Text>
                 </TouchableOpacity>
-              </Center>
+              </VStack>
 
               <Button
                 title="Cadastrar"

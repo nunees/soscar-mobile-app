@@ -16,10 +16,11 @@ export function Input({ errorMessage = null, isInvalid, ...rest }: Props) {
       <NativeBaseInput
         h={14}
         px={4}
+        borderRadius={8}
         fontSize="md"
+        fontFamily={'body'}
         borderWidth={1}
         color="gray.200"
-        fontFamily={'body'}
         placeholderTextColor="gray.500"
         isInvalid={isInvalid}
         _invalid={{
