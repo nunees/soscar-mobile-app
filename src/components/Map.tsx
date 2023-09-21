@@ -1,8 +1,10 @@
 import CarPng from '@assets/car-top.png';
 import PinPng from '@assets/pin.png';
 import TargetPng from '@assets/target.png';
+import { GOOGLE_MAPS_APIKEY } from '@env';
 import { Feather } from '@expo/vector-icons';
 import { useProfile } from '@hooks/useProfile';
+import axios from 'axios';
 import {
   getCurrentPositionAsync,
   requestForegroundPermissionsAsync,
@@ -11,6 +13,7 @@ import { Icon, Image } from 'native-base';
 import { useEffect, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
+import MapViewDirections from 'react-native-maps-directions';
 
 type LocationObject = {
   latitude: number;
@@ -64,6 +67,20 @@ export function Map({ latitude, longitude }: coords) {
     });
   }, [userLocation, partnerLocation]);
 
+  useEffect(() => {
+    const getTravelTime = async () => {
+      axios
+        .get(
+          `https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=${userLocation?.latitude},${userLocation?.longitude}&destinations=${partnerLocation.latitude},${partnerLocation.longitude}&key=${GOOGLE_MAPS_APIKEY}`
+        )
+        .then((response) => {
+          console.log(response.data.rows[0].elements[0].duration.text);
+        });
+    };
+
+    getTravelTime();
+  }, [partnerLocation, userLocation, GOOGLE_MAPS_APIKEY]);
+
   return (
     <View style={styles.container}>
       <MapView
@@ -77,6 +94,14 @@ export function Map({ latitude, longitude }: coords) {
           longitudeDelta: 0.005,
         }}
       >
+        <MapViewDirections
+          origin={userLocation}
+          destination={partnerLocation}
+          apikey={GOOGLE_MAPS_APIKEY}
+          strokeWidth={3}
+          strokeColor="blue"
+        />
+
         {userLocation && (
           <Marker
             coordinate={{
