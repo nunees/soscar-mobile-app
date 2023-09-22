@@ -121,7 +121,7 @@ export function Assistance() {
           destination={currentDestination}
           apikey={GOOGLE_MAPS_APIKEY}
           strokeWidth={5}
-          strokeColor="orange"
+          strokeColor="purple"
         />
 
         <Marker

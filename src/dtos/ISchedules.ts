@@ -11,6 +11,7 @@ export interface ISchedules {
   partner_notes?: string | null;
   created_at?: Date | null;
   updated_at?: Date | null;
+
   location?: {
     id: string;
     cnpj: string;
@@ -31,6 +32,7 @@ export interface ISchedules {
     open_hours: string;
     open_hours_weekend: string[];
     user_id: string;
+    avatar?: string;
     latitude: string;
     longitude: string;
     created_at?: Date;

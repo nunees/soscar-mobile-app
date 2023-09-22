@@ -96,7 +96,7 @@ export function PartnerCard({ image, location, ...rest }: Props) {
 
             <VStack>
               <HStack mb={1}>
-                <Icon name="map-pin" as={Feather} size={4} color="orange.400" />
+                <Icon name="map-pin" as={Feather} size={4} color="purple.400" />
                 <Text>
                   {' '}
                   {getDistanceFromLatLonInKm(
@@ -107,11 +107,11 @@ export function PartnerCard({ image, location, ...rest }: Props) {
                 </Text>
               </HStack>
               <HStack mb={1}>
-                <Icon name="clock" as={Feather} size={4} color="orange.400" />
+                <Icon name="clock" as={Feather} size={4} color="purple.400" />
                 <Text> {location?.open_hours}</Text>
               </HStack>
               <HStack mb={1}>
-                <Icon name="phone" as={Feather} size={4} color="orange.400" />
+                <Icon name="phone" as={Feather} size={4} color="purple.400" />
                 <Text> {location?.business_phone}</Text>
               </HStack>
             </VStack>
@@ -124,7 +124,7 @@ export function PartnerCard({ image, location, ...rest }: Props) {
         right={5}
         width={70}
         height={8}
-        colorScheme={'orange'}
+        colorScheme={'purple'}
         onPress={() => Linking.openURL(functionMapsNavigate() as string)}
       >
         <Icon name="navigation" as={Feather} size={5} color="white" />

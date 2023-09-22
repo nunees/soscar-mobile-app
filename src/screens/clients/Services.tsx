@@ -47,6 +47,7 @@ export function Services() {
           text={'Realize orçamentos judiciais sem sair de casa'}
           image={CompliantImage}
           alt="Orçamento judiciais de serviços"
+          onPress={() => navigation.navigate('legalQuotes')}
         />
         <ServiceCardTypes
           icon="save"
@@ -63,6 +64,7 @@ export function Services() {
           text={'Acompanhe seus orçamentos realizados'}
           image={TimeImage}
           alt="Acompanhe seus orçamentos realizados"
+          onPress={() => navigation.navigate('schedulesList')}
         />
 
         <ServiceCardTypes

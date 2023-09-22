@@ -31,6 +31,7 @@ import {
   Icon,
   Checkbox,
   Image,
+  Center,
 } from 'native-base';
 import { useState, useCallback, useEffect } from 'react';
 import {
@@ -106,29 +107,20 @@ export function EditLocation() {
   ]);
 
   const [location, setLocation] = useState<ILocation>({} as ILocation);
+
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState('');
+
+  const [zipCode, setZipCode] = useState('');
 
   const routes = useRoute();
   const toast = useToast();
+
   const { user } = useAuth();
   const { profile } = useProfile();
 
   const { locationId } = routes.params as RouteParamProps;
   const navigation = useNavigation<PartnerNavigatorRoutesProps>();
-
-  const [cnpj, setCnpj] = useState('');
-  const [businessName, setBusinessName] = useState('');
-  const [businessPhone, setBusinessPhone] = useState('');
-  const [businessEmail, setBusinessEmail] = useState('');
-  const [addressLine, setAddressLine] = useState('');
-  const [number, setNumber] = useState('');
-  const [city, setCity] = useState('');
-  const [district, setDistrict] = useState('');
-  const [state, setState] = useState('');
-  const [zipCode, setZipCode] = useState('');
-
-  const [profilePicture, setProfilePicture] = useState('');
-  const [coverPhoto, setCoverPhoto] = useState('');
 
   const [selectedPaymentMethods, setSelectedPaymentMethods] = useState<
     number[]
@@ -138,14 +130,12 @@ export function EditLocation() {
   >([]);
   const [businessDescription, setBusinessDescription] = useState('');
 
-  const [correctZipCode, setCorrectZipCode] = useState(false);
-
   const [isUploading, setIsUploading] = useState(false);
   const [openDays, setOpenDays] = useState<string[]>([]);
   const [openHour, setOpenHour] = useState('');
   const [closeHour, setCloseHour] = useState('');
 
-  async function handleUserProfilePictureSelect(field: string) {
+  async function handleUserProfilePictureSelect() {
     try {
       setIsLoading(true);
       const photoSelected = await ImagePicker.launchImageLibraryAsync({
@@ -183,35 +173,14 @@ export function EditLocation() {
 
         const userPhotoUploadForm = new FormData();
 
-        if (field === 'avatar') {
-          userPhotoUploadForm.append('avatar', file);
+        userPhotoUploadForm.append('avatar', file);
 
-          await api.put(
-            `/locations/avatar/${location.id}`,
-            userPhotoUploadForm,
-            {
-              headers: {
-                id: user.id,
-                'Content-Type': 'multipart/form-data',
-              },
-            }
-          );
-        } else if (field === 'cover_photo') {
-          console.log('cover_photo');
-          userPhotoUploadForm.append('cover', file);
-          await api.put(
-            `/locations/cover/${location.id}`,
-            userPhotoUploadForm,
-            {
-              headers: {
-                id: user.id,
-                'Content-Type': 'multipart/form-data',
-              },
-            }
-          );
-        } else {
-          throw new AppError('Erro ao atualizar foto');
-        }
+        await api.put(`/locations/avatar/${location.id}`, userPhotoUploadForm, {
+          headers: {
+            id: user.id,
+            'Content-Type': 'multipart/form-data',
+          },
+        });
 
         toast.show({
           title: 'Foto atualizada',
@@ -261,19 +230,19 @@ export function EditLocation() {
       const response = await api.patch(
         `/locations/${location.id}`,
         {
-          cnpj,
-          business_name: businessName,
-          business_phone: businessPhone,
-          business_email: businessEmail,
-          address_line: addressLine,
-          number: Number(number),
-          city,
-          district,
-          state,
-          zipcode: zipCode,
+          cnpj: location.cnpj,
+          business_name: location.business_name,
+          business_phone: location.business_phone,
+          business_email: location.business_email,
+          address_line: location.address_line,
+          number: Number(location.number),
+          city: location.city,
+          district: location.district,
+          state: location.state,
+          zipcode: location.zipcode,
           payment_methods: selectedPaymentMethods,
           business_categories: selectedBusinessServices,
-          business_description: businessDescription,
+          business_description: location.business_description,
           open_hours: `${openHour}-${closeHour}`,
           open_hours_weekend: openDays,
         },
@@ -305,19 +274,20 @@ export function EditLocation() {
 
   async function handleCEP(value: string) {
     try {
-      setZipCode('');
       setIsUploading(true);
-      if (value.length === 8) {
-        setCorrectZipCode(false);
-        const address = await GetAddressByCEP(value);
-        setAddressLine(address.data.logradouro);
-        setDistrict(address.data.bairro);
-        setCity(address.data.localidade);
-        setState(address.data.uf);
-      } else {
-        setCorrectZipCode(true);
-      }
+      setLoadingMessage('Buscando endereço...');
       setZipCode(value);
+      if (zipCode.length === 8) {
+        const address = await GetAddressByCEP(zipCode);
+        setLocation((prevState) => ({
+          ...prevState,
+          address_line: address.data.logradouro,
+          district: address.data.bairro,
+          city: address.data.localidade,
+          state: address.data.uf,
+          zipcode: zipCode,
+        }));
+      }
     } catch (error) {
       const isAppError = error instanceof AppError;
       const title = isAppError ? error.message : 'Erro ao realizar cadastro';
@@ -327,6 +297,7 @@ export function EditLocation() {
         bgColor: 'red.500',
       });
     } finally {
+      setLoadingMessage('');
       setIsUploading(false);
     }
   }
@@ -355,13 +326,11 @@ export function EditLocation() {
     return null;
   }
 
-  useFocusEffect(
-    useCallback(() => {
-      handleFetchLocationDetails(locationId, user.id).then((response) =>
-        setLocation(response.data)
-      );
-    }, [])
-  );
+  useEffect(() => {
+    handleFetchLocationDetails(locationId, user.id).then((response) =>
+      setLocation(response.data)
+    );
+  }, []);
 
   return (
     <VStack>
@@ -372,7 +341,7 @@ export function EditLocation() {
         <LoadingModal
           showModal={isUploading}
           setShowModal={setIsUploading}
-          message="Aguarde..."
+          message={loadingMessage}
         />
       )}
 
@@ -385,139 +354,87 @@ export function EditLocation() {
           }}
         >
           <VStack px={5}>
-            <VStack backgroundColor="white" borderRadius={10} mb={20}>
-              <VStack w={'full'} height={150} borderRadius={10}>
-                <VStack w={'full'} height={150}>
-                  <Image
+            <VStack w={'full'} height={150} borderRadius={10}>
+              <Center py={5}>
+                <HStack>
+                  <UserPhoto
                     source={{
                       uri: location.avatar
-                        ? `${api.defaults.baseURL}/locations/coverimage/${locationId}/${location.cover_photo}`
+                        ? `${api.defaults.baseURL}/locations/avatar/${location.id}/${location.avatar}`
                         : `https://ui-avatars.com/api/?format=png&name=${user.name}+${profile.last_name}`,
                     }}
                     alt="Foto de perfil"
+                    size={150}
+                    borderRadius={100}
                   />
-                </VStack>
-                <HStack
-                  width={30}
-                  height={30}
-                  borderRadius={100}
-                  backgroundColor="orange.500"
-                  alignItems="center"
-                  justifyContent="center"
-                  position="absolute"
-                  bottom={-10}
-                  right={0}
-                  shadow={1}
-                >
-                  <TouchableOpacity
-                    onPress={() =>
-                      handleUserProfilePictureSelect('cover_photo')
-                    }
+
+                  <VStack
+                    width={30}
+                    height={30}
+                    borderRadius={100}
+                    backgroundColor="purple.500"
+                    position="absolute"
+                    bottom={0}
+                    left={100}
+                    alignItems="center"
+                    justifyContent="center"
+                    shadow={1}
                   >
-                    <Icon as={Entypo} name="camera" size={4} color="white" />
-                  </TouchableOpacity>
-                </HStack>
-
-                <VStack h={120} position={'absolute'}>
-                  <HStack position="absolute" top={10} left={120}>
-                    <UserPhoto
-                      source={{
-                        uri: location.avatar
-                          ? `${api.defaults.baseURL}/locations/avatar/${location.id}/${location.avatar}`
-                          : `https://ui-avatars.com/api/?format=png&name=${user.name}+${profile.last_name}`,
-                      }}
-                      alt="Foto de perfil"
-                      size={150}
-                      borderRadius={100}
-                    />
-
-                    <VStack
-                      width={30}
-                      height={30}
-                      borderRadius={100}
-                      backgroundColor="orange.500"
-                      position="absolute"
-                      bottom={0}
-                      left={100}
-                      alignItems="center"
-                      justifyContent="center"
-                      shadow={1}
+                    <TouchableOpacity
+                      onPress={() => handleUserProfilePictureSelect()}
                     >
-                      <TouchableOpacity
-                        onPress={() => handleUserProfilePictureSelect('avatar')}
-                      >
-                        <Icon
-                          as={Entypo}
-                          name="camera"
-                          size={4}
-                          color="white"
-                        />
-                      </TouchableOpacity>
-                    </VStack>
-                  </HStack>
-                </VStack>
-              </VStack>
+                      <Icon as={Entypo} name="camera" size={4} color="white" />
+                    </TouchableOpacity>
+                  </VStack>
+                </HStack>
+              </Center>
             </VStack>
 
-            <VStack p={5} mb={5} borderRadius={10} backgroundColor="white">
+            <VStack p={5} mt={10} borderRadius={10} backgroundColor="white">
               <Text fontSize="md" bold mb={3}>
                 Informacoes pessoais
               </Text>
               <Input
                 placeholder="CNPJ ou CPF"
-                value={location.cnpj || cnpj}
-                onChangeText={setCnpj}
-                InputRightElement={
-                  <Icon
-                    as={Feather}
-                    name={!cnpj ? 'x' : 'check'}
-                    size={4}
-                    mr={2}
-                    color={!cnpj ? 'red.500' : 'green.500'}
-                  />
-                }
+                value={location.cnpj}
+                keyboardType="numeric"
+                onChangeText={(value) => {
+                  setLocation((prevState) => ({
+                    ...prevState,
+                    cnpj: value,
+                  }));
+                }}
               />
+
               <Input
                 placeholder="Nome Fantasia"
-                value={location.business_name || businessName}
-                onChangeText={setBusinessName}
-                InputRightElement={
-                  <Icon
-                    as={Feather}
-                    name={!businessName ? 'x' : 'check'}
-                    size={4}
-                    mr={2}
-                    color={!businessName ? 'red.500' : 'green.500'}
-                  />
-                }
+                value={location.business_name}
+                onChangeText={(value) => {
+                  setLocation((prevState) => ({
+                    ...prevState,
+                    business_name: value,
+                  }));
+                }}
               />
               <Input
                 placeholder="Telefone"
-                value={location.business_phone || businessPhone}
-                onChangeText={setBusinessPhone}
-                InputRightElement={
-                  <Icon
-                    as={Feather}
-                    name={!businessPhone ? 'x' : 'check'}
-                    size={4}
-                    mr={2}
-                    color={!businessPhone ? 'red.500' : 'green.500'}
-                  />
-                }
+                value={location.business_phone}
+                onChangeText={(value) => {
+                  setLocation((prevState) => ({
+                    ...prevState,
+                    business_phone: value,
+                  }));
+                }}
               />
               <Input
                 placeholder="Email"
-                value={location.business_email || businessEmail}
-                onChangeText={setBusinessEmail}
-                InputRightElement={
-                  <Icon
-                    as={Feather}
-                    name={!businessEmail ? 'x' : 'check'}
-                    size={4}
-                    mr={2}
-                    color={!businessEmail ? 'red.500' : 'green.500'}
-                  />
-                }
+                value={location.business_email}
+                onChangeText={(value) => {
+                  setLocation((prevState) => ({
+                    ...prevState,
+                    business_email: value,
+                  }));
+                }}
               />
             </VStack>
 
@@ -529,23 +446,20 @@ export function EditLocation() {
               <Input
                 w={200}
                 placeholder="CEP"
-                value={location.zipcode || zipCode}
+                value={location.zipcode}
+                keyboardType="numeric"
                 onChangeText={(value) => handleCEP(value)}
-                InputRightElement={
-                  <Icon
-                    as={Feather}
-                    name={correctZipCode ? 'x' : 'check'}
-                    size={4}
-                    mr={2}
-                    color={correctZipCode ? 'red.500' : 'green.500'}
-                  />
-                }
               />
 
               <Input
                 placeholder="Endereço"
-                value={location.address_line || addressLine}
-                onChangeText={setAddressLine}
+                value={location.address_line}
+                onChangeText={(value) => {
+                  setLocation((prevState) => ({
+                    ...prevState,
+                    address_line: value,
+                  }));
+                }}
                 editable={false}
                 isDisabled={true}
                 caretHidden={true}
@@ -553,22 +467,23 @@ export function EditLocation() {
               />
               <Input
                 placeholder="Número"
-                onChangeText={setNumber}
-                value={String(location.number) || number}
-                InputRightElement={
-                  <Icon
-                    as={Feather}
-                    name={!number ? 'x' : 'check'}
-                    size={4}
-                    mr={2}
-                    color={!number ? 'red.500' : 'green.500'}
-                  />
-                }
+                onChangeText={(value) => {
+                  setLocation((prevState) => ({
+                    ...prevState,
+                    number: Number(value),
+                  }));
+                }}
+                value={String(location.number)}
               />
               <Input
                 placeholder="Bairro"
-                value={location.district || district}
-                onChangeText={setDistrict}
+                value={location.district}
+                onChangeText={(value) => {
+                  setLocation((prevState) => ({
+                    ...prevState,
+                    district: value,
+                  }));
+                }}
                 editable={false}
                 isDisabled={true}
                 caretHidden={true}
@@ -576,8 +491,13 @@ export function EditLocation() {
               />
               <Input
                 placeholder="Cidade"
-                value={location.city || city}
-                onChangeText={setCity}
+                value={location.city}
+                onChangeText={(value) => {
+                  setLocation((prevState) => ({
+                    ...prevState,
+                    city: value,
+                  }));
+                }}
                 editable={false}
                 isDisabled={true}
                 caretHidden={true}
@@ -585,8 +505,13 @@ export function EditLocation() {
               />
               <Input
                 placeholder="Estado"
-                value={location.state || state}
-                onChangeText={setState}
+                value={location.state}
+                onChangeText={(value) => {
+                  setLocation((prevState) => ({
+                    ...prevState,
+                    state: value,
+                  }));
+                }}
                 editable={false}
                 isDisabled={true}
                 caretHidden={true}
@@ -603,7 +528,7 @@ export function EditLocation() {
                   <Checkbox.Group>
                     <Checkbox
                       value={item.id.toString()}
-                      colorScheme="orange"
+                      colorScheme="purple"
                       mb={5}
                       onChange={() => setPaymentMethodsHandler(item.id)}
                       key={item.id}
@@ -624,7 +549,7 @@ export function EditLocation() {
                   {services.map((item) => (
                     <Checkbox
                       value={item.id.toString()}
-                      colorScheme="orange"
+                      colorScheme="purple"
                       key={item.id}
                       mb={5}
                       onChange={() => setServicesHandler(item.id)}
@@ -644,7 +569,7 @@ export function EditLocation() {
                 <Checkbox.Group>
                   <Checkbox
                     value="segunda"
-                    colorScheme="orange"
+                    colorScheme="purple"
                     mb={5}
                     onChange={() => handleOpenDays('segunda')}
                   >
@@ -652,7 +577,7 @@ export function EditLocation() {
                   </Checkbox>
                   <Checkbox
                     value="terca"
-                    colorScheme="orange"
+                    colorScheme="purple"
                     mb={5}
                     onChange={() => handleOpenDays('terça')}
                   >
@@ -660,7 +585,7 @@ export function EditLocation() {
                   </Checkbox>
                   <Checkbox
                     value="quarta"
-                    colorScheme="orange"
+                    colorScheme="purple"
                     mb={5}
                     onChange={() => handleOpenDays('quarta')}
                   >
@@ -668,7 +593,7 @@ export function EditLocation() {
                   </Checkbox>
                   <Checkbox
                     value="quinta"
-                    colorScheme="orange"
+                    colorScheme="purple"
                     mb={5}
                     onChange={() => handleOpenDays('quinta')}
                   >
@@ -676,7 +601,7 @@ export function EditLocation() {
                   </Checkbox>
                   <Checkbox
                     value="sexta"
-                    colorScheme="orange"
+                    colorScheme="purple"
                     mb={5}
                     onChange={() => handleOpenDays('sexta')}
                   >
@@ -684,7 +609,7 @@ export function EditLocation() {
                   </Checkbox>
                   <Checkbox
                     value="sabado"
-                    colorScheme="orange"
+                    colorScheme="purple"
                     mb={5}
                     onChange={() => handleOpenDays('sabado')}
                   >
@@ -692,7 +617,7 @@ export function EditLocation() {
                   </Checkbox>
                   <Checkbox
                     value="domingo"
-                    colorScheme="orange"
+                    colorScheme="purple"
                     mb={5}
                     onChange={() => handleOpenDays('domingo')}
                   >
@@ -761,7 +686,11 @@ export function EditLocation() {
               />
             </VStack>
 
-            <Button title="Salvar alteracoes" onPress={handleSubmitBusiness} />
+            <Button
+              title="Salvar alteracoes"
+              onPress={handleSubmitBusiness}
+              isLoading={isUploading}
+            />
           </VStack>
         </ScrollView>
       </VStack>

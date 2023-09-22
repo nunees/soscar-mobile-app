@@ -27,18 +27,27 @@ export function ProfileContextProvider({ children }: AuthContextProviderProps) {
   const [profile, setProfile] = useState<IProfileInfoDTO>(
     {} as IProfileInfoDTO
   );
+
   const [isLoadingProfileStorageData, setIsLoadingProfileStorageData] =
     useState(true);
 
   async function saveProfile(profileData: IProfileInfoDTO) {
-    setIsLoadingProfileStorageData(true);
-    await storageUserProfileSave(profileData);
-    setIsLoadingProfileStorageData(false);
+    try {
+      setIsLoadingProfileStorageData(true);
+      await storageUserProfileSave(profileData);
+      setIsLoadingProfileStorageData(false);
+    } catch (error) {
+      throw new AppError('Erro ao salvar perfil');
+    }
   }
 
   async function updateProfile(profileData: IProfileInfoDTO) {
-    await saveProfile(profileData);
-    setProfile(profileData);
+    try {
+      await saveProfile(profileData);
+      setProfile(profileData);
+    } catch (error) {
+      throw new AppError('Erro ao atualizar perfil');
+    }
   }
 
   async function removeProfile() {
@@ -50,10 +59,14 @@ export function ProfileContextProvider({ children }: AuthContextProviderProps) {
   }
 
   async function loadProfile() {
-    setIsLoadingProfileStorageData(true);
-    const profile = await storageUserProfileGet();
-    setProfile(profile);
-    setIsLoadingProfileStorageData(false);
+    try {
+      setIsLoadingProfileStorageData(true);
+      const profile = await storageUserProfileGet();
+      setProfile(profile);
+      setIsLoadingProfileStorageData(false);
+    } catch (error) {
+      throw new AppError('Erro ao carregar perfil');
+    }
   }
 
   useEffect(() => {

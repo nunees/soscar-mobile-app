@@ -155,7 +155,7 @@ export function QuotesList() {
                       as={Feather}
                       name="calendar"
                       size={5}
-                      color="orange.500"
+                      color="purple.500"
                     />
                     <Text pl={2}>
                       {item.created_at
@@ -173,7 +173,7 @@ export function QuotesList() {
                       as={Feather}
                       name="clock"
                       size={5}
-                      color="orange.500"
+                      color="purple.500"
                     />
                     <Text pl={1}>
                       {item.created_at
@@ -194,7 +194,7 @@ export function QuotesList() {
                       as={Feather}
                       name="tool"
                       size={5}
-                      color="orange.400"
+                      color="purple.400"
                     />
                     <Text fontWeight={'normal'} pl={2}>
                       {
@@ -214,7 +214,7 @@ export function QuotesList() {
                       as={Feather}
                       name="life-buoy"
                       size={5}
-                      color="orange.400"
+                      color="purple.400"
                     />
                     <Text fontWeight={'normal'} pl={2}>
                       {item.insurance_company.name}

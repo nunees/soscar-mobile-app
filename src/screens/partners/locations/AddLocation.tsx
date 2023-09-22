@@ -3,7 +3,7 @@ import { Button } from '@components/Button';
 import { Input } from '@components/Input';
 import { LoadingModal } from '@components/LoadingModal';
 import { TextArea } from '@components/TextArea';
-import { Feather } from '@expo/vector-icons';
+import { FontAwesome5 } from '@expo/vector-icons';
 import { useAuth } from '@hooks/useAuth';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
@@ -20,6 +20,7 @@ import {
   useToast,
   HStack,
   Icon,
+  FlatList,
 } from 'native-base';
 import { useState } from 'react';
 
@@ -47,7 +48,7 @@ export function AddLocation() {
     { id: 11, name: 'Outros' },
   ]);
 
-  const [cnpj, setCnpj] = useState('');
+  const [cnpj, setCnpj] = useState<string>('');
   const [businessName, setBusinessName] = useState('');
   const [businessPhone, setBusinessPhone] = useState('');
   const [businessEmail, setBusinessEmail] = useState('');
@@ -245,69 +246,33 @@ export function AddLocation() {
         >
           <VStack py={10} px={19}>
             <VStack p={5} mb={5} borderRadius={10} backgroundColor="white">
-              <Text fontSize="md" bold mb={3}>
+              <Text fontSize="md" fontFamily="heading" bold mb={3}>
                 Informacoes pessoais
               </Text>
               <Input
                 placeholder="CNPJ ou CPF"
                 value={cnpj}
                 onChangeText={setCnpj}
-                InputRightElement={
-                  <Icon
-                    as={Feather}
-                    name={!cnpj ? 'x' : 'check'}
-                    size={4}
-                    mr={2}
-                    color={!cnpj ? 'red.500' : 'green.500'}
-                  />
-                }
               />
               <Input
                 placeholder="Nome Fantasia"
                 value={businessName}
                 onChangeText={setBusinessName}
-                InputRightElement={
-                  <Icon
-                    as={Feather}
-                    name={!businessName ? 'x' : 'check'}
-                    size={4}
-                    mr={2}
-                    color={!businessName ? 'red.500' : 'green.500'}
-                  />
-                }
               />
               <Input
                 placeholder="Telefone"
                 value={businessPhone}
                 onChangeText={setBusinessPhone}
-                InputRightElement={
-                  <Icon
-                    as={Feather}
-                    name={!businessPhone ? 'x' : 'check'}
-                    size={4}
-                    mr={2}
-                    color={!businessPhone ? 'red.500' : 'green.500'}
-                  />
-                }
               />
               <Input
                 placeholder="Email"
                 value={businessEmail}
                 onChangeText={setBusinessEmail}
-                InputRightElement={
-                  <Icon
-                    as={Feather}
-                    name={!businessEmail ? 'x' : 'check'}
-                    size={4}
-                    mr={2}
-                    color={!businessEmail ? 'red.500' : 'green.500'}
-                  />
-                }
               />
             </VStack>
 
             <VStack mb={5} p={5} backgroundColor="white" borderRadius={10}>
-              <Text fontSize="md" bold mb={3}>
+              <Text fontSize="md" fontFamily={'heading'} bold mb={3}>
                 Localizaçao
               </Text>
 
@@ -318,11 +283,11 @@ export function AddLocation() {
                 onChangeText={(value) => handleCEP(value)}
                 InputRightElement={
                   <Icon
-                    as={Feather}
-                    name={correctZipCode ? 'x' : 'check'}
-                    size={4}
+                    as={FontAwesome5}
+                    name={'crosshairs'}
+                    size={5}
                     mr={2}
-                    color={correctZipCode ? 'red.500' : 'green.500'}
+                    onPress={() => console.log('oi')}
                   />
                 }
               />
@@ -340,15 +305,6 @@ export function AddLocation() {
                 placeholder="Número"
                 onChangeText={setNumber}
                 value={number}
-                InputRightElement={
-                  <Icon
-                    as={Feather}
-                    name={!number ? 'x' : 'check'}
-                    size={4}
-                    mr={2}
-                    color={!number ? 'red.500' : 'green.500'}
-                  />
-                }
               />
               <Input
                 placeholder="Bairro"
@@ -383,20 +339,20 @@ export function AddLocation() {
               <Text fontSize="md" mb={3} bold>
                 Meios de pagamentos oferecidos
               </Text>
-              <VStack>
-                {paymentMethods.map((item) => (
-                  <Checkbox.Group>
+              <VStack flexGrow={1}>
+                <Checkbox.Group>
+                  {paymentMethods.map((item) => (
                     <Checkbox
                       value={item.id.toString()}
-                      colorScheme="orange"
-                      mb={5}
-                      onChange={() => setPaymentMethodsHandler(item.id)}
+                      colorScheme="purple"
                       key={item.id}
+                      mb={5}
+                      onChange={() => setServicesHandler(item.id)}
                     >
                       <Text fontSize="md">{item.name}</Text>
                     </Checkbox>
-                  </Checkbox.Group>
-                ))}
+                  ))}
+                </Checkbox.Group>
               </VStack>
             </VStack>
 
@@ -409,7 +365,7 @@ export function AddLocation() {
                   {services.map((item) => (
                     <Checkbox
                       value={item.id.toString()}
-                      colorScheme="orange"
+                      colorScheme="purple"
                       key={item.id}
                       mb={5}
                       onChange={() => setServicesHandler(item.id)}
@@ -429,7 +385,7 @@ export function AddLocation() {
                 <Checkbox.Group>
                   <Checkbox
                     value="segunda"
-                    colorScheme="orange"
+                    colorScheme="purple"
                     mb={5}
                     onChange={() => handleOpenDays('segunda')}
                   >
@@ -437,7 +393,7 @@ export function AddLocation() {
                   </Checkbox>
                   <Checkbox
                     value="terca"
-                    colorScheme="orange"
+                    colorScheme="purple"
                     mb={5}
                     onChange={() => handleOpenDays('terça')}
                   >
@@ -445,7 +401,7 @@ export function AddLocation() {
                   </Checkbox>
                   <Checkbox
                     value="quarta"
-                    colorScheme="orange"
+                    colorScheme="purple"
                     mb={5}
                     onChange={() => handleOpenDays('quarta')}
                   >
@@ -453,7 +409,7 @@ export function AddLocation() {
                   </Checkbox>
                   <Checkbox
                     value="quinta"
-                    colorScheme="orange"
+                    colorScheme="purple"
                     mb={5}
                     onChange={() => handleOpenDays('quinta')}
                   >
@@ -461,7 +417,7 @@ export function AddLocation() {
                   </Checkbox>
                   <Checkbox
                     value="sexta"
-                    colorScheme="orange"
+                    colorScheme="purple"
                     mb={5}
                     onChange={() => handleOpenDays('sexta')}
                   >
@@ -469,7 +425,7 @@ export function AddLocation() {
                   </Checkbox>
                   <Checkbox
                     value="sabado"
-                    colorScheme="orange"
+                    colorScheme="purple"
                     mb={5}
                     onChange={() => handleOpenDays('sabado')}
                   >
@@ -477,7 +433,7 @@ export function AddLocation() {
                   </Checkbox>
                   <Checkbox
                     value="domingo"
-                    colorScheme="orange"
+                    colorScheme="purple"
                     mb={5}
                     onChange={() => handleOpenDays('domingo')}
                   >

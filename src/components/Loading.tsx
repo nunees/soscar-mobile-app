@@ -4,7 +4,7 @@ export function Loading() {
   return (
     <VStack alignItems="center" flex={1} w={'full'} h={'full'}>
       <Spinner
-        color="orange.500"
+        color="purple.500"
         accessibilityLabel="Carregando dados, aguarde"
         size={50}
       />

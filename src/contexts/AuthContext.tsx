@@ -38,9 +38,13 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
     useState(true);
 
   async function userAndTokenUpdate(userData: IUserDTO, token: string) {
-    api.defaults.headers.common.Authorization = `Bearer ${token}`;
+    try {
+      api.defaults.headers.common.Authorization = `Bearer ${token}`;
 
-    setUser(userData);
+      setUser(userData);
+    } catch (error) {
+      throw new AppError('Erro ao atualizar dados do usuário');
+    }
   }
 
   async function storageUserAndTokenSave(
@@ -48,11 +52,15 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
     token: string,
     refresh_token: string
   ) {
-    setIsLoadingUserStorageData(true);
-    await storageUserSave(userData);
-    await storageAuthTokenSave({ token, refresh_token });
+    try {
+      setIsLoadingUserStorageData(true);
+      await storageUserSave(userData);
+      await storageAuthTokenSave({ token, refresh_token });
 
-    setIsLoadingUserStorageData(false);
+      setIsLoadingUserStorageData(false);
+    } catch (error) {
+      throw new AppError('Erro ao salvar dados do usuário');
+    }
   }
 
   async function signIn(email: string, password: string) {
@@ -92,21 +100,29 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
   }
 
   async function updateUserAuth(userUpdated: IUserDTO) {
-    setUser(userUpdated);
-    await storageUserSave(userUpdated);
+    try {
+      setUser(userUpdated);
+      await storageUserSave(userUpdated);
+    } catch (error) {
+      throw new AppError('Erro ao atualizar dados do usuário');
+    }
   }
 
   async function loadUserData() {
-    setIsLoadingUserStorageData(true);
+    try {
+      setIsLoadingUserStorageData(true);
 
-    const userLogged = await storageUserGet();
-    const { token } = await storageAuthTokenGet();
+      const userLogged = await storageUserGet();
+      const { token } = await storageAuthTokenGet();
 
-    if (token && userLogged) {
-      userAndTokenUpdate(userLogged, token);
+      if (token && userLogged) {
+        userAndTokenUpdate(userLogged, token);
+      }
+
+      setIsLoadingUserStorageData(false);
+    } catch (error) {
+      throw new AppError('Erro ao carregar dados do usuário');
     }
-
-    setIsLoadingUserStorageData(false);
   }
 
   useEffect(() => {

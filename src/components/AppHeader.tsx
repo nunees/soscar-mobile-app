@@ -13,7 +13,7 @@ export function AppHeader({ title, icon }: Props) {
   const navigation = useNavigation<AppNavigatorRoutesProps>();
 
   return (
-    <VStack px={5} w="full" h={50} backgroundColor="white" shadow={2}>
+    <VStack px={5} w="full" h={50} backgroundColor="#340554" shadow={2}>
       <HStack pt={2} justifyContent={'flex-start'}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Icon
@@ -24,7 +24,14 @@ export function AppHeader({ title, icon }: Props) {
           />
         </TouchableOpacity>
 
-        <Text bold ml={5} mt={1} textAlign="center" fontSize="md">
+        <Text
+          bold
+          ml={5}
+          mt={1}
+          textAlign="center"
+          fontSize="md"
+          color="gray.100"
+        >
           {title}
         </Text>
       </HStack>

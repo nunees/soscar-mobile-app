@@ -17,7 +17,7 @@ export function Input({ errorMessage = null, isInvalid, ...rest }: Props) {
         h={14}
         px={4}
         borderRadius={8}
-        fontSize="md"
+        fontSize="xs"
         fontFamily={'body'}
         borderWidth={1}
         color="gray.200"
@@ -29,7 +29,7 @@ export function Input({ errorMessage = null, isInvalid, ...rest }: Props) {
         }}
         _focus={{
           bg: 'white',
-          borderColor: 'orange.500',
+          borderColor: 'purple.500',
           borderWidth: 2,
         }}
         {...rest}

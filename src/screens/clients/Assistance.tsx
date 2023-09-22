@@ -1,11 +1,13 @@
 import { Map } from '@components/Map';
 import { Feather } from '@expo/vector-icons';
-import { Pressable, VStack, Icon } from 'native-base';
+import { Pressable, VStack, Icon, View } from 'native-base';
 // import { GOOGLE_MAPS_APIKEY } from '@env';
 import React, { useState } from 'react';
 
 export function Assistance() {
   const [showMapControls, setShowMapControls] = useState(false);
+
+  const [locations, setLocations] = useState();
 
   return (
     <>
@@ -23,9 +25,7 @@ export function Assistance() {
           alignItems="center"
           justifyContent="center"
           onPress={() => console.log('oi')}
-        >
-          <Icon name={'compass'} as={Feather} size={10} />
-        </Pressable>
+        ></Pressable>
       )}
     </>
   );

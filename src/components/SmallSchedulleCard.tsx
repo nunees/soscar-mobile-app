@@ -48,7 +48,7 @@ export function SmallSchedulleCard({ data }: Props) {
                 as={Feather}
                 name="calendar"
                 size={6}
-                color={'orange.800'}
+                color={'purple.800'}
               />
 
               <Text pl={2} pt={1}>
@@ -56,7 +56,7 @@ export function SmallSchedulleCard({ data }: Props) {
               </Text>
             </HStack>
             <HStack ml={5}>
-              <Icon as={Feather} name="clock" size={6} color={'orange.800'} />
+              <Icon as={Feather} name="clock" size={6} color={'purple.800'} />
               <Text pl={2} pt={1}>
                 {data.time}
               </Text>
@@ -66,7 +66,7 @@ export function SmallSchedulleCard({ data }: Props) {
                 as={Feather}
                 name="briefcase"
                 size={6}
-                color={'orange.800'}
+                color={'purple.800'}
               />
               <Text pl={2} pt={1}>
                 {data.location!.business_name.length > 6
@@ -85,7 +85,7 @@ export function SmallSchedulleCard({ data }: Props) {
             <Icon as={Feather} name="file-text" color="blue.500" size={7} />
           )}
           {data.status === 2 && (
-            <Icon as={Feather} name="tool" color="orange.500" size={7} />
+            <Icon as={Feather} name="tool" color="purple.500" size={7} />
           )}
           {data.status === 3 && (
             <Icon as={Feather} name="check" color="green.500" size={7} />

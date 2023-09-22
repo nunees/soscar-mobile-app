@@ -81,7 +81,7 @@ export function Vechicles() {
         placement="bottom-right"
         renderInPortal={false}
         size="md"
-        colorScheme="orange"
+        colorScheme="purple"
         onPress={() => navigation.navigate('addVehicle')}
         icon={<Icon as={Feather} name="plus" size={8} color="white" />}
       />

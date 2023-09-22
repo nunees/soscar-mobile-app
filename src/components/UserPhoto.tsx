@@ -10,7 +10,7 @@ export function UserPhoto({ size, ...rest }: Props) {
       w={size}
       h={size}
       borderRadius={100}
-      borderColor="orange.400"
+      borderColor="purple.400"
       {...rest}
     />
   );

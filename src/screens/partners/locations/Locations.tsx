@@ -3,7 +3,7 @@ import { Loading } from '@components/Loading';
 import { ILocation } from '@dtos/ILocation';
 import { Feather } from '@expo/vector-icons';
 import { useAuth } from '@hooks/useAuth';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { PartnerNavigatorRoutesProps } from '@routes/partner.routes';
 import { api } from '@services/api';
 import { AppError } from '@utils/AppError';
@@ -18,8 +18,21 @@ import {
   useToast,
   Badge,
 } from 'native-base';
-import { useCallback, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { TouchableOpacity, Alert } from 'react-native';
+
+async function loadData(user_id: string) {
+  try {
+    const response = await api.get('/locations', {
+      headers: {
+        id: user_id,
+      },
+    });
+    return response;
+  } catch (error) {
+    throw new AppError('Erro ao buscar locais');
+  }
+}
 
 export function Locations() {
   const { user } = useAuth();
@@ -30,19 +43,6 @@ export function Locations() {
   const [isLoading, setIsLoading] = useState(false);
 
   const navigation = useNavigation<PartnerNavigatorRoutesProps>();
-
-  async function loadData() {
-    try {
-      const response = await api.get('/locations', {
-        headers: {
-          id: user.id,
-        },
-      });
-      setLocations(response.data.locations);
-    } catch (error) {
-      throw new AppError('Erro ao buscar locais');
-    }
-  }
 
   async function handleDeleteLocation(locationId: string) {
     try {
@@ -78,8 +78,6 @@ export function Locations() {
                 });
               } finally {
                 setIsLoading(false);
-                setLocations([]);
-                loadData();
               }
             },
           },
@@ -96,11 +94,9 @@ export function Locations() {
     }
   }
 
-  useFocusEffect(
-    useCallback(() => {
-      loadData();
-    }, [])
-  );
+  useEffect(() => {
+    loadData(user.id).then((response) => setLocations(response.data.locations));
+  }, []);
 
   return (
     <VStack flex={1}>
@@ -115,7 +111,18 @@ export function Locations() {
         >
           {isLoading && <Loading />}
           <VStack flex={1}>
-            <VStack py={10} px={19}>
+            {/* <HStack justifyContent={'center'}>
+              <Text
+                fontFamily={'body'}
+                fontSize={'xs'}
+                ml={5}
+                mt={5}
+                color="gray.400"
+              >
+                Mostrando resultados próximos a você
+              </Text>
+            </HStack> */}
+            <VStack py={3} px={19}>
               {locations.length > 0 ? (
                 locations.map((location) => (
                   <VStack
@@ -177,7 +184,7 @@ export function Locations() {
                           as={Feather}
                           name="edit"
                           size={5}
-                          color="orange.500"
+                          color="purple.500"
                           mr={5}
                         />
                       </TouchableOpacity>
@@ -189,7 +196,7 @@ export function Locations() {
                           as={Feather}
                           name="trash"
                           size={5}
-                          color="orange.500"
+                          color="purple.500"
                           mr={5}
                         />
                       </TouchableOpacity>
@@ -205,7 +212,7 @@ export function Locations() {
                           as={Feather}
                           name="info"
                           size={5}
-                          color="orange.500"
+                          color="purple.500"
                           mr={5}
                         />
                       </TouchableOpacity>
@@ -229,7 +236,7 @@ export function Locations() {
         placement="bottom-right"
         renderInPortal={false}
         size="md"
-        colorScheme="orange"
+        colorScheme="purple"
         onPress={() => navigation.navigate('addLocation')}
         icon={<Icon as={Feather} name="plus" size={8} color="white" />}
       />

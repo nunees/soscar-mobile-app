@@ -26,15 +26,15 @@ export function Button({
     <ButtonNativeBase
       w="full"
       h={14}
-      bg={variant === 'solid' ? 'orange.600' : 'transparent'}
+      bg={variant === 'solid' ? 'purple.900' : 'transparent'}
       rounded="lg"
-      _pressed={{ bg: variant === 'outline' ? 'orange.600' : 'orange.900' }}
+      _pressed={{ bg: variant === 'outline' ? 'purple.600' : 'purple.900' }}
       borderWidth={variant === 'outline' ? 2 : 0}
-      borderColor={variant === 'outline' ? 'orange.600' : 'transparent'}
+      borderColor={variant === 'outline' ? 'purple.600' : 'transparent'}
       {...rest}
     >
       {!hasIcon && (
-        <Text bold color={variant === 'solid' ? 'white' : 'orange.600'}>
+        <Text bold color={variant === 'solid' ? 'white' : 'purple.600'}>
           {title}
         </Text>
       )}

@@ -86,7 +86,7 @@ export default function getLogoImage(brandName: string) {
   switch (brandName) {
     case 'audi.png':
       return audi;
-    case 'bww.png':
+    case 'bmw.png':
       return bmw;
     case 'caoa.png':
       return caoa;

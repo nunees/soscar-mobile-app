@@ -417,7 +417,7 @@ export function NewQuote() {
               </Text>
 
               <Button
-                colorScheme="orange"
+                colorScheme="purple"
                 w={50}
                 h={30}
                 onPress={handleMediaSelect}

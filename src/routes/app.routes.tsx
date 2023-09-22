@@ -8,14 +8,18 @@ import { ChangePassword } from '@screens/clients/ChangePassword';
 import { HomeScreen } from '@screens/clients/HomeScreen';
 import { PartnerDetails } from '@screens/clients/PartnerDetails';
 import { Profile } from '@screens/clients/Profile';
+import { LegalQuotes } from '@screens/clients/quotes/LegalQuotes';
+import { NewLegalQuote } from '@screens/clients/quotes/NewLegalQuote';
 import { NewQuote } from '@screens/clients/quotes/NewQuote';
 import { QuoteDetails } from '@screens/clients/quotes/QuoteDetails';
 import { Quotes } from '@screens/clients/quotes/Quotes';
 import { QuotesList } from '@screens/clients/quotes/QuotesList';
+import { SearchLegalQuote } from '@screens/clients/quotes/SearchLegalQuote';
 import { SearchQuote } from '@screens/clients/quotes/SearchQuote';
 import { NewSchedule } from '@screens/clients/schedule/NewSchedule';
 import { Schedules } from '@screens/clients/schedule/Schedules';
 import { SchedulesDetails } from '@screens/clients/schedule/SchedulesDetails';
+import { SchedulesList } from '@screens/clients/schedule/SchedulesList';
 import { SearchSchedule } from '@screens/clients/schedule/SearchSchedule';
 import { Services } from '@screens/clients/Services';
 import { AddVehicle } from '@screens/clients/vehicles/AddVehicle';
@@ -42,6 +46,10 @@ type AppRotes = {
   quoteDetails: { quoteId: string; hashId: string };
   searchQuote: { serviceId: string };
   schedulesDetails: { scheduleId: string };
+  schedulesList: undefined;
+  legalQuotes: undefined;
+  newLegalQuote: { serviceId: string };
+  searchLegalQuote: { serviceId: string };
 };
 
 export type AppNavigatorRoutesProps = BottomTabNavigationProp<AppRotes>;
@@ -65,7 +73,7 @@ export function AppRoutes() {
         //   fontWeight: 'bold',
         //   paddingBottom: 5,
         // },
-        tabBarActiveTintColor: colors.orange[700],
+        tabBarActiveTintColor: colors.purple[700],
         tabBarInactiveTintColor: colors.gray[500],
         tabBarStyle: {
           backgroundColor: '#f5f4f5',
@@ -127,25 +135,31 @@ export function AppRoutes() {
       <Screen
         name="searchSchedule"
         component={SearchSchedule}
-        options={{ tabBarButton: () => null }}
+        options={{ tabBarButton: () => null, tabBarStyle: { display: 'none' } }}
       />
 
       <Screen
         name="partnerDetails"
         component={PartnerDetails}
-        options={{ tabBarButton: () => null }}
+        options={{ tabBarButton: () => null, tabBarStyle: { display: 'none' } }}
       />
 
       <Screen
         name="newSchedule"
         component={NewSchedule}
-        options={{ tabBarButton: () => null }}
+        options={{ tabBarButton: () => null, tabBarStyle: { display: 'none' } }}
       />
 
       <Screen
         name="schedulesDetails"
         component={SchedulesDetails}
-        options={{ tabBarButton: () => null }}
+        options={{ tabBarButton: () => null, tabBarStyle: { display: 'none' } }}
+      />
+
+      <Screen
+        name="schedulesList"
+        component={SchedulesList}
+        options={{ tabBarButton: () => null, tabBarStyle: { display: 'none' } }}
       />
 
       <Screen
@@ -183,37 +197,37 @@ export function AppRoutes() {
       <Screen
         name="vehicleDetails"
         component={VehicleDetails}
-        options={{ tabBarButton: () => null }}
+        options={{ tabBarButton: () => null, tabBarStyle: { display: 'none' } }}
       />
 
       <Screen
         name="addVehicle"
         component={AddVehicle}
-        options={{ tabBarButton: () => null }}
+        options={{ tabBarButton: () => null, tabBarStyle: { display: 'none' } }}
       />
 
       <Screen
         name="changePassword"
         component={ChangePassword}
-        options={{ tabBarButton: () => null }}
+        options={{ tabBarButton: () => null, tabBarStyle: { display: 'none' } }}
       />
 
       <Screen
         name="quotes"
         component={Quotes}
-        options={{ tabBarButton: () => null }}
+        options={{ tabBarButton: () => null, tabBarStyle: { display: 'none' } }}
       />
 
       <Screen
         name="newQuote"
         component={NewQuote}
-        options={{ tabBarButton: () => null }}
+        options={{ tabBarButton: () => null, tabBarStyle: { display: 'none' } }}
       />
 
       <Screen
         name="searchQuote"
         component={SearchQuote}
-        options={{ tabBarButton: () => null }}
+        options={{ tabBarButton: () => null, tabBarStyle: { display: 'none' } }}
       />
 
       <Screen
@@ -225,6 +239,24 @@ export function AppRoutes() {
       <Screen
         name="quoteDetails"
         component={QuoteDetails}
+        options={{ tabBarButton: () => null, tabBarStyle: { display: 'none' } }}
+      />
+
+      <Screen
+        name="legalQuotes"
+        component={LegalQuotes}
+        options={{ tabBarButton: () => null, tabBarStyle: { display: 'none' } }}
+      />
+
+      <Screen
+        name="newLegalQuote"
+        component={NewLegalQuote}
+        options={{ tabBarButton: () => null, tabBarStyle: { display: 'none' } }}
+      />
+
+      <Screen
+        name="searchLegalQuote"
+        component={SearchLegalQuote}
         options={{ tabBarButton: () => null, tabBarStyle: { display: 'none' } }}
       />
     </Navigator>

@@ -477,7 +477,7 @@ export function LocationDetails() {
                         <VStack
                           mb={5}
                           borderWidth={2}
-                          borderColor={'orange.700'}
+                          borderColor={'purple.700'}
                         >
                           <Image
                             key={photo.id}
@@ -496,7 +496,7 @@ export function LocationDetails() {
                             left={0}
                             borderTopRightRadius={10}
                             borderTopLeftRadius={0}
-                            bg={'orange.900'}
+                            bg={'purple.900'}
                             alignItems={'center'}
                             justifyItems={'center'}
                           >

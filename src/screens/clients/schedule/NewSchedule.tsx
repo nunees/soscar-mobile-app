@@ -205,6 +205,7 @@ export function NewSchedule() {
 
   async function handleSubmit() {
     try {
+      console.log('Send schedule');
       const response = await api.post(
         '/schedules',
         {
@@ -222,6 +223,7 @@ export function NewSchedule() {
         }
       );
 
+      console.log('Uploading photos');
       try {
         files.map(async (file) => {
           userPhotoUploadForm.append('document', file);
@@ -392,7 +394,7 @@ export function NewSchedule() {
                 as={Feather}
                 name="info"
                 size={38}
-                color="orange.400"
+                color="purple.400"
                 mr={1}
                 mt={1}
               />

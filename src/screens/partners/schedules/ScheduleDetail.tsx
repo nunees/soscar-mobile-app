@@ -177,7 +177,7 @@ export function ScheduleDetail() {
                   as={Feather}
                   name="message-square"
                   size={8}
-                  color="orange.500"
+                  color="purple.500"
                 />
               </TouchableOpacity>
             </VStack>
@@ -186,7 +186,7 @@ export function ScheduleDetail() {
           <VStack mt={5}>
             <HStack>
               <VStack>
-                <Icon as={Feather} name="disc" size={8} color="orange.500" />
+                <Icon as={Feather} name="disc" size={8} color="purple.500" />
               </VStack>
               <VStack ml={3}>
                 <Text bold>{schedule?.vehicles?.brand.name}</Text>
@@ -202,7 +202,7 @@ export function ScheduleDetail() {
                   as={Feather}
                   name="life-buoy"
                   size={8}
-                  color="orange.500"
+                  color="purple.500"
                 />
               </VStack>
               <VStack ml={3}>
@@ -213,7 +213,7 @@ export function ScheduleDetail() {
           <VStack mt={5}>
             <HStack>
               <VStack>
-                <Icon as={Feather} name="user" size={8} color="orange.500" />
+                <Icon as={Feather} name="user" size={8} color="purple.500" />
               </VStack>
               <VStack ml={3}>
                 <Text
@@ -226,7 +226,7 @@ export function ScheduleDetail() {
           <VStack mt={5}>
             <HStack>
               <VStack>
-                <Icon as={Feather} name="map-pin" size={8} color="orange.500" />
+                <Icon as={Feather} name="map-pin" size={8} color="purple.500" />
               </VStack>
               <VStack ml={3}>
                 <Text bold>
@@ -241,7 +241,7 @@ export function ScheduleDetail() {
           <VStack mt={5}>
             <HStack>
               <VStack>
-                <Icon as={Feather} name="info" size={8} color="orange.500" />
+                <Icon as={Feather} name="info" size={8} color="purple.500" />
               </VStack>
               <VStack ml={3} w={250}>
                 <Text>
@@ -257,7 +257,7 @@ export function ScheduleDetail() {
                   as={Feather}
                   name="calendar"
                   size={8}
-                  color="orange.500"
+                  color="purple.500"
                 />
               </VStack>
               <VStack ml={3}>
@@ -277,7 +277,7 @@ export function ScheduleDetail() {
           <VStack mt={5}>
             <HStack>
               <VStack>
-                <Icon as={Feather} name="clock" size={8} color="orange.500" />
+                <Icon as={Feather} name="clock" size={8} color="purple.500" />
               </VStack>
               <VStack ml={3}>
                 <Text>{schedule?.time}</Text>
@@ -288,7 +288,7 @@ export function ScheduleDetail() {
           <VStack mt={5}>
             <HStack>
               <VStack>
-                <Icon as={Feather} name="tool" size={8} color="orange.500" />
+                <Icon as={Feather} name="tool" size={8} color="purple.500" />
               </VStack>
               <VStack ml={3}>
                 <Text>{schedule?.service_type?.name}</Text>
@@ -303,7 +303,7 @@ export function ScheduleDetail() {
           <VStack mt={5}>
             <HStack>
               <VStack>
-                <Icon as={Feather} name="image" size={8} color="orange.500" />
+                <Icon as={Feather} name="image" size={8} color="purple.500" />
               </VStack>
               <VStack ml={3}>
                 <Text>Midia</Text>

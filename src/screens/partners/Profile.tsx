@@ -259,8 +259,8 @@ export function Profile() {
                 w={PHOTO_SIZE}
                 height={PHOTO_SIZE}
                 rounded={'full'}
-                startColor={'orange.400'}
-                endColor={'orange.900'}
+                startColor={'purple.400'}
+                endColor={'purple.900'}
               />
             ) : (
               <UserPhoto
@@ -279,20 +279,20 @@ export function Profile() {
               h={10}
               ml={20}
               mt={-10}
-              backgroundColor="orange.500"
+              backgroundColor="purple.500"
               borderRadius="full"
               justifyContent="center"
               alignItems="center"
               shadow={3}
               onPress={handleUserProfilePictureSelect}
-              _pressed={{ backgroundColor: 'orange.600' }}
+              _pressed={{ backgroundColor: 'purple.600' }}
             >
               <Icon as={Entypo} name="edit" size="lg" color="white" />
             </Pressable>
             <Heading>{user.name}</Heading>
             <Text>{user.username}</Text>
             <Pressable onPress={signOut} _pressed={{ opacity: 0.5 }}>
-              <Text color="orange.500" bold>
+              <Text color="purple.500" bold>
                 Sair
               </Text>
             </Pressable>

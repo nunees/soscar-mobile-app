@@ -1,10 +1,11 @@
 import { AppHeader } from '@components/AppHeader';
 import { Input } from '@components/Input';
+import getLogoImage from '@components/LogosImages';
 import { IVehicleDTO } from '@dtos/IVechicleDTO';
 import { useAuth } from '@hooks/useAuth';
 import { useRoute } from '@react-navigation/native';
 import { api } from '@services/api';
-import { ScrollView, VStack, Text, useToast, Heading } from 'native-base';
+import { ScrollView, VStack, Text, useToast, Image, HStack } from 'native-base';
 import { useEffect, useState } from 'react';
 
 type RouteParamsProps = {
@@ -51,28 +52,58 @@ export function VehicleDetails() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ flexGrow: 1 }}
       >
-        <VStack px={10} py={10}>
-          <VStack mb={40}>
-            <Heading pb={10}>Detalhes</Heading>
-            <Text bold>Montadora</Text>
-            <Input value={vehicle.brand?.name} editable={false} />
-            <Text bold>Modelo</Text>
-            <Input value={vehicle.name?.name} editable={false} />
+        <VStack px={5} py={5}>
+          <VStack mb={5} backgroundColor="white" p={5} borderRadius={10}>
+            <HStack>
+              <VStack>
+                <Text bold pb={2}>
+                  Montadora
+                </Text>
+                <Text>{vehicle.brand?.name}</Text>
+              </VStack>
+            </HStack>
+          </VStack>
 
-            <Text bold>Cor</Text>
-            <Input value={vehicle.color} editable={false} />
+          <VStack mb={5} backgroundColor="white" p={5} borderRadius={10}>
+            <Text bold pb={2}>
+              Modelo
+            </Text>
+            <Text>{vehicle.name?.name}</Text>
+          </VStack>
 
-            <Text bold>Ano de Fabricação</Text>
-            <Input value={String(vehicle.year)} editable={false} />
+          <VStack mb={5} backgroundColor="white" p={5} borderRadius={10}>
+            <Text bold pb={2}>
+              Cor
+            </Text>
+            <VStack>{vehicle.color}</VStack>
+          </VStack>
 
-            <Text bold>Placa</Text>
-            <Input value={vehicle.plate} editable={false} />
+          <VStack mb={5} backgroundColor="white" p={5} borderRadius={10}>
+            <Text bold pb={2}>
+              Ano de Fabricação
+            </Text>
+            <Text>{vehicle.year}</Text>
+          </VStack>
 
-            <Text bold>Kilometragen</Text>
-            <Input value={String(vehicle.engineMiles)} editable={false} />
+          <VStack mb={5} backgroundColor="white" p={5} borderRadius={10}>
+            <Text bold pb={2}>
+              Placa
+            </Text>
+            <Text>{vehicle.plate}</Text>
+          </VStack>
 
-            <Text bold>Total Gasto (R$)</Text>
-            <Input value={'0'} editable={false} />
+          <VStack mb={5} backgroundColor="white" p={5} borderRadius={10}>
+            <Text bold pb={2}>
+              Kilometragen
+            </Text>
+            <Text>{vehicle.engineMiles}</Text>
+          </VStack>
+
+          <VStack mb={5} backgroundColor="white" p={5} borderRadius={10}>
+            <Text bold pb={2}>
+              Total Gasto (R$)
+            </Text>
+            <Text>0</Text>
           </VStack>
         </VStack>
       </ScrollView>

@@ -1,4 +1,3 @@
-import ImageHeaderPng from '@assets/header.png';
 import EngineService from '@assets/services/car-engine.png';
 import WashService from '@assets/services/car-service.png';
 import GearService from '@assets/services/gear.png';
@@ -10,31 +9,17 @@ import SuspensionService from '@assets/services/suspension.png';
 import AccessoriesService from '@assets/services/usb.png';
 import WhellService from '@assets/services/wheel.png';
 import AssistanceService from '@assets/services/worker.png';
-import { FavoriteCars } from '@components/FavoriteCars';
-import { ReminderBell } from '@components/ReminderBell';
 import { ServicesSmallCard } from '@components/ServicesSmallCard';
-import { SmallSchedulleCard } from '@components/SmallSchedulleCard';
 import { UserLocation } from '@components/UserLocation';
 import { UserPhoto } from '@components/UserPhoto';
 import { ISchedules } from '@dtos/ISchedules';
 import { IVehicleDTO } from '@dtos/IVechicleDTO';
-import { Feather, Fontisto } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
 import { useAuth } from '@hooks/useAuth';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
 import { api } from '@services/api';
-import {
-  HStack,
-  ScrollView,
-  VStack,
-  Text,
-  Center,
-  Pressable,
-  FlatList,
-  Icon,
-  Image,
-  Heading,
-} from 'native-base';
+import { HStack, ScrollView, VStack, Text, Icon, Heading } from 'native-base';
 import { useCallback, useState } from 'react';
 import { TouchableOpacity } from 'react-native';
 
@@ -65,17 +50,6 @@ export function HomeScreen() {
   const { user } = useAuth();
 
   const navigation = useNavigation<AppNavigatorRoutesProps>();
-
-  function greeting() {
-    const hours = new Date().getHours();
-    if (hours >= 0 && hours < 12) {
-      return 'Bom dia';
-    }
-    if (hours >= 12 && hours < 18) {
-      return 'Boa tarde';
-    }
-    return 'Boa noite';
-  }
 
   useFocusEffect(
     useCallback(() => {
@@ -150,7 +124,7 @@ export function HomeScreen() {
         ListEmptyComponent={() => (
           <Center bg="white">
             <Text color="gray.400">Você não possui veículos cadastrados</Text>
-            <Text color="orange.600" bold>
+            <Text color="purple.600" bold>
               Toque aqui para adicionar
             </Text>
           </Center>
@@ -274,7 +248,7 @@ export function HomeScreen() {
                 <TouchableOpacity
                   onPress={() => navigation.navigate('schedules')}
                 >
-                  <Text color="orange.600" bold>
+                  <Text color="purple.600" bold>
                     Toque aqui para agendar
                   </Text>
                 </TouchableOpacity>

@@ -145,7 +145,7 @@ export function AddVehicle() {
         <AppHeader title="Adicionar Veículo" />
       </VStack>
 
-      <VStack px={10} py={10}>
+      <VStack px={5} py={5}>
         {showModal && (
           <LoadingModal
             showModal={showModal}
@@ -158,92 +158,117 @@ export function AddVehicle() {
           contentContainerStyle={{ paddingBottom: 120 }}
         >
           <VStack>
-            <SelectCar
-              data={brands.map((brand) => {
-                return {
-                  label: brand.name,
-                  value: brand.id,
-                };
-              })}
-              label={'Montadora'}
-              onValueChange={(value) => fetchAllModels(value)}
-            />
+            <VStack backgroundColor="white" p={5} borderRadius={10} mb={5}>
+              <Text color="gray.400" bold pb={2}>
+                Selecione a montadora
+              </Text>
+              <SelectCar
+                data={brands.map((brand) => {
+                  return {
+                    label: brand.name,
+                    value: brand.id,
+                  };
+                })}
+                label={'Montadora'}
+                onValueChange={(value) => fetchAllModels(value)}
+              />
+            </VStack>
 
-            <SelectCar
-              data={
-                models
-                  ? models.map((model) => {
-                      return {
-                        label: model.name,
-                        value: model.id,
-                      };
-                    })
-                  : []
-              }
-              label={'Modelo'}
-              onValueChange={(value) => setModel(Number(value))}
-            />
-
-            <Input
-              placeholder="Ano"
-              value={year}
-              onChangeText={setYear}
-              keyboardType="numeric"
-            />
-            <Input placeholder="Placa" value={plate} onChangeText={setPlate} />
-            {/* <Input placeholder="Cor" value={color} onChangeText={setColor} /> */}
-            <SelectCar
-              data={vehiclesColors.map((color) => {
-                return {
-                  label: color,
-                  value: color,
-                };
-              })}
-              label={'Cor'}
-              onValueChange={(value) => setColor(value)}
-            />
-
-            <Checkbox
-              colorScheme="orange"
-              value={''}
-              onChange={() => setToggleInsurance(!toggleInsurance)}
-              mb={3}
-            >
-              <Text>Meu veículo é segurado</Text>
-            </Checkbox>
-
-            {toggleInsurance && (
+            <VStack backgroundColor="white" p={5} borderRadius={10} mb={5}>
+              <Text color="gray.400" bold pb={2}>
+                Selecione o modelo do veículo
+              </Text>
               <SelectCar
                 data={
-                  insurances
-                    ? insurances.map((insurance) => {
+                  models
+                    ? models.map((model) => {
                         return {
-                          label: insurance.name,
-                          value: insurance.id,
+                          label: model.name,
+                          value: model.id,
                         };
                       })
                     : []
                 }
-                label={'Seguradora'}
-                onValueChange={(value) => setInsuranceId(Number(value))}
+                label={'Modelo'}
+                onValueChange={(value) => setModel(Number(value))}
               />
-            )}
+            </VStack>
 
-            <TextArea
-              placeholder="Observações"
-              value={notes}
-              onChangeText={setNotes}
-            />
-
-            <Checkbox
-              colorScheme="orange"
-              value={'mainVehicle'}
-              onChange={() => setIsMainVehicle(!isMainVehicle)}
-            >
-              <Text color="gray.400" bold>
-                Definir como veículo padrão
+            <VStack backgroundColor="white" p={5} borderRadius={10} mb={5}>
+              <Text color="gray.400" bold pb={2}>
+                Selecione o ano do veículo (Ex: 2021)
               </Text>
-            </Checkbox>
+              <Input
+                placeholder="Ano"
+                value={year}
+                onChangeText={setYear}
+                keyboardType="numeric"
+              />
+            </VStack>
+
+            <VStack backgroundColor="white" p={5} borderRadius={10} mb={5}>
+              <Text color="gray.400" bold pb={2}>
+                Selecione a cor do veículo
+              </Text>
+              <SelectCar
+                data={vehiclesColors.map((color) => {
+                  return {
+                    label: color,
+                    value: color,
+                  };
+                })}
+                label={'Cor'}
+                onValueChange={(value) => setColor(value)}
+              />
+            </VStack>
+
+            <VStack backgroundColor="white" p={5} borderRadius={10} mb={5}>
+              <Checkbox
+                colorScheme="purple"
+                value={''}
+                onChange={() => setToggleInsurance(!toggleInsurance)}
+                mb={3}
+              >
+                <Text>Meu veículo é segurado</Text>
+              </Checkbox>
+
+              {toggleInsurance && (
+                <SelectCar
+                  data={
+                    insurances
+                      ? insurances.map((insurance) => {
+                          return {
+                            label: insurance.name,
+                            value: insurance.id,
+                          };
+                        })
+                      : []
+                  }
+                  label={'Seguradora'}
+                  onValueChange={(value) => setInsuranceId(Number(value))}
+                />
+              )}
+            </VStack>
+
+            <VStack backgroundColor="white" p={5} borderRadius={10} mb={5}>
+              <TextArea
+                placeholder="Observações"
+                value={notes}
+                onChangeText={setNotes}
+              />
+            </VStack>
+
+            <VStack backgroundColor="white" p={5} borderRadius={10} mb={5}>
+              <Checkbox
+                colorScheme="purple"
+                value={'mainVehicle'}
+                onChange={() => setIsMainVehicle(!isMainVehicle)}
+              >
+                <Text color="gray.400" bold>
+                  Definir como veículo padrão
+                </Text>
+              </Checkbox>
+            </VStack>
           </VStack>
           <Button onPress={handleAddVehicle} title={'Salvar'} mt={20} />
         </ScrollView>

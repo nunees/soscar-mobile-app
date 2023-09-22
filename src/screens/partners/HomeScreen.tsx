@@ -1,4 +1,3 @@
-import { ReminderBell } from '@components/ReminderBell';
 import { UserLocation } from '@components/UserLocation';
 import { UserPhoto } from '@components/UserPhoto';
 import { ILocation } from '@dtos/ILocation';
@@ -6,7 +5,7 @@ import { ILocationScheduleDTO } from '@dtos/ILocationSchedule.DTO';
 import { Feather } from '@expo/vector-icons';
 import { useAuth } from '@hooks/useAuth';
 import { useProfile } from '@hooks/useProfile';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { PartnerNavigatorRoutesProps } from '@routes/partner.routes';
 import { api } from '@services/api';
 import { AppError } from '@utils/AppError';
@@ -17,10 +16,9 @@ import {
   HStack,
   Icon,
   Heading,
-  Box,
   Center,
 } from 'native-base';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { TouchableOpacity } from 'react-native';
 
 /**
@@ -44,17 +42,6 @@ export function HomeScreen() {
   const { user } = useAuth();
   const { profile, updateProfile } = useProfile();
   const navigation = useNavigation<PartnerNavigatorRoutesProps>();
-
-  function greeting() {
-    const hours = new Date().getHours();
-    if (hours >= 0 && hours < 12) {
-      return 'Bom dia';
-    }
-    if (hours >= 12 && hours < 18) {
-      return 'Boa tarde';
-    }
-    return 'Boa noite';
-  }
 
   async function countOpenSchedules() {
     const openSchedules = schedules.filter((schedule) => schedule.status === 1);
@@ -135,240 +122,261 @@ export function HomeScreen() {
 
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
-      <VStack py={10} px={19}>
-        <HStack mb={5} justifyContent={'center'}>
-          <UserLocation />
+      <VStack>
+        <HStack justifyContent="space-between">
+          <VStack justifyContent={'space-between'} px={3}>
+            <HStack justifyItems={'baseline'} mb={2}>
+              <HStack ml={2} pt={5}>
+                <Icon as={Feather} name="map-pin" size={5} color="gray.200" />
+                <VStack ml={1}>
+                  <UserLocation />
+                </VStack>
+              </HStack>
+            </HStack>
+          </VStack>
+
+          <VStack alignItems="center" justifyContent="center" mt={5} mr={5}>
+            <UserPhoto
+              source={{
+                uri: user.avatar
+                  ? `${api.defaults.baseURL}/user/avatar/${user.id}/${user.avatar}`
+                  : `https://ui-avatars.com/api/?format=png&name=${user.name}W&size=512`,
+              }}
+              alt="Foto de perfil"
+              size={8}
+            />
+          </VStack>
         </HStack>
 
-        <HStack justifyContent={'space-between'}>
-          <HStack justifyItems={'baseline'}>
-            <TouchableOpacity onPress={() => navigation.navigate('home')}>
-              <UserPhoto
-                source={{
-                  uri: user.avatar
-                    ? `${api.defaults.baseURL}/user/avatar/${user.id}/${user.avatar}`
-                    : `https://ui-avatars.com/api/?format=png&name=${user.name}+${profile.last_name}`,
-                }}
-                alt="Foto de perfil"
-                size={8}
-              />
-            </TouchableOpacity>
-            <Box ml={2} pb={10}>
-              <Heading color="gray.200" fontSize="lg">
-                {`${greeting()},`}
-              </Heading>
-              <Text>{`${user.name}`}</Text>
-            </Box>
-          </HStack>
-          <HStack mt={3}>
-            <ReminderBell />
-          </HStack>
-        </HStack>
-
-        <VStack width={380}>
-          <Heading>Resumo</Heading>
-          <HStack justifyContent="space-between">
-            <Text>Agendamentos em aberto: </Text>
-            <Text>{openSchedulesCounter}</Text>
-          </HStack>
-          <HStack justifyContent="space-between">
-            <Text>Agendamentos em andamento: </Text>
-            <Text>{inProgressSchedulesCounter}</Text>
-          </HStack>
-          <HStack justifyContent="space-between">
-            <Text>Agendamentos finalizados: </Text>
-            <Text>{finishedSchedulesCounter}</Text>
-          </HStack>
-          <HStack justifyContent="space-between">
-            <Text>Agendamentos cancelados: </Text>
-            <Text>{canceledSchedulesCounter}</Text>
-          </HStack>
+        <VStack px={5} py={5}>
+          <VStack backgroundColor={'white'} p={5} borderRadius={10}>
+            <Heading fontFamily={'heading'}>Financeiro</Heading>
+          </VStack>
         </VStack>
 
-        <VStack mt={10}>
-          <HStack justifyContent="space-between">
-            <Heading>Agendamentos</Heading>
-            <TouchableOpacity onPress={loadData}>
-              <Icon
-                as={Feather}
-                name="refresh-ccw"
-                size={8}
-                color="orange.500"
-              />
-            </TouchableOpacity>
-          </HStack>
+        <VStack px={5} py={5}>
+          <VStack p={5} borderRadius={10} backgroundColor="white">
+            <Heading fontFamily={'heading'}>Resumo</Heading>
+            <HStack justifyContent="space-between">
+              <Text>Agendamentos em aberto: </Text>
+              <Text>{openSchedulesCounter}</Text>
+            </HStack>
+            <HStack justifyContent="space-between">
+              <Text>Agendamentos em andamento: </Text>
+              <Text>{inProgressSchedulesCounter}</Text>
+            </HStack>
+            <HStack justifyContent="space-between">
+              <Text>Agendamentos finalizados: </Text>
+              <Text>{finishedSchedulesCounter}</Text>
+            </HStack>
+            <HStack justifyContent="space-between">
+              <Text>Agendamentos cancelados: </Text>
+              <Text>{canceledSchedulesCounter}</Text>
+            </HStack>
+          </VStack>
         </VStack>
 
-        {schedules.length > 0 ? (
-          <VStack>
-            <VStack mt={5}>
-              <Text>Aguardando</Text>
-              {locations.map((location) => (
+        <VStack px={5} py={5}>
+          <VStack backgroundColor={'white'} p={5} borderRadius={10}>
+            <VStack>
+              <HStack justifyContent="space-between">
+                <Heading>Agendamentos</Heading>
+                <TouchableOpacity onPress={loadData}>
+                  <Icon
+                    as={Feather}
+                    name="refresh-ccw"
+                    size={8}
+                    color="purple.500"
+                  />
+                </TouchableOpacity>
+              </HStack>
+              {schedules.length > 0 ? (
                 <VStack>
-                  {schedules.map((schedule) => {
-                    if (schedule.status === 1) {
-                      return (
-                        <TouchableOpacity
-                          onPress={() =>
-                            navigation.navigate('scheduleDetail', {
-                              scheduleId: String(schedule.id),
-                            })
+                  <VStack mt={5}>
+                    <Text>Aguardando</Text>
+                    {locations.map((location) => (
+                      <VStack>
+                        {schedules.map((schedule) => {
+                          if (schedule.status === 1) {
+                            return (
+                              <TouchableOpacity
+                                onPress={() =>
+                                  navigation.navigate('scheduleDetail', {
+                                    scheduleId: String(schedule.id),
+                                  })
+                                }
+                              >
+                                <VStack
+                                  w={380}
+                                  h={50}
+                                  borderWidth={1}
+                                  borderColor="gray.600"
+                                  borderRadius={5}
+                                  justifyItems="baseline"
+                                  alignItems="center"
+                                  mt={2}
+                                  key={schedule.id}
+                                >
+                                  <VStack p={3}>
+                                    <HStack>
+                                      <HStack pr={3}>
+                                        <Icon
+                                          as={Feather}
+                                          name="briefcase"
+                                          size={5}
+                                          color="purple.500"
+                                        />
+                                        <Text bold pl={2}>
+                                          {location.business_name}
+                                        </Text>
+                                      </HStack>
+                                      <HStack pl={3}>
+                                        <Icon
+                                          as={Feather}
+                                          name="calendar"
+                                          size={5}
+                                          color="purple.500"
+                                        />
+                                        <Text bold pl={2}>
+                                          {schedule.date
+                                            .toString()
+                                            .split('T')[0]
+                                            .split('-')
+                                            .reverse()
+                                            .join('/')}
+                                        </Text>
+                                      </HStack>
+                                      <HStack pl={3}>
+                                        <Icon
+                                          as={Feather}
+                                          name="clock"
+                                          size={5}
+                                          color="purple.500"
+                                        />
+                                        <Text bold pl={2}>
+                                          {schedule.time}
+                                        </Text>
+
+                                        <Icon
+                                          as={Feather}
+                                          name="arrow-right"
+                                          size={7}
+                                          color="purple.500"
+                                          ml={5}
+                                        />
+                                      </HStack>
+                                    </HStack>
+                                  </VStack>
+                                </VStack>
+                              </TouchableOpacity>
+                            );
                           }
-                        >
-                          <VStack
-                            w={380}
-                            h={50}
-                            borderWidth={1}
-                            borderColor="gray.600"
-                            borderRadius={5}
-                            justifyItems="baseline"
-                            alignItems="center"
-                            mt={2}
-                            key={schedule.id}
-                          >
-                            <VStack p={3}>
-                              <HStack>
-                                <HStack pr={3}>
-                                  <Icon
-                                    as={Feather}
-                                    name="briefcase"
-                                    size={5}
-                                    color="orange.500"
-                                  />
-                                  <Text bold pl={2}>
-                                    {location.business_name}
-                                  </Text>
-                                </HStack>
-                                <HStack pl={3}>
-                                  <Icon
-                                    as={Feather}
-                                    name="calendar"
-                                    size={5}
-                                    color="orange.500"
-                                  />
-                                  <Text bold pl={2}>
-                                    {schedule.date
-                                      .toString()
-                                      .split('T')[0]
-                                      .split('-')
-                                      .reverse()
-                                      .join('/')}
-                                  </Text>
-                                </HStack>
-                                <HStack pl={3}>
-                                  <Icon
-                                    as={Feather}
-                                    name="clock"
-                                    size={5}
-                                    color="orange.500"
-                                  />
-                                  <Text bold pl={2}>
-                                    {schedule.time}
-                                  </Text>
+                          return <VStack></VStack>;
+                        })}
+                      </VStack>
+                    ))}
+                  </VStack>
 
-                                  <Icon
-                                    as={Feather}
-                                    name="arrow-right"
-                                    size={7}
-                                    color="orange.500"
-                                    ml={5}
-                                  />
-                                </HStack>
-                              </HStack>
-                            </VStack>
-                          </VStack>
-                        </TouchableOpacity>
-                      );
-                    }
-                    return <VStack></VStack>;
-                  })}
+                  <VStack mt={5}>
+                    <Text>Em andamento</Text>
+                    {locations.map((location) => (
+                      <VStack>
+                        {schedules.map((schedule) => {
+                          if (schedule.status === 2) {
+                            return (
+                              <VStack
+                                w={380}
+                                h={50}
+                                borderWidth={1}
+                                borderColor="gray.600"
+                                borderRadius={5}
+                                justifyItems="baseline"
+                                alignItems="center"
+                                mt={2}
+                              >
+                                <VStack p={3}>
+                                  <HStack>
+                                    <HStack pr={3}>
+                                      <Icon
+                                        as={Feather}
+                                        name="briefcase"
+                                        size={5}
+                                        color="purple.500"
+                                      />
+                                      <Text bold pl={2}>
+                                        {location.business_name}
+                                      </Text>
+                                    </HStack>
+                                    <HStack pl={3}>
+                                      <Icon
+                                        as={Feather}
+                                        name="calendar"
+                                        size={5}
+                                        color="purple.500"
+                                      />
+                                      <Text bold pl={2}>
+                                        {schedule.date
+                                          .toString()
+                                          .split('T')[0]
+                                          .split('-')
+                                          .reverse()
+                                          .join('/')}
+                                      </Text>
+                                    </HStack>
+                                    <HStack pl={3}>
+                                      <Icon
+                                        as={Feather}
+                                        name="clock"
+                                        size={5}
+                                        color="purple.500"
+                                      />
+                                      <Text bold pl={2}>
+                                        {schedule.time}
+                                      </Text>
+
+                                      <Icon
+                                        as={Feather}
+                                        name="arrow-right"
+                                        size={7}
+                                        color="purple.500"
+                                        ml={5}
+                                      />
+                                    </HStack>
+                                  </HStack>
+                                </VStack>
+                              </VStack>
+                            );
+                          }
+                          return null;
+                        })}
+                      </VStack>
+                    ))}
+                  </VStack>
                 </VStack>
-              ))}
-            </VStack>
-
-            <VStack mt={5}>
-              <Text>Em andamento</Text>
-              {locations.map((location) => (
-                <VStack>
-                  {schedules.map((schedule) => {
-                    if (schedule.status === 2) {
-                      return (
-                        <VStack
-                          w={380}
-                          h={50}
-                          borderWidth={1}
-                          borderColor="gray.600"
-                          borderRadius={5}
-                          justifyItems="baseline"
-                          alignItems="center"
-                          mt={2}
-                        >
-                          <VStack p={3}>
-                            <HStack>
-                              <HStack pr={3}>
-                                <Icon
-                                  as={Feather}
-                                  name="briefcase"
-                                  size={5}
-                                  color="orange.500"
-                                />
-                                <Text bold pl={2}>
-                                  {location.business_name}
-                                </Text>
-                              </HStack>
-                              <HStack pl={3}>
-                                <Icon
-                                  as={Feather}
-                                  name="calendar"
-                                  size={5}
-                                  color="orange.500"
-                                />
-                                <Text bold pl={2}>
-                                  {schedule.date
-                                    .toString()
-                                    .split('T')[0]
-                                    .split('-')
-                                    .reverse()
-                                    .join('/')}
-                                </Text>
-                              </HStack>
-                              <HStack pl={3}>
-                                <Icon
-                                  as={Feather}
-                                  name="clock"
-                                  size={5}
-                                  color="orange.500"
-                                />
-                                <Text bold pl={2}>
-                                  {schedule.time}
-                                </Text>
-
-                                <Icon
-                                  as={Feather}
-                                  name="arrow-right"
-                                  size={7}
-                                  color="orange.500"
-                                  ml={5}
-                                />
-                              </HStack>
-                            </HStack>
-                          </VStack>
-                        </VStack>
-                      );
-                    }
-                    return null;
-                  })}
+              ) : (
+                <VStack pt={5}>
+                  <Center>
+                    <Text color="gray.600">
+                      Voce nao possui nenhum em aberto
+                    </Text>
+                  </Center>
                 </VStack>
-              ))}
+              )}
             </VStack>
           </VStack>
-        ) : (
-          <VStack pt={5}>
-            <Center>
-              <Text color="gray.600">Voce nao possui nenhum em aberto</Text>
-            </Center>
+        </VStack>
+
+        <VStack px={5} py={5}>
+          <VStack backgroundColor={'white'} p={5} borderRadius={10}>
+            <Heading fontFamily={'heading'}>Lembretes</Heading>
           </VStack>
-        )}
+        </VStack>
+
+        <VStack px={5} py={5}>
+          <VStack backgroundColor={'white'} p={5} borderRadius={10}>
+            <Heading fontFamily={'heading'}>Mensagens</Heading>
+          </VStack>
+        </VStack>
       </VStack>
     </ScrollView>
   );

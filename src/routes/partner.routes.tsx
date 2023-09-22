@@ -1,4 +1,4 @@
-import { Feather } from '@expo/vector-icons';
+import { Feather, FontAwesome5 } from '@expo/vector-icons';
 import {
   createBottomTabNavigator,
   BottomTabNavigationProp,
@@ -32,28 +32,23 @@ export type PartnerNavigatorRoutesProps =
 const { Screen, Navigator } = createBottomTabNavigator<PartnerRoutes>();
 
 export function PartnerRoutes() {
-  const { colors, fonts } = useTheme();
+  const { colors } = useTheme();
 
-  const iconSize = 8;
+  const iconSize = 7;
 
   return (
     <Navigator
       screenOptions={{
         headerShown: false,
-        tabBarShowLabel: true,
-        tabBarLabelPosition: 'below-icon',
-        tabBarLabelStyle: {
-          fontSize: 10,
-          fontFamily: fonts.body,
-          fontWeight: 'bold',
-          paddingBottom: 10,
-        },
-        tabBarActiveTintColor: colors.orange[700],
+        tabBarShowLabel: false,
+
+        tabBarActiveTintColor: colors.purple[700],
         tabBarInactiveTintColor: colors.gray[500],
         tabBarStyle: {
-          backgroundColor: colors.white,
-          borderTopWidth: 1,
-          minHeight: 70,
+          backgroundColor: '#f5f4f5',
+          minHeight: 60,
+          borderTopWidth: 0,
+          borderTopColor: '#f5f4f5',
         },
       }}
     >
@@ -63,7 +58,7 @@ export function PartnerRoutes() {
         options={{
           title: 'Início',
           tabBarIcon: ({ color }) => (
-            <Icon as={Feather} name="home" size={iconSize} color={color} />
+            <Icon as={FontAwesome5} name="home" size={iconSize} color={color} />
           ),
         }}
       />
@@ -73,7 +68,12 @@ export function PartnerRoutes() {
         options={{
           title: 'Locais',
           tabBarIcon: ({ color }) => (
-            <Icon as={Feather} name="map-pin" size={iconSize} color={color} />
+            <Icon
+              as={FontAwesome5}
+              name="address-book"
+              size={iconSize}
+              color={color}
+            />
           ),
         }}
       />
@@ -81,19 +81,19 @@ export function PartnerRoutes() {
       <Screen
         name="addLocation"
         component={AddLocation}
-        options={{ tabBarButton: () => null }}
+        options={{ tabBarButton: () => null, tabBarStyle: { display: 'none' } }}
       />
 
       <Screen
         name="locationDetails"
         component={LocationDetails}
-        options={{ tabBarButton: () => null }}
+        options={{ tabBarButton: () => null, tabBarStyle: { display: 'none' } }}
       />
 
       <Screen
         name="editLocation"
         component={EditLocation}
-        options={{ tabBarButton: () => null }}
+        options={{ tabBarButton: () => null, tabBarStyle: { display: 'none' } }}
       />
 
       <Screen
@@ -118,7 +118,12 @@ export function PartnerRoutes() {
         options={{
           title: 'Assistencia',
           tabBarIcon: ({ color }) => (
-            <Icon as={Feather} name="life-buoy" size={iconSize} color={color} />
+            <Icon
+              as={FontAwesome5}
+              name="hands-helping"
+              size={iconSize}
+              color={color}
+            />
           ),
         }}
       />
@@ -129,7 +134,12 @@ export function PartnerRoutes() {
         options={{
           title: 'Perfil',
           tabBarIcon: ({ color }) => (
-            <Icon as={Feather} name="user" size={iconSize} color={color} />
+            <Icon
+              as={FontAwesome5}
+              name="user-circle"
+              size={iconSize}
+              color={color}
+            />
           ),
         }}
       />
@@ -138,7 +148,10 @@ export function PartnerRoutes() {
       <Screen
         name="scheduleDetail"
         component={ScheduleDetail}
-        options={{ tabBarButton: () => null }}
+        options={{
+          tabBarButton: () => null,
+          tabBarStyle: { display: 'none' },
+        }}
       />
     </Navigator>
   );

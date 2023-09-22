@@ -28,7 +28,7 @@ export function TextArea({ errorMessage = null, ...rest }: Props) {
         }}
         _focus={{
           bg: 'white',
-          borderColor: 'orange.500',
+          borderColor: 'purple.500',
           borderWidth: 2,
         }}
         {...rest}

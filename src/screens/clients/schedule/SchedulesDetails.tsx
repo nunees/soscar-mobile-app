@@ -10,7 +10,6 @@ import { useMapsLinking } from '@hooks/useMapsLinking';
 import { useFocusEffect, useRoute } from '@react-navigation/native';
 import { api } from '@services/api';
 import {
-  Center,
   HStack,
   Heading,
   Icon,
@@ -139,7 +138,7 @@ export function SchedulesDetails() {
               {' '}
               Status
             </Text>
-            <StatusIcon status={Number(4)} accepted={true} />
+            <StatusIcon status={schedule?.status} accepted={true} />
             <VStack alignItems="center">
               {schedule?.status === 4 && (
                 <VStack alignItems="center">
@@ -264,7 +263,7 @@ export function SchedulesDetails() {
                 )
               }
             >
-              <Text color="orange.500" bold>
+              <Text color="purple.500" bold>
                 Ver no mapa
               </Text>
             </TouchableOpacity>
@@ -315,7 +314,7 @@ export function SchedulesDetails() {
           <VStack mt={5} backgroundColor="white" p={5} borderRadius={10}>
             <HStack>
               <VStack>
-                <Icon as={Feather} name="info" size={8} color="orange.500" />
+                <Icon as={Feather} name="info" size={8} color="purple.500" />
               </VStack>
               <VStack ml={3}>
                 <Text bold>Informacoes finais</Text>

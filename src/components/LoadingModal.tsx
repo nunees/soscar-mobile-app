@@ -18,7 +18,7 @@ export function LoadingModal({
         <Modal.Body>
           <VStack alignItems="center">
             <Spinner
-              color="orange.500"
+              color="purple.500"
               accessibilityLabel="Aguarde..."
               size={50}
             />

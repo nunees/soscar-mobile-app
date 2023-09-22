@@ -13,14 +13,14 @@ export function StatusIcon({ status, accepted }: Props) {
         {status === 1 && (
           <HStack>
             <VStack>
-              <Icon as={Entypo} name="calendar" size={8} color="orange.500" />
+              <Icon as={Entypo} name="calendar" size={8} color="purple.500" />
             </VStack>
             <HStack pl={3}>
               <Icon
                 as={Entypo}
                 name="flow-line"
                 size={10}
-                color="orange.500"
+                color="purple.500"
                 style={{ transform: [{ rotate: '90deg' }] }}
               />
             </HStack>
@@ -30,19 +30,19 @@ export function StatusIcon({ status, accepted }: Props) {
         {status === 2 && (
           <HStack>
             <VStack>
-              <Icon as={Feather} name="calendar" size={8} color="orange.500" />
+              <Icon as={Feather} name="calendar" size={8} color="purple.500" />
             </VStack>
             <HStack pl={3}>
               <Icon
                 as={Entypo}
                 name="flow-line"
                 size={10}
-                color="orange.500"
+                color="purple.500"
                 style={{ transform: [{ rotate: '90deg' }] }}
               />
             </HStack>
             <VStack pl={3}>
-              <Icon as={Entypo} name="clock" size={8} color="orange.500" />
+              <Icon as={Entypo} name="clock" size={8} color="purple.500" />
             </VStack>
           </HStack>
         )}
@@ -50,31 +50,31 @@ export function StatusIcon({ status, accepted }: Props) {
         {status === 3 && (
           <HStack>
             <VStack>
-              <Icon as={Feather} name="calendar" size={8} color="orange.500" />
+              <Icon as={Feather} name="calendar" size={8} color="purple.500" />
             </VStack>
             <HStack pl={3}>
               <Icon
                 as={Entypo}
                 name="flow-line"
                 size={10}
-                color="orange.500"
+                color="purple.500"
                 style={{ transform: [{ rotate: '90deg' }] }}
               />
             </HStack>
             <VStack pl={3}>
-              <Icon as={Feather} name="clock" size={8} color="orange.500" />
+              <Icon as={Feather} name="clock" size={8} color="purple.500" />
             </VStack>
             <VStack pl={3}>
               <Icon
                 as={Entypo}
                 name="flow-line"
                 size={10}
-                color="orange.500"
+                color="purple.500"
                 style={{ transform: [{ rotate: '90deg' }] }}
               />
             </VStack>
             <VStack pl={3}>
-              <Icon as={Feather} name="clipboard" size={8} color="orange.500" />
+              <Icon as={Feather} name="clipboard" size={8} color="purple.500" />
             </VStack>
           </HStack>
         )}
@@ -82,38 +82,38 @@ export function StatusIcon({ status, accepted }: Props) {
         {status === 4 && (
           <HStack>
             <VStack>
-              <Icon as={Feather} name="calendar" size={8} color="orange.500" />
+              <Icon as={Feather} name="calendar" size={8} color="purple.500" />
             </VStack>
             <HStack pl={3}>
               <Icon
                 as={Entypo}
                 name="flow-line"
                 size={10}
-                color="orange.500"
+                color="purple.500"
                 style={{ transform: [{ rotate: '90deg' }] }}
               />
             </HStack>
             <VStack pl={3}>
-              <Icon as={Feather} name="clock" size={8} color="orange.500" />
+              <Icon as={Feather} name="clock" size={8} color="purple.500" />
             </VStack>
             <VStack pl={3}>
               <Icon
                 as={Entypo}
                 name="flow-line"
                 size={10}
-                color="orange.500"
+                color="purple.500"
                 style={{ transform: [{ rotate: '90deg' }] }}
               />
             </VStack>
             <VStack pl={3}>
-              <Icon as={Feather} name="clipboard" size={8} color="orange.500" />
+              <Icon as={Feather} name="clipboard" size={8} color="purple.500" />
             </VStack>
             <VStack pl={3}>
               <Icon
                 as={Entypo}
                 name="flow-line"
                 size={10}
-                color="orange.500"
+                color="purple.500"
                 style={{ transform: [{ rotate: '90deg' }] }}
               />
             </VStack>

@@ -120,7 +120,7 @@ export function SignIn() {
 
                 <HStack justifyContent={'space-between'}>
                   {/* <Checkbox
-                    colorScheme="orange"
+                    colorScheme="purple"
                     value={''}
                     onChange={() => {}}
                     mr={10}
@@ -128,7 +128,7 @@ export function SignIn() {
                     <Text fontSize="xs">Salvar credenciais</Text>
                   </Checkbox> */}
                   <TouchableOpacity>
-                    <Text fontWeight={'bold'} color="orange.700" fontSize="xs">
+                    <Text fontWeight={'bold'} color="purple.700" fontSize="xs">
                       Esqueci minha senha
                     </Text>
                   </TouchableOpacity>
@@ -144,7 +144,7 @@ export function SignIn() {
                 <HStack mt={5}>
                   <Text fontSize="xs">Não tem uma conta?</Text>
                   <Pressable onPress={handleSignUp}>
-                    <Text color="orange.700" pl={1} fontSize="xs">
+                    <Text color="purple.700" pl={1} fontSize="xs">
                       Registre-se
                     </Text>
                   </Pressable>

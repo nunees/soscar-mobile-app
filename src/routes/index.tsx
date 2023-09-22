@@ -4,13 +4,16 @@ import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { AppRoutes } from '@routes/app.routes';
 import { AuthRoutes } from '@routes/auth.routes';
 import { PartnerRoutes } from '@routes/partner.routes';
-import { Box } from 'native-base';
+import { Box, useTheme } from 'native-base';
 import { LogBox } from 'react-native';
 
 export function Routes() {
   const theme = DefaultTheme;
-  theme.colors.background = '#f5f4f5';
 
+  const { colors } = useTheme();
+
+  // eslint-disable-next-line prefer-destructuring
+  theme.colors.background = colors.gray[100];
   const { user, isLoadingUserStorageData } = useAuth();
 
   if (isLoadingUserStorageData) {
