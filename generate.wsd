@@ -1,0 +1,8 @@
+@startuml agendar
+actor usuario
+participant parceiro
+database datastore
+
+user -> parceiro: solicitação de serviço
+
+@enduml
