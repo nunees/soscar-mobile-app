@@ -2,13 +2,20 @@ import {
   Input as NativeBaseInput,
   FormControl,
   IInputProps,
+  WarningOutlineIcon,
 } from 'native-base';
 
 type Props = IInputProps & {
   errorMessage?: string | null;
+  helperText?: string;
 };
 
-export function Input({ errorMessage = null, isInvalid, ...rest }: Props) {
+export function Input({
+  errorMessage = null,
+  isInvalid,
+  helperText,
+  ...rest
+}: Props) {
   const invalid = !!errorMessage;
 
   return (
@@ -17,11 +24,11 @@ export function Input({ errorMessage = null, isInvalid, ...rest }: Props) {
         h={14}
         px={4}
         borderRadius={8}
-        fontSize="xs"
-        fontFamily={'body'}
+        fontSize="md"
+        fontFamily="body"
         borderWidth={1}
-        color="gray.200"
-        placeholderTextColor="gray.500"
+        color="gray.600"
+        placeholderTextColor="gray.400"
         isInvalid={isInvalid}
         _invalid={{
           borderWidth: 2,
@@ -34,7 +41,13 @@ export function Input({ errorMessage = null, isInvalid, ...rest }: Props) {
         }}
         {...rest}
       />
-      <FormControl.ErrorMessage>{errorMessage}</FormControl.ErrorMessage>
+
+      {helperText && (
+        <FormControl.HelperText>{helperText}</FormControl.HelperText>
+      )}
+      <FormControl.ErrorMessage rightIcon={<WarningOutlineIcon size="xs" />}>
+        {errorMessage}
+      </FormControl.ErrorMessage>
     </FormControl>
   );
 }

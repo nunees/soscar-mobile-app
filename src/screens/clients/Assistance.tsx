@@ -24,7 +24,7 @@ export function Assistance() {
           bottom={100}
           alignItems="center"
           justifyContent="center"
-          onPress={() => console.log('oi')}
+          onPress={() => null}
         ></Pressable>
       )}
     </>

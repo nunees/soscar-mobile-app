@@ -1,5 +1,6 @@
 import { ILocation } from '@dtos/ILocation';
 import { Feather } from '@expo/vector-icons';
+import { useGPS } from '@hooks/useGPS';
 import { useProfile } from '@hooks/useProfile';
 import { CalculatePositionDistance } from '@utils/CalculatePositionDistance';
 import {
@@ -29,6 +30,7 @@ type Props = IImageProps &
 
 export function PartnerCard({ image, location, ...rest }: Props) {
   const { profile } = useProfile();
+  const { coords } = useGPS();
 
   function functionMapsNavigate() {
     const scheme = Platform.select({
@@ -57,6 +59,13 @@ export function PartnerCard({ image, location, ...rest }: Props) {
     const now = new Date().getHours();
     return now >= Number(open) && now <= Number(close);
   }
+
+  const distance = Number(
+    getDistanceFromLatLonInKm(
+      [coords.latitude, coords.longitude],
+      [Number(location?.latitude), Number(location?.longitude)]
+    ).toPrecision(3)
+  );
 
   return (
     <VStack
@@ -99,11 +108,9 @@ export function PartnerCard({ image, location, ...rest }: Props) {
                 <Icon name="map-pin" as={Feather} size={4} color="purple.400" />
                 <Text>
                   {' '}
-                  {getDistanceFromLatLonInKm(
-                    [Number(profile.latitude), Number(profile.longitude)],
-                    [Number(location?.latitude), Number(location?.longitude)]
-                  ).toPrecision(3)}{' '}
-                  km de voce
+                  {distance < 1
+                    ? 'bem proximo a voce'
+                    : ` ${distance} km de voce`}
                 </Text>
               </HStack>
               <HStack mb={1}>

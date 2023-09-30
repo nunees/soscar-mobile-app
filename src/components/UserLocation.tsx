@@ -13,11 +13,9 @@ export function UserLocation() {
   const [address, setAddress] = useState<string>('');
 
   useEffect(() => {
-    displayAddress(coords)
-      .then((response) =>
-        setAddress(`${response[0].street}, ${response[0].district}`)
-      )
-      .catch((error) => console.log(error));
+    displayAddress(coords).then((response) =>
+      setAddress(`${response[0].street}, ${response[0].district}`)
+    );
   }, [coords]);
 
   return (

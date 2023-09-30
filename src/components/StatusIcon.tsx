@@ -1,4 +1,4 @@
-import { Entypo, Feather } from '@expo/vector-icons';
+import { Entypo, FontAwesome5 } from '@expo/vector-icons';
 import { HStack, Icon, VStack } from 'native-base';
 
 type Props = {
@@ -13,7 +13,12 @@ export function StatusIcon({ status, accepted }: Props) {
         {status === 1 && (
           <HStack>
             <VStack>
-              <Icon as={Entypo} name="calendar" size={8} color="purple.500" />
+              <Icon
+                as={FontAwesome5}
+                name="calendar-alt"
+                size={8}
+                color="purple.500"
+              />
             </VStack>
             <HStack pl={3}>
               <Icon
@@ -30,7 +35,12 @@ export function StatusIcon({ status, accepted }: Props) {
         {status === 2 && (
           <HStack>
             <VStack>
-              <Icon as={Feather} name="calendar" size={8} color="purple.500" />
+              <Icon
+                as={FontAwesome5}
+                name="calendar-alt"
+                size={8}
+                color="purple.500"
+              />
             </VStack>
             <HStack pl={3}>
               <Icon
@@ -42,7 +52,12 @@ export function StatusIcon({ status, accepted }: Props) {
               />
             </HStack>
             <VStack pl={3}>
-              <Icon as={Entypo} name="clock" size={8} color="purple.500" />
+              <Icon
+                as={FontAwesome5}
+                name="clock"
+                size={8}
+                color="purple.500"
+              />
             </VStack>
           </HStack>
         )}
@@ -50,7 +65,12 @@ export function StatusIcon({ status, accepted }: Props) {
         {status === 3 && (
           <HStack>
             <VStack>
-              <Icon as={Feather} name="calendar" size={8} color="purple.500" />
+              <Icon
+                as={FontAwesome5}
+                name="calendar-alt"
+                size={8}
+                color="purple.500"
+              />
             </VStack>
             <HStack pl={3}>
               <Icon
@@ -62,7 +82,12 @@ export function StatusIcon({ status, accepted }: Props) {
               />
             </HStack>
             <VStack pl={3}>
-              <Icon as={Feather} name="clock" size={8} color="purple.500" />
+              <Icon
+                as={FontAwesome5}
+                name="clock"
+                size={8}
+                color="purple.500"
+              />
             </VStack>
             <VStack pl={3}>
               <Icon
@@ -74,7 +99,12 @@ export function StatusIcon({ status, accepted }: Props) {
               />
             </VStack>
             <VStack pl={3}>
-              <Icon as={Feather} name="clipboard" size={8} color="purple.500" />
+              <Icon
+                as={FontAwesome5}
+                name="clipboard"
+                size={8}
+                color="purple.500"
+              />
             </VStack>
           </HStack>
         )}
@@ -82,7 +112,12 @@ export function StatusIcon({ status, accepted }: Props) {
         {status === 4 && (
           <HStack>
             <VStack>
-              <Icon as={Feather} name="calendar" size={8} color="purple.500" />
+              <Icon
+                as={FontAwesome5}
+                name="calendar-alt"
+                size={8}
+                color="purple.500"
+              />
             </VStack>
             <HStack pl={3}>
               <Icon
@@ -94,7 +129,12 @@ export function StatusIcon({ status, accepted }: Props) {
               />
             </HStack>
             <VStack pl={3}>
-              <Icon as={Feather} name="clock" size={8} color="purple.500" />
+              <Icon
+                as={FontAwesome5}
+                name="clock"
+                size={8}
+                color="purple.500"
+              />
             </VStack>
             <VStack pl={3}>
               <Icon
@@ -106,7 +146,12 @@ export function StatusIcon({ status, accepted }: Props) {
               />
             </VStack>
             <VStack pl={3}>
-              <Icon as={Feather} name="clipboard" size={8} color="purple.500" />
+              <Icon
+                as={FontAwesome5}
+                name="clipboard"
+                size={8}
+                color="purple.500"
+              />
             </VStack>
             <VStack pl={3}>
               <Icon
@@ -119,8 +164,8 @@ export function StatusIcon({ status, accepted }: Props) {
             </VStack>
             <VStack pl={3}>
               <Icon
-                as={Feather}
-                name={accepted ? 'check-circle' : 'x-circle'}
+                as={FontAwesome5}
+                name={accepted ? 'flag-checkered' : 'frown-open'}
                 size={8}
                 color={accepted ? 'green.500' : 'red.500'}
               />

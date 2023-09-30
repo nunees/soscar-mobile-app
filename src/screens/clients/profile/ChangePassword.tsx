@@ -17,14 +17,6 @@ type FormDataProps = {
   confirm_password: string;
 };
 
-// const profileSchema = yup.object().shape({
-//   oldPassword: yup.string().required('Senha atual é obrigatória'),
-//   password: yup.string().min(6, 'A senha deve ter pelo menos 6 dígitos.'),
-//   confirm_password: yup
-//     .string()
-//     .oneOf([yup.ref('password')], 'As senhas devem ser iguais.'),
-// });
-
 export function ChangePassword() {
   const [showModal, setShowModal] = useState(false);
 
@@ -93,7 +85,7 @@ export function ChangePassword() {
           name="oldPassword"
           render={({ field: { value, onChange } }) => (
             <Input
-              placeholder="********"
+              placeholder="Digite sua senha atual"
               onChangeText={onChange}
               secureTextEntry
               value={value}
@@ -110,7 +102,7 @@ export function ChangePassword() {
           name="password"
           render={({ field: { value, onChange } }) => (
             <Input
-              placeholder="********"
+              placeholder="Digite sua nova senha"
               onChangeText={onChange}
               value={value}
               secureTextEntry
@@ -127,7 +119,7 @@ export function ChangePassword() {
           name="confirm_password"
           render={({ field: { value, onChange } }) => (
             <Input
-              placeholder="********"
+              placeholder="Confirme sua nova senha"
               onChangeText={onChange}
               value={value}
               secureTextEntry

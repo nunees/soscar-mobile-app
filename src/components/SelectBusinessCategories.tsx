@@ -90,8 +90,8 @@ export function SelectBusinessCategories({
       accessibilityLabel={label}
       placeholder={label}
       borderWidth={1}
-      fontSize="xs"
-      color="gray.100"
+      fontSize="md"
+      color="gray.400"
       fontFamily={'body'}
       placeholderTextColor="gray.400"
       {...rest}

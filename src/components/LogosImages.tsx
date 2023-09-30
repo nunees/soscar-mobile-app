@@ -82,7 +82,6 @@ import volvo from '@assets/logos/volvo.png';
 // }
 
 export default function getLogoImage(brandName: string) {
-  console.log(brandName);
   switch (brandName) {
     case 'audi.png':
       return audi;

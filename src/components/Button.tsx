@@ -26,7 +26,7 @@ export function Button({
     <ButtonNativeBase
       w="full"
       h={14}
-      bg={variant === 'solid' ? 'purple.900' : 'transparent'}
+      bg={variant === 'solid' ? 'purple.800' : 'transparent'}
       rounded="lg"
       _pressed={{ bg: variant === 'outline' ? 'purple.600' : 'purple.900' }}
       borderWidth={variant === 'outline' ? 2 : 0}

@@ -10,15 +10,22 @@ import { EditLocation } from '@screens/partners/locations/EditLocation';
 import { LocationDetails } from '@screens/partners/locations/LocationDetails';
 import { Locations } from '@screens/partners/locations/Locations';
 import { Messaging } from '@screens/partners/Messaging';
-import { Profile } from '@screens/partners/Profile';
+import { Orders } from '@screens/partners/Orders';
+import { ChangePassword } from '@screens/partners/profile/ChangePassword';
+import EditProfileInformation from '@screens/partners/profile/EditProfileInformation';
+import MyAccountInformation from '@screens/partners/profile/MyAccountInformation';
+import { Profile } from '@screens/partners/profile/Profile';
 import { ScheduleDetail } from '@screens/partners/schedules/ScheduleDetail';
 import { Icon, useTheme } from 'native-base';
 
 type PartnerRoutes = {
   home: undefined;
   profile: undefined;
+  myaccountInformation: undefined;
+  editProfileInformation: undefined;
+  changePassword: undefined;
   locations: undefined;
-  messaging: undefined;
+  orders: undefined;
   assistance: undefined;
   addLocation: undefined;
   locationDetails: { locationId: string };
@@ -97,14 +104,14 @@ export function PartnerRoutes() {
       />
 
       <Screen
-        name="messaging"
-        component={Messaging}
+        name="orders"
+        component={Orders}
         options={{
-          title: 'Mensagens',
+          title: 'Ordens',
           tabBarIcon: ({ color }) => (
             <Icon
-              as={Feather}
-              name="message-square"
+              as={FontAwesome5}
+              name="clipboard-list"
               size={iconSize}
               color={color}
             />
@@ -142,6 +149,24 @@ export function PartnerRoutes() {
             />
           ),
         }}
+      />
+
+      <Screen
+        name="myaccountInformation"
+        component={MyAccountInformation}
+        options={{ tabBarButton: () => null, tabBarStyle: { display: 'none' } }}
+      />
+
+      <Screen
+        name="editProfileInformation"
+        component={EditProfileInformation}
+        options={{ tabBarButton: () => null, tabBarStyle: { display: 'none' } }}
+      />
+
+      <Screen
+        name="changePassword"
+        component={ChangePassword}
+        options={{ tabBarButton: () => null, tabBarStyle: { display: 'none' } }}
       />
 
       {/* Schedules */}

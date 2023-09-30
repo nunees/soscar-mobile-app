@@ -1,7 +1,7 @@
 import { AppHeader } from '@components/AppHeader';
 import { Loading } from '@components/Loading';
 import { LoadingModal } from '@components/LoadingModal';
-import { UserPhoto } from '@components/UserPhoto';
+import UserPhoto from '@components/UserPhoto';
 import { IQuoteList } from '@dtos/IQuoteList';
 import { ISchedules } from '@dtos/ISchedules';
 import { Entypo, Feather, FontAwesome5 } from '@expo/vector-icons';
@@ -94,11 +94,13 @@ const serviceTypes = [
 
 async function fetchData(user_id: string) {
   try {
-    const response = await api.get('/schedules/', {
+    const response = await api.get('/schedules/client', {
       headers: {
         id: user_id,
       },
     });
+
+    console.log(response.data);
     return response.data;
   } catch (error) {
     throw new AppError('Não foi possível carregar os agendamentos');
@@ -115,11 +117,7 @@ export function SchedulesList() {
 
   useFocusEffect(
     useCallback(() => {
-      setIsLoadingMessage('Carregando agendamentos...');
-      setIsLoading(true);
       fetchData(user.id).then((response) => setQuotes(response));
-      setIsLoading(false);
-
       return () => {
         setQuotes([]);
       };
@@ -155,8 +153,8 @@ export function SchedulesList() {
             >
               <VStack backgroundColor="white" borderRadius={10} p={5}>
                 <VStack mb={5}>
-                  <HStack justifyContent={'space-between'}>
-                    <VStack>
+                  <HStack justifyContent={'flex-start'}>
+                    <VStack pr={3}>
                       <UserPhoto
                         source={{
                           uri: item.location?.avatar
@@ -164,25 +162,16 @@ export function SchedulesList() {
                             : `https://ui-avatars.com/api/?format=png&name=${item.location?.business_name}`,
                         }}
                         alt="Foto de perfil"
-                        size={50}
+                        size={60}
                         borderRadius={100}
                       />
                     </VStack>
 
-                    <VStack pl={5}>
+                    <VStack>
                       <Text fontSize={'md'} bold>
                         {item.location?.business_name}
                       </Text>
                       <Text fontSize={'md'}>{item.location?.city}</Text>
-                    </VStack>
-
-                    <VStack>
-                      <Badge colorScheme="purple">
-                        {item.status === 1 && 'Aguardando'}
-                        {item.status === 2 && 'Aguardando Confirmacao'}
-                        {item.status === 3 && 'Em analise'}
-                        {item.status === 4 && 'Aprovado'}
-                      </Badge>
                     </VStack>
                   </HStack>
                 </VStack>
@@ -229,6 +218,25 @@ export function SchedulesList() {
                 <Text fontSize="xs" color="gray.400">
                   {item.id}
                 </Text>
+                <VStack>
+                  {item.status === 1 && (
+                    <Badge colorScheme="purple" variant={'solid'}>
+                      Solicitacao enviada
+                    </Badge>
+                  )}
+
+                  {item.status === 2 && (
+                    <Badge colorScheme="warning">Aguardando confirmacao</Badge>
+                  )}
+
+                  {item.status === 3 && (
+                    <Badge colorScheme="orange">Finalizado</Badge>
+                  )}
+
+                  {item.status === 4 && (
+                    <Badge colorScheme="danger">Cacelado</Badge>
+                  )}
+                </VStack>
               </VStack>
             </Pressable>
           )}

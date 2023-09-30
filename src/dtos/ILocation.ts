@@ -15,7 +15,7 @@ export interface ILocation {
   zipcode: string;
   payment_methods: number[];
   business_categories: number[];
-  business_description: string | null;
+  business_description: string;
   latitude: string;
   longitude: string;
   cover_photo: string;

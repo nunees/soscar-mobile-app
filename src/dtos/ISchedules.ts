@@ -1,5 +1,5 @@
 export interface ISchedules {
-  id?: string;
+  id: string;
   user_id: string;
   vehicle_id: string;
   service_type_id: number | null;

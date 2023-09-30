@@ -9,17 +9,16 @@ import SuspensionService from '@assets/services/suspension.png';
 import AccessoriesService from '@assets/services/usb.png';
 import WhellService from '@assets/services/wheel.png';
 import AssistanceService from '@assets/services/worker.png';
+import CheckConnection from '@components/CheckConnection';
 import { ServicesSmallCard } from '@components/ServicesSmallCard';
-import { UserLocation } from '@components/UserLocation';
-import { UserPhoto } from '@components/UserPhoto';
+import UserPhoto from '@components/UserPhoto';
 import { ISchedules } from '@dtos/ISchedules';
 import { IVehicleDTO } from '@dtos/IVechicleDTO';
-import { Feather } from '@expo/vector-icons';
 import { useAuth } from '@hooks/useAuth';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
 import { api } from '@services/api';
-import { HStack, ScrollView, VStack, Text, Icon, Heading } from 'native-base';
+import { HStack, ScrollView, VStack, Text, Heading } from 'native-base';
 import { useCallback, useState } from 'react';
 import { TouchableOpacity } from 'react-native';
 
@@ -29,7 +28,6 @@ async function fetchUserVehicles(user_id: string) {
       id: user_id,
     },
   });
-
   return response;
 }
 
@@ -39,7 +37,6 @@ async function fetchSchedules(user_id: string) {
       id: user_id,
     },
   });
-
   return response;
 }
 
@@ -59,166 +56,148 @@ export function HomeScreen() {
   );
 
   return (
-    <ScrollView showsVerticalScrollIndicator={false}>
-      <VStack>
-        <HStack justifyContent="space-between">
-          <VStack justifyContent={'space-between'} px={3}>
-            <HStack justifyItems={'baseline'} mb={2}>
-              <HStack ml={2} pt={5}>
-                <Icon as={Feather} name="map-pin" size={5} color="gray.200" />
-                <VStack ml={1}>
-                  <UserLocation />
-                </VStack>
-              </HStack>
-            </HStack>
-          </VStack>
-
-          <VStack alignItems="center" justifyContent="center" mt={5} mr={5}>
-            <UserPhoto
-              source={{
-                uri: user.avatar
-                  ? `${api.defaults.baseURL}/user/avatar/${user.id}/${user.avatar}`
-                  : `https://ui-avatars.com/api/?format=png&name=${user.name}W&size=512`,
-              }}
-              alt="Foto de perfil"
-              size={10}
-            />
-          </VStack>
-        </HStack>
-
-        <VStack backgroundColor="white" p={5} m={5} borderRadius={8}>
-          <VStack>
-            <Heading>Ola, {user.name}</Heading>
-            <Text fontFamily="body" fontSize="xs" color="gray.400">
-              Bem-vinda de novo!
-            </Text>
-          </VStack>
-        </VStack>
-      </VStack>
-
-      {/* <VStack mt={10}>
-        <HStack justifyContent={'space-between'}>
-          <Text bold ml={5}>
-            Meus Veículos
-          </Text>
-
-          <Pressable onPress={() => navigation.navigate('vehicles')}>
-            <Text px={5} color="gray.400">
-              Ver todos
-            </Text>
-          </Pressable>
-        </HStack>
-      </VStack> */}
-
-      {/* <FlatList
-        px={5}
-        py={5}
-        horizontal={true}
-        data={vehicles}
-        ListFooterComponent={() => <Text>1</Text>}
-        renderItem={({ item }) => (
-          <HStack pr={10}>
-            <FavoriteCars vehicle={item} key={item.id} />
-          </HStack>
-        )}
-        ListEmptyComponent={() => (
-          <Center bg="white">
-            <Text color="gray.400">Você não possui veículos cadastrados</Text>
-            <Text color="purple.600" bold>
-              Toque aqui para adicionar
-            </Text>
-          </Center>
-        )}
-      /> } */}
-
-      <VStack>
-        <HStack justifyContent={'space-between'}>
-          <Text bold mb={2} ml={5}>
-            Agendamento rapido
-          </Text>
-        </HStack>
-
-        <ScrollView
-          horizontal={true}
-          showsHorizontalScrollIndicator={false}
-          ml={3}
+    <VStack>
+      <CheckConnection />
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <VStack
+          backgroundColor="purple.900"
+          p={5}
+          borderBottomRadius={0}
+          shadow={1}
         >
-          <ServicesSmallCard
-            image={EngineService}
-            alt="mecânico"
-            title="Mecânico"
-          />
-          <ServicesSmallCard
-            image={EletricService}
-            alt="eletrico"
-            title="Eletrica"
-          />
-          <ServicesSmallCard
-            image={WashService}
-            alt="limpeza"
-            title="Limpeza"
-          />
-          <ServicesSmallCard image={GearService} alt="cambio" title="Cambio" />
-          <ServicesSmallCard
-            image={AssistanceService}
-            alt="assistencia"
-            title="Assistencia"
-          />
-          <ServicesSmallCard
-            image={AccessoriesService}
-            alt="acessorios"
-            title="Acessorios"
-          />
+          <HStack justifyContent="space-between">
+            <HStack>
+              <VStack>
+                <Heading color="white">Ola, {user.name}</Heading>
+                <Text fontFamily="body" fontSize="xs" color="white">
+                  Bem-vinda de novo!
+                </Text>
+              </VStack>
+            </HStack>
 
-          <ServicesSmallCard image={GlassService} alt="vidros" title="Vidros" />
+            <HStack>
+              <VStack>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate('profile')}
+                >
+                  <UserPhoto
+                    source={{
+                      uri: user.avatar
+                        ? `${api.defaults.baseURL}/user/avatar/${user.id}/${user.avatar}`
+                        : `https://ui-avatars.com/api/?format=png&name=${user.name}W&size=512`,
+                    }}
+                    alt="Foto de perfil"
+                    size={10}
+                    borderWidth={2}
+                    borderColor="white"
+                  />
+                </TouchableOpacity>
+              </VStack>
+            </HStack>
+          </HStack>
 
-          <ServicesSmallCard image={OilService} alt="fluidos" title="Fluidos" />
+          <HStack pt={10}>
+            <VStack>
+              <HStack justifyContent={'space-between'}>
+                <Text mb={2} color="white" bold>
+                  Agendamento rapido
+                </Text>
+              </HStack>
 
-          <ServicesSmallCard
-            image={PaintService}
-            alt="funilaria e pintura"
-            title="Pintura"
-          />
+              <ScrollView
+                horizontal={true}
+                showsHorizontalScrollIndicator={false}
+              >
+                <ServicesSmallCard
+                  image={EngineService}
+                  alt="mecânico"
+                  title="Mecânico"
+                />
+                <ServicesSmallCard
+                  image={EletricService}
+                  alt="eletrico"
+                  title="Eletrica"
+                />
+                <ServicesSmallCard
+                  image={WashService}
+                  alt="limpeza"
+                  title="Limpeza"
+                />
+                <ServicesSmallCard
+                  image={GearService}
+                  alt="cambio"
+                  title="Cambio"
+                />
+                <ServicesSmallCard
+                  image={AssistanceService}
+                  alt="assistencia"
+                  title="Assistencia"
+                />
+                <ServicesSmallCard
+                  image={AccessoriesService}
+                  alt="acessorios"
+                  title="Acessorios"
+                />
 
-          <ServicesSmallCard
-            image={SuspensionService}
-            alt="Suspensão"
-            title="Suspensão"
-          />
+                <ServicesSmallCard
+                  image={GlassService}
+                  alt="vidros"
+                  title="Vidros"
+                />
 
-          <ServicesSmallCard
-            image={WhellService}
-            alt="borracharia"
-            title="Borracharia"
-          />
-        </ScrollView>
-      </VStack>
+                <ServicesSmallCard
+                  image={OilService}
+                  alt="fluidos"
+                  title="Fluidos"
+                />
 
-      <VStack mt={5} px={5}>
-        <Text bold mb={2}>
-          Parceiros Recomendados
-        </Text>
+                <ServicesSmallCard
+                  image={PaintService}
+                  alt="funilaria e pintura"
+                  title="Pintura"
+                />
 
-        <TouchableOpacity>
-          <VStack h={100} bg="white" borderRadius={10}>
-            <Text>Some partner</Text>
-          </VStack>
-        </TouchableOpacity>
-      </VStack>
+                <ServicesSmallCard
+                  image={SuspensionService}
+                  alt="Suspensão"
+                  title="Suspensão"
+                />
 
-      <VStack mt={5} px={5}>
-        <Text bold mb={2}>
-          Informacoes e ofertas
-        </Text>
+                <ServicesSmallCard
+                  image={WhellService}
+                  alt="borracharia"
+                  title="Borracharia"
+                />
+              </ScrollView>
+            </VStack>
+          </HStack>
+        </VStack>
 
-        <TouchableOpacity>
-          <VStack h={200} bg="white" borderRadius={10}>
-            <Text>Some partner</Text>
-          </VStack>
-        </TouchableOpacity>
-      </VStack>
+        <VStack mt={5} px={5}>
+          <Text bold mb={2}>
+            Parceiros Recomendados
+          </Text>
 
-      {/*
+          <TouchableOpacity>
+            <VStack h={100} bg="white" borderRadius={10}>
+              <Text>Some partner</Text>
+            </VStack>
+          </TouchableOpacity>
+        </VStack>
+
+        <VStack mt={5} px={5}>
+          <Text bold mb={2}>
+            Informacoes e ofertas
+          </Text>
+
+          <TouchableOpacity>
+            <VStack h={200} bg="white" borderRadius={10}>
+              <Text>Some partner</Text>
+            </VStack>
+          </TouchableOpacity>
+        </VStack>
+
+        {/*
       <VStack px={5}>
         <HStack justifyContent={'space-between'} alignContent={'baseline'}>
           <Text bold mb={2}>
@@ -256,7 +235,8 @@ export function HomeScreen() {
             </VStack>
           )}
         /> */}
-      {/* </VStack> */}
-    </ScrollView>
+        {/* </VStack> */}
+      </ScrollView>
+    </VStack>
   );
 }

@@ -23,12 +23,10 @@ import {
   VStack,
   ScrollView,
   HStack,
-  Heading,
   Text,
   useToast,
   Icon,
   Image,
-  Center,
 } from 'native-base';
 import { useEffect, useState } from 'react';
 import { Alert, TouchableOpacity } from 'react-native';
@@ -205,7 +203,6 @@ export function NewSchedule() {
 
   async function handleSubmit() {
     try {
-      console.log('Send schedule');
       const response = await api.post(
         '/schedules',
         {
@@ -223,7 +220,6 @@ export function NewSchedule() {
         }
       );
 
-      console.log('Uploading photos');
       try {
         files.map(async (file) => {
           userPhotoUploadForm.append('document', file);

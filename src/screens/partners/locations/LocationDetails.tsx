@@ -1,8 +1,8 @@
 import { AppHeader } from '@components/AppHeader';
 import { Button } from '@components/Button';
-import { UserPhoto } from '@components/UserPhoto';
+import UserPhoto from '@components/UserPhoto';
 import { ILocation } from '@dtos/ILocation';
-import { Feather } from '@expo/vector-icons';
+import { Entypo, Feather } from '@expo/vector-icons';
 import { useAuth } from '@hooks/useAuth';
 import { useProfile } from '@hooks/useProfile';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -20,6 +20,10 @@ import {
   HStack,
   Icon,
   Image,
+  Skeleton,
+  Center,
+  Heading,
+  Pressable,
 } from 'native-base';
 import { useEffect, useState } from 'react';
 import { TouchableOpacity } from 'react-native';
@@ -152,6 +156,73 @@ export function LocationDetails() {
     }
   }
 
+  async function handleAvatarLocation() {
+    try {
+      setIsPhotoLoading(true);
+      const photoSelected = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        quality: 1,
+        aspect: [4, 4],
+        allowsEditing: true,
+      });
+
+      if (photoSelected.canceled) {
+        return;
+      }
+
+      if (photoSelected.assets[0].uri) {
+        const photoInfo = (await FileSystem.getInfoAsync(
+          photoSelected.assets[0].uri
+        )) as IFileInfo;
+
+        if (photoInfo?.size && photoInfo.size / 1021 / 1024 > 5) {
+          toast.show({
+            title: 'A imagem deve ter no máximo 5MB',
+            placement: 'top',
+            bgColor: 'red.500',
+          });
+        }
+
+        const fileExtension = photoSelected.assets[0].uri.split('.').pop();
+
+        const photoFile = {
+          name: `${user.username}.${fileExtension}`.toLowerCase(),
+          uri: photoSelected.assets[0].uri,
+          type: `${photoSelected.assets[0].type}/${fileExtension}`,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any;
+
+        const userPhotoUploadForm = new FormData();
+        userPhotoUploadForm.append('avatar', photoFile);
+
+        await api.put(`/locations/avatar/${location.id}`, userPhotoUploadForm, {
+          headers: {
+            id: user.id,
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+
+        toast.show({
+          title: 'Foto atualizada',
+          placement: 'top',
+          bgColor: 'green.500',
+        });
+        setIsPhotoLoading(false);
+      }
+    } catch (error) {
+      const isAppError = error instanceof AppError;
+      const title = isAppError ? error.message : 'Erro na atualização';
+      toast.show({
+        title,
+        placement: 'top',
+        bgColor: 'red.500',
+      });
+    } finally {
+      setIsPhotoLoading(false);
+      await handleFetchLocationDetails();
+    }
+  }
+
   async function deletePhoto(photo: string) {
     try {
       const response = await api.delete(`/locations/photo/${photo}`, {
@@ -192,7 +263,51 @@ export function LocationDetails() {
             paddingBottom: 120,
           }}
         >
-          <VStack backgroundColor="white" borderRadius={10} p={5}>
+          <VStack>
+            <Center px={5}>
+              {isPhotoLoading ? (
+                <Skeleton
+                  w={40}
+                  height={40}
+                  rounded={'full'}
+                  startColor={'purple.400'}
+                  endColor={'purple.900'}
+                />
+              ) : (
+                <UserPhoto
+                  source={{
+                    uri: location.avatar
+                      ? `${api.defaults.baseURL}/locations/avatar/${location.id}/${location.avatar}`
+                      : `https://ui-avatars.com/api/?format=png&name=${location.business_name}&size=512`,
+                  }}
+                  alt="Foto de perfil"
+                  size={40}
+                />
+              )}
+
+              <Pressable
+                w={10}
+                h={10}
+                ml={20}
+                mt={-10}
+                backgroundColor="purple.500"
+                borderRadius="full"
+                justifyContent="center"
+                alignItems="center"
+                shadow={3}
+                onPress={handleAvatarLocation}
+                _pressed={{ backgroundColor: 'purple.600' }}
+              >
+                <Icon as={Entypo} name="edit" size="lg" color="white" />
+              </Pressable>
+
+              <Text pb={1} bold>
+                Adicione a logo de sua empresa
+              </Text>
+            </Center>
+          </VStack>
+
+          <VStack backgroundColor="white" borderRadius={10} p={5} mt={10}>
             <HStack>
               <VStack>
                 <UserPhoto
@@ -226,7 +341,10 @@ export function LocationDetails() {
             </HStack>
           </VStack>
 
-          <VStack px={5} mt={10}>
+          <VStack p={5} mt={10} backgroundColor="white" borderRadius={10}>
+            <VStack mb={3}>
+              <Text bold>Local</Text>
+            </VStack>
             <HStack>
               <HStack>
                 <Icon
@@ -241,70 +359,73 @@ export function LocationDetails() {
                 </VStack>
               </HStack>
             </HStack>
-          </VStack>
 
-          <VStack px={5} mt={5}>
-            <HStack>
+            <VStack mt={5}>
               <HStack>
-                <Icon
-                  as={Feather}
-                  name="map-pin"
-                  size={5}
-                  ml={3}
-                  mt={5}
-                  color="amber.600"
-                />
-                <VStack ml={2}>
-                  <Text>
-                    {location.address_line},{location.number}-
-                    {location.district}
-                  </Text>
-                  <Text>
-                    {location.city}-{location.state}
-                  </Text>
-                  <Text>{location.zipcode}</Text>
-                </VStack>
+                <HStack>
+                  <Icon
+                    as={Feather}
+                    name="map-pin"
+                    size={5}
+                    ml={3}
+                    mt={5}
+                    color="amber.600"
+                  />
+                  <VStack ml={2}>
+                    <Text>
+                      {location.address_line},{location.number}-
+                      {location.district}
+                    </Text>
+                    <Text>
+                      {location.city}-{location.state}
+                    </Text>
+                    <Text>{location.zipcode}</Text>
+                  </VStack>
+                </HStack>
               </HStack>
-            </HStack>
-          </VStack>
+            </VStack>
 
-          <VStack px={5} mt={5}>
-            <HStack>
+            <VStack mt={5}>
               <HStack>
-                <Icon
-                  as={Feather}
-                  name="mail"
-                  size={5}
-                  ml={3}
-                  color="amber.600"
-                />
-                <VStack ml={2}>
-                  <Text>{location.business_email}</Text>
-                </VStack>
+                <HStack>
+                  <Icon
+                    as={Feather}
+                    name="mail"
+                    size={5}
+                    ml={3}
+                    color="amber.600"
+                  />
+                  <VStack ml={2}>
+                    <Text>{location.business_email}</Text>
+                  </VStack>
+                </HStack>
               </HStack>
-            </HStack>
-          </VStack>
+            </VStack>
 
-          <VStack px={5} mt={5}>
-            <HStack>
+            <VStack mt={5}>
               <HStack>
-                <Icon
-                  as={Feather}
-                  name="info"
-                  size={5}
-                  ml={3}
-                  color="amber.600"
-                />
-                <VStack ml={2} w={300}>
-                  <Text textAlign="justify">
-                    {location.business_description}
-                  </Text>
-                </VStack>
+                <HStack>
+                  <Icon
+                    as={Feather}
+                    name="info"
+                    size={5}
+                    ml={3}
+                    color="amber.600"
+                  />
+                  <VStack ml={2} w={300}>
+                    <Text textAlign="justify">
+                      {location.business_description}
+                    </Text>
+                  </VStack>
+                </HStack>
               </HStack>
-            </HStack>
+            </VStack>
           </VStack>
 
-          <VStack px={5} mt={5}>
+          <VStack p={5} mt={5} backgroundColor="white" borderRadius={10}>
+            <VStack mb={3}>
+              <Text bold>Meios de Pagamento</Text>
+            </VStack>
             <HStack>
               <HStack>
                 <Icon
@@ -314,30 +435,29 @@ export function LocationDetails() {
                   ml={3}
                   color="amber.600"
                 />
-                <VStack ml={2} w={300}>
+                <HStack ml={2} w={300}>
                   {location.payment_methods?.map((payment) => {
                     return (
-                      <HStack key={payment}>
-                        <HStack>
-                          <VStack ml={2}>
-                            <Text>
-                              {
-                                paymentMethods.find((method) =>
-                                  method.id === payment ? method.name : ''
-                                )?.name
-                              }
-                            </Text>
-                          </VStack>
-                        </HStack>
-                      </HStack>
+                      <VStack key={payment} ml={3}>
+                        <Text>
+                          {
+                            paymentMethods.find((method) =>
+                              method.id === payment ? method.name : ''
+                            )?.name
+                          }
+                        </Text>
+                      </VStack>
                     );
                   })}
-                </VStack>
+                </HStack>
               </HStack>
             </HStack>
           </VStack>
 
-          <VStack px={5} mt={5}>
+          <VStack p={5} mt={5} backgroundColor="white" borderRadius={10}>
+            <VStack mb={3}>
+              <Text bold>Servicos oferecidos</Text>
+            </VStack>
             <HStack>
               <HStack>
                 <Icon
@@ -347,30 +467,29 @@ export function LocationDetails() {
                   ml={3}
                   color="amber.600"
                 />
-                <VStack ml={2} w={300}>
+                <HStack ml={2} w={300}>
                   {location.business_categories?.map((category) => {
                     return (
-                      <HStack key={category}>
-                        <HStack>
-                          <VStack ml={2}>
-                            <Text>
-                              {
-                                servicesCategories.find((service) =>
-                                  service.id === category ? service.name : ''
-                                )?.name
-                              }
-                            </Text>
-                          </VStack>
-                        </HStack>
-                      </HStack>
+                      <VStack key={category} ml={3}>
+                        <Text>
+                          {
+                            servicesCategories.find((service) =>
+                              service.id === category ? service.name : ''
+                            )?.name
+                          }
+                        </Text>
+                      </VStack>
                     );
                   })}
-                </VStack>
+                </HStack>
               </HStack>
             </HStack>
           </VStack>
 
-          <VStack px={5} mt={5}>
+          <VStack p={5} mt={5} backgroundColor="white" borderRadius={10}>
+            <VStack mb={3}>
+              <Text bold>Dias da semana</Text>
+            </VStack>
             <HStack>
               <HStack>
                 <Icon
@@ -380,24 +499,23 @@ export function LocationDetails() {
                   ml={3}
                   color="amber.600"
                 />
-                <VStack ml={2} w={300}>
+                <HStack ml={2} w={300}>
                   {location.open_hours_weekend?.map((category) => {
                     return (
-                      <HStack key={category}>
-                        <VStack>
-                          <HStack ml={2}>
-                            <Text>{category}</Text>
-                          </HStack>
-                        </VStack>
-                      </HStack>
+                      <VStack key={category} ml={3}>
+                        <Text>{category.toLocaleLowerCase()}</Text>
+                      </VStack>
                     );
                   })}
-                </VStack>
+                </HStack>
               </HStack>
             </HStack>
           </VStack>
 
-          <VStack px={5} mt={5}>
+          <VStack p={5} mt={5} backgroundColor="white" borderRadius={10}>
+            <VStack mb={3}>
+              <Text bold>Horario</Text>
+            </VStack>
             <HStack>
               <HStack>
                 <Icon
@@ -421,7 +539,10 @@ export function LocationDetails() {
             </HStack>
           </VStack>
 
-          <VStack px={5} mt={10}>
+          <VStack p={5} mt={5} backgroundColor="white" borderRadius={10}>
+            <VStack mb={3}>
+              <Text bold>Data de criacao</Text>
+            </VStack>
             <HStack>
               <HStack>
                 <Icon
@@ -441,7 +562,10 @@ export function LocationDetails() {
             </HStack>
           </VStack>
 
-          <VStack px={5} mt={5}>
+          <VStack p={5} mt={5} backgroundColor="white" borderRadius={10}>
+            <VStack mb={3}>
+              <Text bold>Fotos e videos do local</Text>
+            </VStack>
             <HStack>
               <HStack>
                 <Icon
@@ -525,21 +649,20 @@ export function LocationDetails() {
                     h={50}
                     variant={'outline'}
                   />
-
-                  <Button
-                    title="Editar Local"
-                    onPress={() =>
-                      navigation.navigate('editLocation', {
-                        locationId: location.id,
-                      })
-                    }
-                    h={50}
-                    mt={100}
-                  />
                 </VStack>
               </HStack>
             </HStack>
           </VStack>
+          <Button
+            title="Editar Local"
+            onPress={() =>
+              navigation.navigate('editLocation', {
+                locationId: location.id,
+              })
+            }
+            h={50}
+            mt={100}
+          />
         </ScrollView>
       </VStack>
     </VStack>

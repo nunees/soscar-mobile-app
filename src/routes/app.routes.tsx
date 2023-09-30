@@ -4,10 +4,12 @@ import {
   BottomTabNavigationProp,
 } from '@react-navigation/bottom-tabs';
 import { Assistance } from '@screens/clients/Assistance';
-import { ChangePassword } from '@screens/clients/ChangePassword';
 import { HomeScreen } from '@screens/clients/HomeScreen';
 import { PartnerDetails } from '@screens/clients/PartnerDetails';
-import { Profile } from '@screens/clients/Profile';
+import { ChangePassword } from '@screens/clients/profile/ChangePassword';
+import EditProfileInformation from '@screens/clients/profile/EditProfileInformation';
+import MyAccountInformation from '@screens/clients/profile/MyAccountInformation';
+import { Profile } from '@screens/clients/profile/Profile';
 import { LegalQuotes } from '@screens/clients/quotes/LegalQuotes';
 import { NewLegalQuote } from '@screens/clients/quotes/NewLegalQuote';
 import { NewQuote } from '@screens/clients/quotes/NewQuote';
@@ -31,6 +33,8 @@ type AppRotes = {
   home: undefined;
   vehicles: undefined;
   profile: undefined;
+  myaccountInformation: undefined;
+  editProfileInformation: undefined;
   assistance: undefined;
   vehicleDetails: { vehicleId: string };
   addVehicle: undefined;
@@ -66,13 +70,6 @@ export function AppRoutes() {
       screenOptions={{
         headerShown: false,
         tabBarShowLabel: false,
-        // tabBarLabelPosition: 'below-icon',
-        // tabBarLabelStyle: {
-        //   fontSize: 10,
-        //   fontFamily: fonts.body,
-        //   fontWeight: 'bold',
-        //   paddingBottom: 5,
-        // },
         tabBarActiveTintColor: colors.purple[700],
         tabBarInactiveTintColor: colors.gray[500],
         tabBarStyle: {
@@ -129,37 +126,55 @@ export function AppRoutes() {
       <Screen
         name="schedules"
         component={Schedules}
-        options={{ tabBarButton: () => null, tabBarStyle: { display: 'none' } }}
+        options={{
+          tabBarButton: () => null,
+          tabBarStyle: { display: 'none' },
+        }}
       />
 
       <Screen
         name="searchSchedule"
         component={SearchSchedule}
-        options={{ tabBarButton: () => null, tabBarStyle: { display: 'none' } }}
+        options={{
+          tabBarButton: () => null,
+          tabBarStyle: { display: 'none' },
+        }}
       />
 
       <Screen
         name="partnerDetails"
         component={PartnerDetails}
-        options={{ tabBarButton: () => null, tabBarStyle: { display: 'none' } }}
+        options={{
+          tabBarButton: () => null,
+          tabBarStyle: { display: 'none' },
+        }}
       />
 
       <Screen
         name="newSchedule"
         component={NewSchedule}
-        options={{ tabBarButton: () => null, tabBarStyle: { display: 'none' } }}
+        options={{
+          tabBarButton: () => null,
+          tabBarStyle: { display: 'none' },
+        }}
       />
 
       <Screen
         name="schedulesDetails"
         component={SchedulesDetails}
-        options={{ tabBarButton: () => null, tabBarStyle: { display: 'none' } }}
+        options={{
+          tabBarButton: () => null,
+          tabBarStyle: { display: 'none' },
+        }}
       />
 
       <Screen
         name="schedulesList"
         component={SchedulesList}
-        options={{ tabBarButton: () => null, tabBarStyle: { display: 'none' } }}
+        options={{
+          tabBarButton: () => null,
+          tabBarStyle: { display: 'none' },
+        }}
       />
 
       <Screen
@@ -195,69 +210,120 @@ export function AppRoutes() {
       />
 
       <Screen
+        name="myaccountInformation"
+        component={MyAccountInformation}
+        options={{
+          tabBarButton: () => null,
+          tabBarStyle: { display: 'none' },
+        }}
+      />
+
+      <Screen
+        name="editProfileInformation"
+        component={EditProfileInformation}
+        options={{
+          tabBarButton: () => null,
+          tabBarStyle: { display: 'none' },
+        }}
+      />
+
+      <Screen
         name="vehicleDetails"
         component={VehicleDetails}
-        options={{ tabBarButton: () => null, tabBarStyle: { display: 'none' } }}
+        options={{
+          tabBarButton: () => null,
+          tabBarStyle: { display: 'none' },
+        }}
       />
 
       <Screen
         name="addVehicle"
         component={AddVehicle}
-        options={{ tabBarButton: () => null, tabBarStyle: { display: 'none' } }}
+        options={{
+          tabBarButton: () => null,
+          tabBarStyle: { display: 'none' },
+        }}
       />
 
       <Screen
         name="changePassword"
         component={ChangePassword}
-        options={{ tabBarButton: () => null, tabBarStyle: { display: 'none' } }}
+        options={{
+          tabBarButton: () => null,
+          tabBarStyle: { display: 'none' },
+        }}
       />
 
       <Screen
         name="quotes"
         component={Quotes}
-        options={{ tabBarButton: () => null, tabBarStyle: { display: 'none' } }}
+        options={{
+          tabBarButton: () => null,
+          tabBarStyle: { display: 'none' },
+        }}
       />
 
       <Screen
         name="newQuote"
         component={NewQuote}
-        options={{ tabBarButton: () => null, tabBarStyle: { display: 'none' } }}
+        options={{
+          tabBarButton: () => null,
+          tabBarStyle: { display: 'none' },
+        }}
       />
 
       <Screen
         name="searchQuote"
         component={SearchQuote}
-        options={{ tabBarButton: () => null, tabBarStyle: { display: 'none' } }}
+        options={{
+          tabBarButton: () => null,
+          tabBarStyle: { display: 'none' },
+        }}
       />
 
       <Screen
         name="quotesList"
         component={QuotesList}
-        options={{ tabBarButton: () => null, tabBarStyle: { display: 'none' } }}
+        options={{
+          tabBarButton: () => null,
+          tabBarStyle: { display: 'none' },
+        }}
       />
 
       <Screen
         name="quoteDetails"
         component={QuoteDetails}
-        options={{ tabBarButton: () => null, tabBarStyle: { display: 'none' } }}
+        options={{
+          tabBarButton: () => null,
+          tabBarStyle: { display: 'none' },
+        }}
       />
 
       <Screen
         name="legalQuotes"
         component={LegalQuotes}
-        options={{ tabBarButton: () => null, tabBarStyle: { display: 'none' } }}
+        options={{
+          tabBarButton: () => null,
+          tabBarStyle: { display: 'none' },
+        }}
       />
 
       <Screen
         name="newLegalQuote"
         component={NewLegalQuote}
-        options={{ tabBarButton: () => null, tabBarStyle: { display: 'none' } }}
+        options={{
+          tabBarButton: () => null,
+          tabBarStyle: { display: 'none' },
+        }}
       />
 
       <Screen
         name="searchLegalQuote"
         component={SearchLegalQuote}
-        options={{ tabBarButton: () => null, tabBarStyle: { display: 'none' } }}
+        options={{
+          tabBarButton: () => null,
+          tabBarStyle: { display: 'none' },
+        }}
       />
     </Navigator>
   );

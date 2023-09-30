@@ -4,6 +4,7 @@ import { LoadingModal } from '@components/LoadingModal';
 import { PartnerCard } from '@components/PartnerCard';
 import { ILocation } from '@dtos/ILocation';
 import { useAuth } from '@hooks/useAuth';
+import { useGPS } from '@hooks/useGPS';
 import {
   useFocusEffect,
   useNavigation,
@@ -11,53 +12,43 @@ import {
 } from '@react-navigation/native';
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
 import { api } from '@services/api';
-import { VStack, useToast, FlatList } from 'native-base';
+import { VStack, FlatList } from 'native-base';
 import { useCallback, useState } from 'react';
 
 type RouteParamsProps = {
   serviceId: string;
 };
 
-async function findLocations(serviceId: string, user_id: string) {
-  const response = await api.get(`/locations/services/${serviceId}`, {
-    headers: {
-      id: user_id,
-    },
-  });
-  return response;
-}
-
 export function SearchSchedule() {
   const [isLoading, setIsLoading] = useState(false);
-  const [locations, setLocations] = useState<ILocation[]>();
+  const [locations, setLocations] = useState<ILocation[]>({} as ILocation[]);
 
   const navigation = useNavigation<AppNavigatorRoutesProps>();
   const { user } = useAuth();
-  const toast = useToast();
 
   const routes = useRoute();
   const { serviceId } = routes.params as RouteParamsProps;
 
+  const findLocations = useCallback(
+    async (serviceId: string, user_id: string) => {
+      const response = await api.get(`/locations/services/${serviceId}`, {
+        headers: {
+          id: user_id,
+        },
+      });
+
+      setLocations(response.data);
+    },
+    [locations]
+  );
+
   useFocusEffect(
     useCallback(() => {
-      console.log('Mounted');
-      setIsLoading(true);
-      findLocations(serviceId, user.id)
-        .then((response) => setLocations(response.data))
-        .catch((error) => {
-          toast.show({
-            title:
-              'Erro ao buscar parceiros, verifique sua conexão com a internet',
-            placement: 'top',
-            bgColor: 'red.500',
-          });
-          throw new Error(error);
-        });
-      setIsLoading(false);
+      findLocations(serviceId, user.id);
       return () => {
-        setLocations([]);
+        setLocations({} as ILocation[]);
       };
-    }, [findLocations, serviceId])
+    }, [])
   );
 
   return (

@@ -25,7 +25,7 @@ export function Routes() {
   return (
     <Box flex={1} bg="white">
       <NavigationContainer theme={theme}>
-        {
+        {/* {
           // eslint-disable-next-line no-nested-ternary
           !user?.id ? (
             <AuthRoutes />
@@ -34,7 +34,10 @@ export function Routes() {
           ) : (
             <AppRoutes />
           )
-        }
+        } */}
+        {!user.id && <AuthRoutes />}
+        {user.id && !user.isPartner && <AppRoutes />}
+        {user.id && user.isPartner && <PartnerRoutes />}
       </NavigationContainer>
     </Box>
   );

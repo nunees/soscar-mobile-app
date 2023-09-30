@@ -1,6 +1,7 @@
-import LoginHeaderSVG from '@assets/login/login-header.svg';
+import BackgroundPNG from '@assets/login/background.png';
 import { Button } from '@components/Button';
 import { Input } from '@components/Input';
+import { Feather } from '@expo/vector-icons';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useAuth } from '@hooks/useAuth';
 import { useNavigation } from '@react-navigation/native';
@@ -13,11 +14,12 @@ import {
   Text,
   useToast,
   HStack,
-  ScrollView,
+  Icon,
+  Image,
 } from 'native-base';
 import { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { Pressable, TouchableOpacity } from 'react-native';
+import { Pressable, TouchableOpacity, ScrollView } from 'react-native';
 import * as yup from 'yup';
 
 type FormDataProps = {
@@ -59,7 +61,7 @@ export function SignIn() {
 
       toast.show({
         title,
-        placement: 'top',
+        placement: 'bottom',
         bgColor: 'red.500',
       });
     } finally {
@@ -68,28 +70,55 @@ export function SignIn() {
   }
 
   return (
-    <VStack flex={1} backgroundColor="white">
-      <ScrollView>
+    <VStack flex={1} backgroundColor="purple.900">
+      <ScrollView
+        contentContainerStyle={{
+          paddingBottom: 20,
+        }}
+      >
         <VStack>
-          <HStack pl={100} width={200} height={80}>
-            <LoginHeaderSVG width={200} />
-          </HStack>
-        </VStack>
-        <VStack>
-          <VStack px={10}>
-            <Heading pb={2}>Bem-vindo!</Heading>
-            <Text>Faça login para continuar</Text>
+          <VStack width={'full'} height={400}>
+            <Image
+              source={BackgroundPNG}
+              alt="background image"
+              resizeMode="cover"
+            />
           </VStack>
-          <VStack flex={1}>
+        </VStack>
+
+        <VStack
+          backgroundColor="purple.900"
+          borderTopLeftRadius={10}
+          borderTopRightRadius={10}
+          flex={1}
+        >
+          <VStack px={10} py={3}>
+            <Heading color="gray.100">Bem-vindo!</Heading>
+            <Text color="gray.200">Faça login para continuar</Text>
+          </VStack>
+
+          <VStack>
             <VStack>
               <VStack ml={5}></VStack>
-              <Center px={10} mt={5}>
+              <Center px={10} mt={2}>
                 <Controller
                   control={control}
                   name="email"
                   rules={{ required: 'Informe seu e-mail' }}
                   render={({ field: { onChange, value } }) => (
                     <Input
+                      InputLeftElement={
+                        <Icon
+                          as={Feather}
+                          name="mail"
+                          size={5}
+                          ml={2}
+                          color="gray.400"
+                        />
+                      }
+                      selectionColor={'white'}
+                      backgroundColor={'transparent'}
+                      color="gray.100"
                       fontSize="md"
                       placeholder="Email"
                       autoCapitalize="none"
@@ -107,6 +136,17 @@ export function SignIn() {
                   rules={{ required: 'Informe sua senha' }}
                   render={({ field: { onChange, value } }) => (
                     <Input
+                      InputLeftElement={
+                        <Icon
+                          as={Feather}
+                          name="key"
+                          size={5}
+                          ml={2}
+                          color="gray.400"
+                        />
+                      }
+                      backgroundColor={'transparent'}
+                      color="gray.100"
                       fontSize="md"
                       placeholder="Senha"
                       autoCapitalize="none"
@@ -119,16 +159,8 @@ export function SignIn() {
                 />
 
                 <HStack justifyContent={'space-between'}>
-                  {/* <Checkbox
-                    colorScheme="purple"
-                    value={''}
-                    onChange={() => {}}
-                    mr={10}
-                  >
-                    <Text fontSize="xs">Salvar credenciais</Text>
-                  </Checkbox> */}
                   <TouchableOpacity>
-                    <Text fontWeight={'bold'} color="purple.700" fontSize="xs">
+                    <Text bold color="purple.200" fontSize="xs">
                       Esqueci minha senha
                     </Text>
                   </TouchableOpacity>
@@ -136,15 +168,17 @@ export function SignIn() {
 
                 <Button
                   title="Acessar"
-                  mt={20}
+                  mt={5}
                   onPress={handleSubmit(handleSignIn)}
                   isLoading={isLoading}
                 />
 
                 <HStack mt={5}>
-                  <Text fontSize="xs">Não tem uma conta?</Text>
+                  <Text fontSize="xs" color="gray.100">
+                    Não tem uma conta?
+                  </Text>
                   <Pressable onPress={handleSignUp}>
-                    <Text color="purple.700" pl={1} fontSize="xs">
+                    <Text bold color="purple.200" pl={1} fontSize="xs">
                       Registre-se
                     </Text>
                   </Pressable>

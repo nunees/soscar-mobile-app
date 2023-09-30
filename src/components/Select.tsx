@@ -16,11 +16,11 @@ export function Select({ label, data, ...rest }: Props) {
       fontSize="md"
       fontFamily={'body'}
       borderWidth={1}
-      color="gray.200"
+      color="gray.400"
       _selectedItem={{
-        color: 'gray.200',
+        color: 'gray.400',
       }}
-      placeholderTextColor="gray.500"
+      placeholderTextColor="gray.400"
       accessibilityLabel={label}
       placeholder={label}
       dropdownIcon={<Icon as={Feather} name="chevron-down" size={5} mr={5} />}

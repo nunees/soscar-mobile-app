@@ -46,7 +46,8 @@
     "react-native-screens": "~3.20.0",
     "react-native-svg": "13.4.0",
     "react-native-video": "^5.2.1",
-    "yup": "^1.2.0"
+    "yup": "^1.2.0",
+    "@react-native-community/netinfo": "9.3.7"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

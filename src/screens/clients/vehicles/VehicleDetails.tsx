@@ -1,35 +1,44 @@
 import { AppHeader } from '@components/AppHeader';
-import { Input } from '@components/Input';
-import getLogoImage from '@components/LogosImages';
-import { IVehicleDTO } from '@dtos/IVechicleDTO';
+import { Button } from '@components/Button';
 import { useAuth } from '@hooks/useAuth';
 import { useRoute } from '@react-navigation/native';
 import { api } from '@services/api';
 import { ScrollView, VStack, Text, useToast, Image, HStack } from 'native-base';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 type RouteParamsProps = {
   vehicleId: string;
 };
 
 export function VehicleDetails() {
+  const [brand, setBrand] = useState<string>('');
+  const [model, setModel] = useState<string>('');
+  const [color, setColor] = useState<string>('');
+  const [year, setYear] = useState<string>('');
+  const [plate, setPlate] = useState<string>('');
+  const [engineMiles, setEngineMiles] = useState('');
+  const [totalSpent, setTotalSpent] = useState(0);
+
   const route = useRoute();
   const toast = useToast();
 
   const { user } = useAuth();
-
   const { vehicleId } = route.params as RouteParamsProps;
 
-  const [vehicle, setVehicle] = useState<IVehicleDTO>({} as IVehicleDTO);
-
-  async function fetchVehicleDetails() {
+  const fetchVehicleDetails = useCallback(async () => {
     try {
       const response = await api.get(`/vehicles/${vehicleId}`, {
         headers: {
           id: user.id,
         },
       });
-      setVehicle(response.data as IVehicleDTO);
+      setBrand(response.data.brand.name);
+      setModel(response.data.name.name);
+      setColor(response.data.color);
+
+      setYear(response.data.year);
+      setPlate(response.data.plate);
+      setEngineMiles(response.data.engineMiles);
     } catch {
       toast.show({
         title: 'Erro ao buscar detalhes do veículo',
@@ -37,7 +46,7 @@ export function VehicleDetails() {
         bgColor: 'red.500',
       });
     }
-  }
+  }, []);
 
   useEffect(() => {
     fetchVehicleDetails();
@@ -50,7 +59,9 @@ export function VehicleDetails() {
       </VStack>
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ flexGrow: 1 }}
+        contentContainerStyle={{
+          paddingBottom: 100,
+        }}
       >
         <VStack px={5} py={5}>
           <VStack mb={5} backgroundColor="white" p={5} borderRadius={10}>
@@ -59,7 +70,7 @@ export function VehicleDetails() {
                 <Text bold pb={2}>
                   Montadora
                 </Text>
-                <Text>{vehicle.brand?.name}</Text>
+                <Text>{brand}</Text>
               </VStack>
             </HStack>
           </VStack>
@@ -68,43 +79,47 @@ export function VehicleDetails() {
             <Text bold pb={2}>
               Modelo
             </Text>
-            <Text>{vehicle.name?.name}</Text>
+            <Text>{model}</Text>
           </VStack>
 
           <VStack mb={5} backgroundColor="white" p={5} borderRadius={10}>
             <Text bold pb={2}>
               Cor
             </Text>
-            <VStack>{vehicle.color}</VStack>
+            <Text>{color}</Text>
           </VStack>
 
           <VStack mb={5} backgroundColor="white" p={5} borderRadius={10}>
             <Text bold pb={2}>
               Ano de Fabricação
             </Text>
-            <Text>{vehicle.year}</Text>
+            <Text>{year}</Text>
           </VStack>
 
           <VStack mb={5} backgroundColor="white" p={5} borderRadius={10}>
             <Text bold pb={2}>
               Placa
             </Text>
-            <Text>{vehicle.plate}</Text>
+            <Text>{plate}</Text>
           </VStack>
 
           <VStack mb={5} backgroundColor="white" p={5} borderRadius={10}>
             <Text bold pb={2}>
               Kilometragen
             </Text>
-            <Text>{vehicle.engineMiles}</Text>
+            <Text>{engineMiles}</Text>
           </VStack>
 
           <VStack mb={5} backgroundColor="white" p={5} borderRadius={10}>
             <Text bold pb={2}>
               Total Gasto (R$)
             </Text>
-            <Text>0</Text>
+            <Text>{totalSpent}</Text>
           </VStack>
+        </VStack>
+
+        <VStack px={5} py={5}>
+          <Button title="Alterar dados" />
         </VStack>
       </ScrollView>
     </VStack>

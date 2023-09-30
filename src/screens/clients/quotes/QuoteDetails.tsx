@@ -68,8 +68,6 @@ export function QuoteDetails() {
 
       setIsLoading(false);
       setIsLoadingMessage('');
-
-      console.log(userFiles);
     } catch (error) {
       setIsLoading(false);
       setIsLoadingMessage('');

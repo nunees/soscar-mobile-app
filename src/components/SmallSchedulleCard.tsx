@@ -18,11 +18,8 @@ type Props = {
 
 export function SmallSchedulleCard({ data }: Props) {
   const date = data.date
-    .toString()
-    .split('T')[0]
-    .split('-')
-    .reverse()
-    .join('/');
+    ? data.date.toString().split('T')[0].split('-').reverse().join('/')
+    : '';
 
   const navigation = useNavigation<AppNavigatorRoutesProps>();
 

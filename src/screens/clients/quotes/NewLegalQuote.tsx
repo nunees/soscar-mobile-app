@@ -149,7 +149,7 @@ export function NewLegalQuote() {
         },
       });
       setLocations(response.data);
-      console.log(response.data);
+
       setIsLoading(false);
     } catch (error) {
       throw new AppError('Erro ao buscar localizacao');
@@ -541,7 +541,7 @@ export function NewLegalQuote() {
               <Text fontSize="md" bold mb={2}>
                 Locais
               </Text>
-              <TouchableOpacity onPress={() => console.log('oi')}>
+              <TouchableOpacity onPress={() => null}>
                 <Icon
                   as={FontAwesome5}
                   name={'search-plus'}

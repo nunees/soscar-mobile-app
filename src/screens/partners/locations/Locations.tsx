@@ -3,7 +3,7 @@ import { Loading } from '@components/Loading';
 import { ILocation } from '@dtos/ILocation';
 import { Feather } from '@expo/vector-icons';
 import { useAuth } from '@hooks/useAuth';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { PartnerNavigatorRoutesProps } from '@routes/partner.routes';
 import { api } from '@services/api';
 import { AppError } from '@utils/AppError';
@@ -18,21 +18,8 @@ import {
   useToast,
   Badge,
 } from 'native-base';
-import { useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { TouchableOpacity, Alert } from 'react-native';
-
-async function loadData(user_id: string) {
-  try {
-    const response = await api.get('/locations', {
-      headers: {
-        id: user_id,
-      },
-    });
-    return response;
-  } catch (error) {
-    throw new AppError('Erro ao buscar locais');
-  }
-}
 
 export function Locations() {
   const { user } = useAuth();
@@ -43,6 +30,19 @@ export function Locations() {
   const [isLoading, setIsLoading] = useState(false);
 
   const navigation = useNavigation<PartnerNavigatorRoutesProps>();
+
+  const loadData = useCallback(async () => {
+    try {
+      const response = await api.get('/locations', {
+        headers: {
+          id: user.id,
+        },
+      });
+      setLocations(response.data.locations);
+    } catch (error) {
+      throw new AppError('Erro ao buscar locais');
+    }
+  }, [locations]);
 
   async function handleDeleteLocation(locationId: string) {
     try {
@@ -70,6 +70,7 @@ export function Locations() {
                   placement: 'top',
                   bgColor: 'green.500',
                 });
+                loadData();
               } catch (error) {
                 toast.show({
                   title: 'Erro ao deletar local',
@@ -94,9 +95,11 @@ export function Locations() {
     }
   }
 
-  useEffect(() => {
-    loadData(user.id).then((response) => setLocations(response.data.locations));
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      loadData();
+    }, [])
+  );
 
   return (
     <VStack flex={1}>
@@ -111,17 +114,6 @@ export function Locations() {
         >
           {isLoading && <Loading />}
           <VStack flex={1}>
-            {/* <HStack justifyContent={'center'}>
-              <Text
-                fontFamily={'body'}
-                fontSize={'xs'}
-                ml={5}
-                mt={5}
-                color="gray.400"
-              >
-                Mostrando resultados próximos a você
-              </Text>
-            </HStack> */}
             <VStack py={3} px={19}>
               {locations.length > 0 ? (
                 locations.map((location) => (
@@ -161,7 +153,14 @@ export function Locations() {
                         </Badge>
                       )}
                     </HStack>
-                    <Heading pb={5}>{location.business_name}</Heading>
+                    <Heading pb={5}>
+                      {location.business_name.length > 20
+                        ? `${location.business_name.slice(
+                            0,
+                            20
+                          )}...`.toUpperCase()
+                        : location.business_name.toUpperCase()}
+                    </Heading>
                     <Text pb={2}>
                       <Text bold>CNPJ/CPF:</Text> {location.business_phone}
                     </Text>

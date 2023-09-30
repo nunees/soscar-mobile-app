@@ -28,9 +28,8 @@ export function Vechicles() {
 
   useFocusEffect(
     useCallback(() => {
-      fetchUserVehicles(user.id)
-        .then((response) => setVehicles(response.data))
-        .catch((error) => console.log(error));
+      fetchUserVehicles(user.id).then((response) => setVehicles(response.data));
+
       return () => {
         setVehicles([]);
       };
@@ -56,6 +55,7 @@ export function Vechicles() {
               <VStack>
                 {vehicles.map((vehicle) => (
                   <VStack
+                    key={vehicle.id}
                     backgroundColor="white"
                     borderRadius={10}
                     mb={3}

@@ -82,13 +82,9 @@ export function Map({ latitude, longitude }: coords) {
 
   useEffect(() => {
     const getTravelTime = async () => {
-      axios
-        .get(
-          `https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=${userLocation?.latitude},${userLocation?.longitude}&destinations=${partnerLocation.latitude},${partnerLocation.longitude}&key=${GOOGLE_MAPS_APIKEY}`
-        )
-        .then((response) => {
-          console.log(response.data.rows[0].elements[0].duration.text);
-        });
+      axios.get(
+        `https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=${userLocation?.latitude},${userLocation?.longitude}&destinations=${partnerLocation.latitude},${partnerLocation.longitude}&key=${GOOGLE_MAPS_APIKEY}`
+      );
     };
 
     getTravelTime();

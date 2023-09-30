@@ -19,19 +19,17 @@ export function ServicesSmallCard({ image, alt, title, ...rest }: Props) {
   return (
     <HStack
       mr={2}
-      w={120}
+      w={100}
       h={100}
       alignItems={'center'}
       justifyContent={'center'}
-      borderWidth={1}
-      borderRadius={10}
-      borderColor={'gray.700'}
+      borderRadius={5}
       backgroundColor="white"
     >
       <VStack shadow={1} justifyItems="center">
         <TouchableOpacity {...rest}>
           <VStack bg={'transparent'}>
-            <Image source={image} alt={alt} w={50} h={50} {...rest} />
+            <Image source={image} alt={alt} w={60} h={60} {...rest} />
           </VStack>
         </TouchableOpacity>
         <Text mt={2} textAlign={'center'} bold>

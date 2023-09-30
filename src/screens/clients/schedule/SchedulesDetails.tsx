@@ -18,7 +18,7 @@ import {
   Text,
   VStack,
 } from 'native-base';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Alert, Linking, TouchableOpacity } from 'react-native';
 
 type RouteParams = {
@@ -38,15 +38,6 @@ type SchedulesFiles = {
  * 4 - Realizado
  */
 
-async function fetchScheduleDetails(scheduleId: string, userId: string) {
-  const response = await api.get(`/schedules/${scheduleId}`, {
-    headers: {
-      id: userId,
-    },
-  });
-  return response;
-}
-
 export function SchedulesDetails() {
   const [schedule, setSchedule] = useState<ISchedules>();
   const [loadedImages, setLoadedImages] = useState<any[]>([]);
@@ -57,6 +48,28 @@ export function SchedulesDetails() {
 
   const { user } = useAuth();
   const { deviceMapNavigation } = useMapsLinking();
+
+  const fetchScheduleDetails = useCallback(async () => {
+    try {
+      const response = await api.get(`/schedules/find/${scheduleId}`, {
+        headers: {
+          id: user.id,
+        },
+      });
+
+      console.log(response.data);
+
+      setSchedule(response.data);
+
+      setCarLogo(response.data.vehicles.brand.icon);
+      setSchedule(response.data);
+      response.data.SchedulesFiles.map((file: SchedulesFiles) =>
+        setLoadedImages((oldState) => [...oldState, file])
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
 
   async function handleCancelSchedule() {
     Alert.alert(
@@ -73,7 +86,7 @@ export function SchedulesDetails() {
             await api.put(
               `/schedules/${schedule?.id}`,
               {
-                status: 0,
+                status: 4,
               },
               {
                 headers: {
@@ -81,28 +94,21 @@ export function SchedulesDetails() {
                 },
               }
             );
+            fetchScheduleDetails();
           },
         },
       ]
     );
   }
 
-  useFocusEffect(
-    useCallback(() => {
-      fetchScheduleDetails(scheduleId, user.id).then((response) => {
-        setCarLogo(response.data.vehicles.brand.icon);
-        setSchedule(response.data);
-        response.data.SchedulesFiles.map((file: SchedulesFiles) =>
-          setLoadedImages((oldState) => [...oldState, file])
-        );
-      });
-
-      return () => {
-        setSchedule({} as ISchedules);
-        setLoadedImages([]);
-      };
-    }, [fetchScheduleDetails])
-  );
+  useEffect(() => {
+    fetchScheduleDetails();
+    return () => {
+      setSchedule({} as ISchedules);
+      setLoadedImages([]);
+      setCarLogo('');
+    };
+  }, []);
 
   return (
     <VStack flex={1}>
@@ -138,7 +144,10 @@ export function SchedulesDetails() {
               {' '}
               Status
             </Text>
-            <StatusIcon status={schedule?.status} accepted={true} />
+            <StatusIcon
+              status={Number(schedule?.status)}
+              accepted={schedule?.status === 3}
+            />
             <VStack alignItems="center">
               {schedule?.status === 4 && (
                 <VStack alignItems="center">

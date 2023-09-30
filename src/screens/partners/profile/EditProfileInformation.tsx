@@ -1,37 +1,32 @@
 import { AppHeader } from '@components/AppHeader';
 import { Button } from '@components/Button';
 import { Input } from '@components/Input';
-import { LineDivider } from '@components/LineDivider';
-import { LoadingModal } from '@components/LoadingModal';
-import { UserPhoto } from '@components/UserPhoto';
+import UserPhoto from '@components/UserPhoto';
 import { Entypo } from '@expo/vector-icons';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useAuth } from '@hooks/useAuth';
 import { useProfile } from '@hooks/useProfile';
-import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
-import { AppNavigatorRoutesProps } from '@routes/app.routes';
+import { PartnerNavigatorRoutesProps } from '@routes/partner.routes';
 import { api } from '@services/api';
 import { AppError } from '@utils/AppError';
 import { IFileInfo } from 'expo-file-system';
 import * as FileSystem from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';
 import {
-  Text,
-  ScrollView,
-  VStack,
   Center,
-  Skeleton,
+  Heading,
   Icon,
   Pressable,
-  Heading,
+  ScrollView,
+  Skeleton,
+  Text,
+  VStack,
   useToast,
 } from 'native-base';
 import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import * as yup from 'yup';
-
-const PHOTO_SIZE = 33;
 
 type FormDataProps = {
   name: string;
@@ -40,27 +35,25 @@ type FormDataProps = {
   username: string;
 };
 
+const PHOTO_SIZE = 33;
+
 const profileSchema = yup.object().shape({
   name: yup.string().required('Nome é obrigatório'),
   lastName: yup.string().required('Sobrenome é obrigatório'),
-  phone: yup.string().required('Telefone é obrigatório'),
+  phone: yup.string().optional(),
   username: yup.string().required('Nome de usuário é obrigatório'),
 });
 
-export function Profile() {
-  const { user, signOut, updateUserAuth } = useAuth();
+export default function EditProfileInformation() {
+  const [isPhotoLoading, setIsPhotoLoading] = useState(false);
+  const { user, updateUserAuth } = useAuth();
   const { profile, updateProfile } = useProfile();
 
+  const [tempDate] = useState('');
   const [showModal, setShowModal] = useState(false);
 
-  const [date, setDate] = useState<Date | null>(null);
-  const [tempDate, setTempDate] = useState('');
-
-  const [isPhotoLoading, setIsPhotoLoading] = useState(false);
-
   const toast = useToast();
-
-  const navigation = useNavigation<AppNavigatorRoutesProps>();
+  const navigation = useNavigation<PartnerNavigatorRoutesProps>();
 
   const {
     control,
@@ -73,16 +66,81 @@ export function Profile() {
       phone: profile.phone,
       username: user.username,
     },
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     resolver: yupResolver(profileSchema),
   });
 
-  function handleDate(date: Date) {
-    const day = date.getDate();
-    const month = date.getMonth() + 1;
-    const year = date.getFullYear();
-    setTempDate(`${day}/${month}/${year}`);
-    const newDate = new Date(year, month - 1, day);
-    setDate(newDate);
+  async function handleSubmitProfile(data: FormDataProps) {
+    try {
+      setShowModal(true);
+      const response = await api.patch(
+        '/user',
+        {
+          name: data.name,
+          last_name: data.lastName,
+          username: data.username,
+          mobile_phone: data.phone,
+        },
+        {
+          headers: {
+            id: user.id,
+          },
+        }
+      );
+
+      const userUpdated = user;
+      user.name = response.data.name;
+      user.username = response.data.username;
+      user.email = response.data.email;
+      if (response.data.avatar) {
+        user.avatar = response.data.avatar;
+      }
+      await updateUserAuth(userUpdated);
+
+      await updateProfile({
+        name: response.data.name,
+        last_name: response.data.last_name,
+        phone: response.data.mobile_phone,
+        birth_date: response.data.birth_date,
+        cpf: response.data.cpf,
+        genderId: response.data.genderId,
+      });
+
+      toast.show({
+        title: 'Perfil atualizado',
+        placement: 'top',
+        bgColor: 'green.500',
+      });
+      navigation.navigate('myaccountInformation');
+    } catch (error) {
+      setShowModal(false);
+      const isAppError = error instanceof AppError;
+      toast.show({
+        title: isAppError ? error.message : 'Erro ao obter dados',
+        placement: 'top',
+        bgColor: 'red.500',
+      });
+    } finally {
+      setShowModal(false);
+    }
+  }
+
+  async function loadData() {
+    if (!profile.last_name || !profile.phone || !profile.birth_date) {
+      const response = await api.get('/user/profile', {
+        headers: {
+          id: user.id,
+        },
+      });
+
+      profile.name = response.data.name;
+      profile.last_name = response.data.last_name;
+      profile.phone = response.data.mobile_phone;
+      profile.birth_date = response.data.birth_date;
+      profile.cpf = response.data.cpf;
+      await updateProfile(profile);
+    }
   }
 
   async function handleUserProfilePictureSelect() {
@@ -135,11 +193,13 @@ export function Profile() {
           }
         );
 
-        if (avatarResponse.status === 200 || avatarResponse.status === 201) {
-          const userUpdated = user;
+        const userUpdated = user;
+        if (avatarResponse.data.avatar) {
           userUpdated.avatar = avatarResponse.data.avatar;
-          updateUserAuth(userUpdated);
+        } else {
+          userUpdated.avatar = '';
         }
+        updateUserAuth(userUpdated);
 
         toast.show({
           title: 'Foto atualizada',
@@ -161,76 +221,6 @@ export function Profile() {
     }
   }
 
-  async function handleSubmitProfile(data: FormDataProps) {
-    try {
-      setShowModal(true);
-      const response = await api.patch(
-        '/user',
-        {
-          name: data.name,
-          last_name: data.lastName,
-          username: data.username,
-          mobile_phone: data.phone,
-          birth_date: date,
-        },
-        {
-          headers: {
-            id: user.id,
-          },
-        }
-      );
-
-      const userUpdated = user;
-      user.name = response.data.name;
-      user.username = response.data.username;
-      user.email = response.data.email;
-      user.avatar = response.data.avatar;
-      await updateUserAuth(userUpdated);
-
-      await updateProfile({
-        name: response.data.name,
-        last_name: response.data.last_name,
-        phone: response.data.mobile_phone,
-        birth_date: response.data.birth_date,
-        cpf: response.data.cpf,
-        genderId: response.data.genderId,
-      });
-
-      toast.show({
-        title: 'Perfil atualizado',
-        placement: 'top',
-        bgColor: 'green.500',
-      });
-    } catch (error) {
-      setShowModal(false);
-      const isAppError = error instanceof AppError;
-      toast.show({
-        title: isAppError ? error.message : 'Erro ao obter dados',
-        placement: 'top',
-        bgColor: 'red.500',
-      });
-    } finally {
-      setShowModal(false);
-    }
-  }
-
-  async function loadData() {
-    if (!profile.last_name) {
-      const response = await api.get('/user/profile', {
-        headers: {
-          id: user.id,
-        },
-      });
-
-      profile.name = response.data.name;
-      profile.last_name = response.data.last_name;
-      profile.phone = response.data.mobile_phone;
-      profile.birth_date = response.data.birth_date;
-      profile.cpf = response.data.cpf;
-      await updateProfile(profile);
-    }
-  }
-
   useEffect(() => {
     loadData();
   }, []);
@@ -238,21 +228,16 @@ export function Profile() {
   return (
     <VStack>
       <VStack>
-        <AppHeader title="Meu Perfil" />
+        <AppHeader title="Editar informacoes pessoais" />
       </VStack>
 
-      <VStack px={10} py={10}>
-        {showModal && (
-          <LoadingModal
-            showModal={showModal}
-            setShowModal={setShowModal}
-            message="Carregando dados..."
-          />
-        )}
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 120 }}
-        >
+      <ScrollView
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{
+          paddingBottom: 100,
+        }}
+      >
+        <VStack px={5} py={5}>
           <Center px={10}>
             {isPhotoLoading ? (
               <Skeleton
@@ -289,18 +274,11 @@ export function Profile() {
             >
               <Icon as={Entypo} name="edit" size="lg" color="white" />
             </Pressable>
-            <Heading>{user.name}</Heading>
-            <Text>{user.username}</Text>
-            <Pressable onPress={signOut} _pressed={{ opacity: 0.5 }}>
-              <Text color="purple.500" bold>
-                Sair
-              </Text>
-            </Pressable>
+            <Heading pb={1}>{user.name}</Heading>
+            <Text pb={1}>{user.username}</Text>
           </Center>
 
-          <LineDivider />
-
-          <VStack>
+          <VStack backgroundColor={'white'} p={5} borderRadius={10}>
             <Text bold fontSize="xs">
               Nome
             </Text>
@@ -339,10 +317,10 @@ export function Profile() {
             <Input
               placeholder={profile.cpf}
               editable={false}
+              isDisabled={true}
               value={profile.cpf}
               caretHidden={true}
-              backgroundColor="gray.700"
-              borderBottomColor={'gray.700'}
+              helperText="Seu numero de CPF não pode ser alterado"
             />
 
             <Text bold fontSize="xs">
@@ -369,9 +347,9 @@ export function Profile() {
               value={user.email}
               placeholder={user.email}
               editable={false}
+              isDisabled={true}
               caretHidden={true}
-              backgroundColor="gray.700"
-              borderBottomColor={'gray.700'}
+              helperText="Seu email não pode ser alterado"
             />
 
             <Text bold fontSize="xs">
@@ -396,32 +374,19 @@ export function Profile() {
             <Input
               placeholder={tempDate}
               editable={false}
-              value={tempDate}
+              isDisabled={true}
+              value={tempDate || profile?.birth_date?.toString()}
               caretHidden
-              onPressIn={() => {
-                DateTimePickerAndroid.open({
-                  mode: 'date',
-                  value: new Date(),
-                  onChange: (event, date) => handleDate(date as Date),
-                });
-              }}
-            />
-
-            <Button
-              isLoading={showModal}
-              title="Atualizar informações"
-              mt={10}
-              onPress={handleSubmit(handleSubmitProfile)}
-            />
-            <Button
-              isLoading={showModal}
-              title="Alterar senha"
-              mt={10}
-              onPress={() => navigation.navigate('changePassword')}
             />
           </VStack>
-        </ScrollView>
-      </VStack>
+          <Button
+            mt={10}
+            isLoading={showModal}
+            title="Atualizar informações"
+            onPress={handleSubmit(handleSubmitProfile)}
+          />
+        </VStack>
+      </ScrollView>
     </VStack>
   );
 }

@@ -19,7 +19,7 @@ import {
   VStack,
   useToast,
 } from 'native-base';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Alert, TouchableOpacity } from 'react-native';
 
 type RouteParams = {
@@ -40,7 +40,9 @@ type SchedulesFiles = {
 
 export function ScheduleDetail() {
   const [schedule, setSchedule] = useState<ISchedules>();
+
   const [schedulesFiles, setSchedulesFiles] = useState<any[]>([]);
+
   const [partnerNotes, setPartnerNotes] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -54,12 +56,46 @@ export function ScheduleDetail() {
   const { profile } = useProfile();
   const toast = useToast();
 
+  const handleChangeScheduleStatus = useCallback(async (code: number) => {
+    try {
+      await api.put(
+        `/schedules/${schedule?.id}`,
+        {
+          status: code,
+        },
+        {
+          headers: {
+            id: user.id,
+          },
+        }
+      );
+      toast.show({
+        title: 'Agendamento atualizado com sucesso',
+        placement: 'top',
+        bgColor: 'green.500',
+      });
+    } catch (error) {
+      const isAppError = error instanceof AppError;
+      toast.show({
+        title: isAppError ? error.message : 'Erro ao anexar arquivos',
+        placement: 'top',
+        bgColor: 'red.500',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   async function fetchScheduleDetails() {
     setLoadedImages([]);
     const response = await api.get(`/schedules/${scheduleId}`);
 
     setSchedule(response.data);
     setSchedulesFiles(response.data.SchedulesFiles);
+
+    if (response.data.status === 1) {
+      await handleChangeScheduleStatus(2);
+    }
 
     response.data.SchedulesFiles.map((file: SchedulesFiles) =>
       setLoadedImages((oldState) => [...oldState, file])
