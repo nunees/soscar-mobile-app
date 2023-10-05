@@ -4,7 +4,6 @@ import { LoadingModal } from '@components/LoadingModal';
 import { PartnerCard } from '@components/PartnerCard';
 import { ILocation } from '@dtos/ILocation';
 import { useAuth } from '@hooks/useAuth';
-import { useGPS } from '@hooks/useGPS';
 import {
   useFocusEffect,
   useNavigation,
@@ -12,7 +11,8 @@ import {
 } from '@react-navigation/native';
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
 import { api } from '@services/api';
-import { VStack, FlatList } from 'native-base';
+import { AppError } from '@utils/AppError';
+import { VStack, FlatList, useToast } from 'native-base';
 import { useCallback, useState } from 'react';
 
 type RouteParamsProps = {
@@ -25,19 +25,30 @@ export function SearchSchedule() {
 
   const navigation = useNavigation<AppNavigatorRoutesProps>();
   const { user } = useAuth();
+  const toast = useToast();
 
   const routes = useRoute();
   const { serviceId } = routes.params as RouteParamsProps;
 
   const findLocations = useCallback(
     async (serviceId: string, user_id: string) => {
-      const response = await api.get(`/locations/services/${serviceId}`, {
-        headers: {
-          id: user_id,
-        },
-      });
+      try {
+        const response = await api.get(`/locations/services/${serviceId}`, {
+          headers: {
+            id: user_id,
+          },
+        });
 
-      setLocations(response.data);
+        setLocations(response.data);
+      } catch (error) {
+        const isAppError = error instanceof AppError;
+        const message = isAppError ? error.message : 'Erro ao buscar locais';
+        toast.show({
+          title: message,
+          placement: 'top',
+          bgColor: 'red.500',
+        });
+      }
     },
     [locations]
   );
@@ -79,11 +90,6 @@ export function SearchSchedule() {
                   })
                 }
                 location={item}
-                image={{
-                  uri:
-                    `${api.defaults.baseURL}/locations/avatar/${item.id}/${item.avatar}` ||
-                    `https://ui-avatars.com/api/?name=${item.business_name}&background=random&length=1&rounded=true&size=128`,
-                }}
                 key={item.id}
               />
             );

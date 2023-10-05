@@ -1,5 +1,6 @@
 import { AppHeader } from '@components/AppHeader';
 import { Button } from '@components/Button';
+import { LoadingModal } from '@components/LoadingModal';
 import UserPhoto from '@components/UserPhoto';
 import { ILocation } from '@dtos/ILocation';
 import { Entypo, Feather } from '@expo/vector-icons';
@@ -22,7 +23,6 @@ import {
   Image,
   Skeleton,
   Center,
-  Heading,
   Pressable,
 } from 'native-base';
 import { useEffect, useState } from 'react';
@@ -57,6 +57,8 @@ const servicesCategories = [
 
 export function LocationDetails() {
   const [location, setLocation] = useState<ILocation>({} as ILocation);
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState('');
   const [isPhotoLoading, setIsPhotoLoading] = useState(false);
 
   const routes = useRoute();
@@ -69,6 +71,8 @@ export function LocationDetails() {
 
   async function handleFetchLocationDetails() {
     try {
+      setIsLoading(true);
+      setLoadingMessage('Carregando detalhes da localização');
       const response = await api.get(`/locations/${locationId}`, {
         headers: {
           id: user.id,
@@ -82,6 +86,8 @@ export function LocationDetails() {
         placement: 'top',
         bgColor: 'red.500',
       });
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -248,6 +254,10 @@ export function LocationDetails() {
 
   useEffect(() => {
     handleFetchLocationDetails();
+
+    return () => {
+      setLocation({} as ILocation);
+    };
   }, []);
 
   return (
@@ -263,6 +273,14 @@ export function LocationDetails() {
             paddingBottom: 120,
           }}
         >
+          {isLoading && (
+            <LoadingModal
+              showModal={isLoading}
+              setShowModal={setIsLoading}
+              message={loadingMessage}
+            />
+          )}
+
           <VStack>
             <Center px={5}>
               {isPhotoLoading ? (
@@ -341,7 +359,18 @@ export function LocationDetails() {
             </HStack>
           </VStack>
 
-          <VStack p={5} mt={10} backgroundColor="white" borderRadius={10}>
+          <Button
+            title="Editar Local"
+            onPress={() =>
+              navigation.navigate('editLocation', {
+                locationId: location.id,
+              })
+            }
+            h={50}
+            mt={5}
+          />
+
+          <VStack p={5} mt={5} backgroundColor="white" borderRadius={10}>
             <VStack mb={3}>
               <Text bold>Local</Text>
             </VStack>
@@ -467,7 +496,7 @@ export function LocationDetails() {
                   ml={3}
                   color="amber.600"
                 />
-                <HStack ml={2} w={300}>
+                <HStack ml={2} w={300} flexWrap={'wrap'}>
                   {location.business_categories?.map((category) => {
                     return (
                       <VStack key={category} ml={3}>
@@ -499,7 +528,7 @@ export function LocationDetails() {
                   ml={3}
                   color="amber.600"
                 />
-                <HStack ml={2} w={300}>
+                <HStack ml={2} w={300} flexWrap={'wrap'}>
                   {location.open_hours_weekend?.map((category) => {
                     return (
                       <VStack key={category} ml={3}>
@@ -653,16 +682,10 @@ export function LocationDetails() {
               </HStack>
             </HStack>
           </VStack>
-          <Button
-            title="Editar Local"
-            onPress={() =>
-              navigation.navigate('editLocation', {
-                locationId: location.id,
-              })
-            }
-            h={50}
-            mt={100}
-          />
+
+          <VStack p={5} mt={5} backgroundColor="white" borderRadius={10}>
+            <Text bold>Avaliacoes</Text>
+          </VStack>
         </ScrollView>
       </VStack>
     </VStack>

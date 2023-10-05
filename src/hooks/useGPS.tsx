@@ -17,7 +17,11 @@ export function useGPS() {
     async function handleGPS() {
       const { granted } = await requestForegroundPermissionsAsync();
       if (granted) {
-        const currentPosition = await getCurrentPositionAsync();
+        console.log('Granted');
+        const currentPosition = await getCurrentPositionAsync({
+          accuracy: 6,
+        });
+
         setCoords(currentPosition.coords);
         profile.latitude = currentPosition.coords.latitude;
         profile.longitude = currentPosition.coords.longitude;

@@ -181,7 +181,12 @@ export default function MyAccountInformation() {
           <VStack backgroundColor="white" p={3} borderRadius={10} mt={3}>
             <Text bold>Sexo</Text>
             <Text color="gray.400">
-              {profile.genderId ? profile.genderId : 'Nao informado'}
+              {profile.genderId === 1 && 'Masculino'}
+              {profile.genderId === 2 && 'Feminino'}
+              {profile.genderId === 3 && 'Transgenero'}
+              {profile.genderId === 4 && 'Nao-binario'}
+              {profile.genderId === 5 && 'Outro'}
+              {!profile.genderId && 'Nao informado'}
             </Text>
           </VStack>
 

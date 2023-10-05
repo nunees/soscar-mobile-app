@@ -21,7 +21,7 @@
       [
         "expo-location",
         {
-          "locationAlwaysAndWhenInUsePermission": "Allow SoS Auto to use your location."
+          "locationAlwaysAndWhenInUsePermission": "Allow SOS Auto to use your location."
         }
       ]
     ],

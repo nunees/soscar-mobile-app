@@ -1,4 +1,4 @@
-import { Feather, FontAwesome5 } from '@expo/vector-icons';
+import { FontAwesome5 } from '@expo/vector-icons';
 import {
   createBottomTabNavigator,
   BottomTabNavigationProp,
@@ -9,7 +9,6 @@ import { AddLocation } from '@screens/partners/locations/AddLocation';
 import { EditLocation } from '@screens/partners/locations/EditLocation';
 import { LocationDetails } from '@screens/partners/locations/LocationDetails';
 import { Locations } from '@screens/partners/locations/Locations';
-import { Messaging } from '@screens/partners/Messaging';
 import { Orders } from '@screens/partners/Orders';
 import { ChangePassword } from '@screens/partners/profile/ChangePassword';
 import EditProfileInformation from '@screens/partners/profile/EditProfileInformation';

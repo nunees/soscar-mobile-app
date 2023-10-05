@@ -375,7 +375,16 @@ export default function EditProfileInformation() {
               placeholder={tempDate}
               editable={false}
               isDisabled={true}
-              value={tempDate || profile?.birth_date?.toString()}
+              value={
+                tempDate || profile?.birth_date
+                  ? profile.birth_date
+                      .toString()
+                      .split('T')[0]
+                      .split('-')
+                      .reverse()
+                      .join('/') || 'Nao informado'
+                  : 'Nao informado'
+              }
               caretHidden
             />
           </VStack>

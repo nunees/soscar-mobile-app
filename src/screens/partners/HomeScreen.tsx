@@ -1,6 +1,4 @@
 import UserPhoto from '@components/UserPhoto';
-import { ILocation } from '@dtos/ILocation';
-import { ILocationScheduleDTO } from '@dtos/ILocationSchedule.DTO';
 import { ISchedules } from '@dtos/ISchedules';
 import { Feather } from '@expo/vector-icons';
 import { useAuth } from '@hooks/useAuth';
@@ -50,22 +48,17 @@ export function HomeScreen() {
   const [schedules, setSchedules] = useState<ISchedules[]>({} as ISchedules[]);
 
   const { user } = useAuth();
+  const { profile, updateProfile } = useProfile();
 
   const toast = useToast();
 
-  const navigation = useNavigation<PartnerNavigatorRoutesProps>();
-
-  const fetchSchedules = useCallback(async () => {
+  async function fetchSchedules() {
     try {
       const response = await api.get('/schedules/partner', {
         headers: {
           id: user.id,
         },
       });
-
-      if (!response.data) {
-        setSchedules({} as ISchedules[]);
-      }
 
       setSchedules(response.data);
     } catch (error) {
@@ -77,14 +70,34 @@ export function HomeScreen() {
         });
       }
     }
+  }
+
+  const fetchUserData = useCallback(async (user_id: string) => {
+    const response = await api.get(`/user/profile/${user_id}`, {
+      headers: {
+        id: user_id,
+      },
+    });
+    return response;
   }, []);
 
-  useEffect(() => {
-    fetchSchedules();
-    return () => {
-      setSchedules({} as ISchedules[]);
-    };
-  }, []);
+  const navigation = useNavigation<PartnerNavigatorRoutesProps>();
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchUserData(user.id).then((response) => {
+        updateProfile({
+          birth_date: response.data.birth_date,
+          cpf: response.data.cpf,
+          genderId: response.data.genderId,
+          last_name: response.data.last_name,
+          name: response.data.name,
+          phone: response.data.mobile_phone,
+        });
+      });
+      fetchSchedules();
+    }, [])
+  );
 
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
@@ -97,9 +110,17 @@ export function HomeScreen() {
           <VStack justifyContent={'space-between'} px={3}>
             <HStack justifyItems={'baseline'} mb={2}>
               <HStack ml={2} pt={5}>
-                <Text bold color="white" fontSize={20}>
-                  Ola, {user.name}
-                </Text>
+                <VStack>
+                  <Text bold color="white" fontSize={20}>
+                    Ola, {user.name}
+                  </Text>
+                  <Text color="white">
+                    {profile.genderId === 1 && 'Bem vindo'}
+                    {profile.genderId === 2 && 'Bem vinda'}
+                    {profile.genderId === 3 && 'Bem vindx'}
+                    {profile.genderId === 4 && 'Bem vindes'}
+                  </Text>
+                </VStack>
               </HStack>
             </HStack>
           </VStack>
@@ -112,7 +133,7 @@ export function HomeScreen() {
                   : `https://ui-avatars.com/api/?format=png&name=${user.name}W&size=512`,
               }}
               alt="Foto de perfil"
-              size={8}
+              size={10}
             />
           </VStack>
         </HStack>
@@ -146,7 +167,8 @@ export function HomeScreen() {
             Agendamentos pendentes
           </Text>
 
-          {schedules.length > 0 &&
+          {schedules &&
+            schedules.length > 0 &&
             schedules?.map(
               (schedule: ISchedules) =>
                 schedule.status === 1 && (
@@ -196,7 +218,8 @@ export function HomeScreen() {
                   </Pressable>
                 )
             )}
-          {schedules.length && (
+
+          {!schedules.length && (
             <Center>
               <Text color="gray.300">Nenhum agendamento pendente</Text>
             </Center>

@@ -8,7 +8,9 @@ import {
   Nunito_700Bold,
 } from '@expo-google-fonts/nunito';
 import { Routes } from '@routes/index';
+import * as Location from 'expo-location';
 import { NativeBaseProvider } from 'native-base';
+import { useEffect } from 'react';
 import { StatusBar } from 'react-native';
 
 import { THEME } from './src/theme';

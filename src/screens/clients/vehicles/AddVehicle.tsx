@@ -97,6 +97,10 @@ export function AddVehicle() {
     try {
       setShowModal(true);
 
+      if (year.length < 4 || year.length > 4) {
+        throw new AppError('Ano inválido');
+      }
+
       await api.post(
         '/vehicles',
         {
@@ -104,7 +108,7 @@ export function AddVehicle() {
           name_id: Number(model),
           color,
           year: Number(year),
-          plate,
+          plate: plate.toUpperCase() || '',
           notes,
           insurance_id: Number(insuranceId) || 12,
           isPrimary: isMainVehicle,
@@ -255,6 +259,14 @@ export function AddVehicle() {
                 placeholder="Observações"
                 value={notes}
                 onChangeText={setNotes}
+              />
+            </VStack>
+
+            <VStack backgroundColor="white" p={5} borderRadius={10} mb={5}>
+              <Input
+                placeholder="Placa"
+                value={plate}
+                onChangeText={setPlate}
               />
             </VStack>
 

@@ -13,8 +13,9 @@ import CheckConnection from '@components/CheckConnection';
 import { ServicesSmallCard } from '@components/ServicesSmallCard';
 import UserPhoto from '@components/UserPhoto';
 import { ISchedules } from '@dtos/ISchedules';
-import { IVehicleDTO } from '@dtos/IVechicleDTO';
 import { useAuth } from '@hooks/useAuth';
+import { useGPS } from '@hooks/useGPS';
+import { useProfile } from '@hooks/useProfile';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
 import { api } from '@services/api';
@@ -22,36 +23,50 @@ import { HStack, ScrollView, VStack, Text, Heading } from 'native-base';
 import { useCallback, useState } from 'react';
 import { TouchableOpacity } from 'react-native';
 
-async function fetchUserVehicles(user_id: string) {
-  const response = await api.get('/vehicles/', {
-    headers: {
-      id: user_id,
-    },
-  });
-  return response;
-}
-
-async function fetchSchedules(user_id: string) {
-  const response = await api.get('/schedules/', {
-    headers: {
-      id: user_id,
-    },
-  });
-  return response;
-}
-
 export function HomeScreen() {
-  const [vehicles, setVehicles] = useState<IVehicleDTO[]>([]);
+  const { user } = useAuth();
+  const { profile, updateProfile } = useProfile();
+
   const [schedules, setSchedules] = useState<ISchedules[]>([]);
 
-  const { user } = useAuth();
-
   const navigation = useNavigation<AppNavigatorRoutesProps>();
+  const { coords } = useGPS();
+
+  const fetchUserData = useCallback(async (user_id: string) => {
+    const response = await api.get(`/user/profile/${user_id}`, {
+      headers: {
+        id: user_id,
+      },
+    });
+    return response;
+  }, []);
+
+  const fetchSchedules = useCallback(async (user_id: string) => {
+    const response = await api.get('/schedules/', {
+      headers: {
+        id: user_id,
+      },
+    });
+    return response;
+  }, []);
+
+  console.log(coords);
 
   useFocusEffect(
     useCallback(() => {
-      fetchUserVehicles(user.id).then((response) => setVehicles(response.data));
-      fetchSchedules(user.id).then((response) => setSchedules(response.data));
+      fetchUserData(user.id).then((response) => {
+        updateProfile({
+          birth_date: response.data.birth_date,
+          cpf: response.data.cpf,
+          genderId: response.data.genderId,
+          last_name: response.data.last_name,
+          name: response.data.name,
+          phone: response.data.mobile_phone,
+        });
+      });
+      fetchSchedules(user.id).then((response) => {
+        setSchedules(response.data);
+      });
     }, [])
   );
 
@@ -69,8 +84,11 @@ export function HomeScreen() {
             <HStack>
               <VStack>
                 <Heading color="white">Ola, {user.name}</Heading>
-                <Text fontFamily="body" fontSize="xs" color="white">
-                  Bem-vinda de novo!
+                <Text fontFamily="body" fontSize="md" color="white">
+                  {profile.genderId === 1 && 'Bem vindo'}
+                  {profile.genderId === 2 && 'Bem vinda'}
+                  {profile.genderId === 3 && 'Bem vindx'}
+                  {profile.genderId === 4 && 'Bem vindx'}
                 </Text>
               </VStack>
             </HStack>

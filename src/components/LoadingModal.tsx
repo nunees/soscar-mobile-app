@@ -22,7 +22,7 @@ export function LoadingModal({
               accessibilityLabel="Aguarde..."
               size={50}
             />
-            <Text>{message}</Text>
+            <Text fontSize={'md'}>{message}</Text>
           </VStack>
         </Modal.Body>
       </Modal.Content>

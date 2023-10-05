@@ -85,17 +85,21 @@ export function SelectBusinessCategories({
 }: Props) {
   return (
     <SelectNative
-      mb={3}
-      minWidth={'full'}
+      h={14}
+      px={4}
+      borderRadius={10}
+      fontSize="md"
+      fontFamily={'body'}
+      borderWidth={1}
+      color="gray.400"
+      _selectedItem={{
+        color: 'gray.400',
+      }}
+      placeholderTextColor="gray.400"
       accessibilityLabel={label}
       placeholder={label}
-      borderWidth={1}
-      fontSize="md"
-      color="gray.400"
-      fontFamily={'body'}
-      placeholderTextColor="gray.400"
-      {...rest}
       dropdownIcon={<Icon as={Feather} name="chevron-down" size={5} mr={5} />}
+      {...rest}
     >
       {
         // eslint-disable-next-line array-callback-return

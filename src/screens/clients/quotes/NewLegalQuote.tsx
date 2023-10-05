@@ -273,10 +273,6 @@ export function NewLegalQuote() {
     }, [])
   );
 
-  function getDistanceFromLatLonInKm(arg0: number[], arg1: number[]) {
-    throw new Error('Function not implemented.');
-  }
-
   return (
     <VStack pb={10}>
       <VStack mb={5}>
@@ -296,14 +292,8 @@ export function NewLegalQuote() {
           paddingBottom: 100,
         }}
       >
-        <VStack alignSelf="center">
-          <VStack
-            w={350}
-            backgroundColor="white"
-            borderRadius={10}
-            py={5}
-            px={5}
-          >
+        <VStack px={5} py={1}>
+          <VStack backgroundColor="white" borderRadius={10} p={5}>
             <Text fontSize="md" bold mb={2}>
               Veiculo
             </Text>
@@ -326,14 +316,8 @@ export function NewLegalQuote() {
           </VStack>
         </VStack>
 
-        <VStack alignSelf="center" mt={5}>
-          <VStack
-            w={350}
-            backgroundColor="white"
-            borderRadius={10}
-            py={5}
-            px={5}
-          >
+        <VStack px={5} py={1}>
+          <VStack backgroundColor="white" borderRadius={10} p={5}>
             <Text fontSize="md" bold>
               Seguradora
             </Text>
@@ -341,14 +325,8 @@ export function NewLegalQuote() {
           </VStack>
         </VStack>
 
-        <VStack alignSelf="center" mt={5}>
-          <VStack
-            w={350}
-            backgroundColor="white"
-            borderRadius={10}
-            py={5}
-            px={5}
-          >
+        <VStack px={5} py={1}>
+          <VStack backgroundColor="white" borderRadius={10} p={5}>
             <Text fontSize="md" bold mb={2}>
               Tipo de Servico
             </Text>
@@ -360,14 +338,8 @@ export function NewLegalQuote() {
           </VStack>
         </VStack>
 
-        <VStack alignSelf="center" mt={5}>
-          <VStack
-            w={350}
-            backgroundColor="white"
-            borderRadius={10}
-            py={5}
-            px={5}
-          >
+        <VStack px={5} py={1}>
+          <VStack backgroundColor="white" borderRadius={10} p={5}>
             <Text fontSize="md" bold mb={2}>
               Meus Dados
             </Text>
@@ -381,14 +353,8 @@ export function NewLegalQuote() {
           </VStack>
         </VStack>
 
-        <VStack alignSelf="center" mt={5}>
-          <VStack
-            w={350}
-            backgroundColor="white"
-            borderRadius={10}
-            py={5}
-            px={5}
-          >
+        <VStack px={5} py={1}>
+          <VStack backgroundColor="white" borderRadius={10} p={5}>
             <Text fontSize="md" bold mb={2}>
               Informacoes adicionais
             </Text>
@@ -403,14 +369,8 @@ export function NewLegalQuote() {
           </VStack>
         </VStack>
 
-        <VStack alignSelf="center" mt={5}>
-          <VStack
-            w={350}
-            backgroundColor="white"
-            borderRadius={10}
-            py={5}
-            px={5}
-          >
+        <VStack px={5} py={1}>
+          <VStack backgroundColor="white" borderRadius={10} p={5}>
             <HStack justifyContent="space-between">
               <Text fontSize="md" bold mb={2}>
                 Arquivos de midia
@@ -529,14 +489,8 @@ export function NewLegalQuote() {
           </VStack>
         </VStack>
 
-        <VStack alignSelf="center" mt={5}>
-          <VStack
-            w={350}
-            backgroundColor="white"
-            borderRadius={10}
-            py={5}
-            px={5}
-          >
+        <VStack px={5} py={1}>
+          <VStack backgroundColor="white" borderRadius={10} p={5}>
             <HStack justifyContent={'space-between'}>
               <Text fontSize="md" bold mb={2}>
                 Locais
@@ -616,14 +570,8 @@ export function NewLegalQuote() {
           </VStack>
         </VStack>
 
-        <VStack alignSelf="center" mt={5}>
-          <VStack
-            w={350}
-            backgroundColor="white"
-            borderRadius={10}
-            py={5}
-            px={5}
-          >
+        <VStack px={5} py={1}>
+          <VStack backgroundColor="white" borderRadius={10} p={5}>
             <Text fontSize="md" bold mb={2}>
               Confirmacao
             </Text>

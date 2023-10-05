@@ -5,7 +5,6 @@ import { useAuth } from '@hooks/useAuth';
 import { useProfile } from '@hooks/useProfile';
 import { useNavigation } from '@react-navigation/native';
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
-import { PartnerNavigatorRoutesProps } from '@routes/partner.routes';
 import { api } from '@services/api';
 import {
   ScrollView,
@@ -55,6 +54,8 @@ export default function MyAccountInformation() {
       setShowModal(true);
     }
   }, []);
+
+  console.log(profile);
 
   return (
     <VStack>

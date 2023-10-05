@@ -69,20 +69,6 @@ export function NewSchedule() {
 
   const userPhotoUploadForm = new FormData();
 
-  function getWeekDay(date: Date) {
-    const weekdays = [
-      'Segunda',
-      'Terça',
-      'Quarta',
-      'Quinta',
-      'Sexta',
-      'Sabado',
-      'Domingo',
-    ];
-    const currentWeekday = weekdays[date.getDay()];
-    return currentWeekday;
-  }
-
   async function handleUserProfilePictureSelect() {
     try {
       const media = await ImagePicker.launchImageLibraryAsync({
@@ -282,16 +268,7 @@ export function NewSchedule() {
             paddingBottom: 130,
           }}
         >
-          {location && (
-            <PartnerCard
-              image={{
-                uri:
-                  `${api.defaults.baseURL}/locations/avatar/${location.id}/${location.avatar}` ||
-                  `https://ui-avatars.com/api/?name=${location.business_name}&background=random&length=1&rounded=true&size=128`,
-              }}
-              location={location}
-            />
-          )}
+          {location && <PartnerCard location={location} />}
 
           <VStack p={5} mb={5} backgroundColor="white" borderRadius={10}>
             <VStack>

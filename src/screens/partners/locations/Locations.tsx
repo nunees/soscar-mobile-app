@@ -1,5 +1,5 @@
 import { AppHeader } from '@components/AppHeader';
-import { Loading } from '@components/Loading';
+import { LoadingModal } from '@components/LoadingModal';
 import { ILocation } from '@dtos/ILocation';
 import { Feather } from '@expo/vector-icons';
 import { useAuth } from '@hooks/useAuth';
@@ -33,6 +33,7 @@ export function Locations() {
 
   const loadData = useCallback(async () => {
     try {
+      setIsLoading(true);
       const response = await api.get('/locations', {
         headers: {
           id: user.id,
@@ -41,6 +42,8 @@ export function Locations() {
       setLocations(response.data.locations);
     } catch (error) {
       throw new AppError('Erro ao buscar locais');
+    } finally {
+      setIsLoading(false);
     }
   }, [locations]);
 
@@ -98,6 +101,10 @@ export function Locations() {
   useFocusEffect(
     useCallback(() => {
       loadData();
+
+      return () => {
+        setLocations([]);
+      };
     }, [])
   );
 
@@ -112,7 +119,13 @@ export function Locations() {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 120 }}
         >
-          {isLoading && <Loading />}
+          {isLoading && (
+            <LoadingModal
+              showModal={isLoading}
+              setShowModal={setIsLoading}
+              message="Aguarde..."
+            />
+          )}
           <VStack flex={1}>
             <VStack py={3} px={19}>
               {locations.length > 0 ? (

@@ -4,20 +4,18 @@ import ButtonSelection from '@components/ButtonSelection';
 import { Input } from '@components/Input';
 import { LoadingModal } from '@components/LoadingModal';
 import { TextArea } from '@components/TextArea';
-import { ICreateLocationDTO } from '@dtos/ICreateLocationDTO';
-import { FontAwesome5 } from '@expo/vector-icons';
 import { useAuth } from '@hooks/useAuth';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { PartnerNavigatorRoutesProps } from '@routes/partner.routes';
 import { api } from '@services/api';
 import { AppError } from '@utils/AppError';
 import { ConvertAddressToLatLong } from '@utils/CalculatePositionDistance';
 import { GetAddressByCEP } from '@utils/GetAddressByCEP';
-import { ScrollView, VStack, Text, useToast, HStack, Icon } from 'native-base';
-import { useCallback, useState } from 'react';
+import { ScrollView, VStack, Text, useToast, HStack } from 'native-base';
+import { useCallback, useEffect, useState } from 'react';
 
-const payment_methods = [
+const payment_types = [
   { id: 1, name: 'Dinheiro' },
   { id: 2, name: 'Crédito' },
   { id: 3, name: 'Débito' },
@@ -40,166 +38,59 @@ const services_types = [
   { id: 11, name: 'Outros' },
 ];
 
-type ServicesType = {
-  id: number;
-  name: string;
-};
+function handleMultipleSelection(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  changeFunction: React.Dispatch<React.SetStateAction<any[]>>,
+  state: unknown[],
+  value: unknown
+) {
+  const alreadySelected = state.includes(value);
 
-type PaymentMethodsType = {
-  id: number;
-  name: string;
-};
+  if (alreadySelected === undefined) {
+    changeFunction([value]);
+    return;
+  }
+  if (!alreadySelected) {
+    changeFunction([...state!, value]);
+    return;
+  }
+  if (alreadySelected) {
+    changeFunction(state?.filter((item) => item !== value));
+  }
+}
 
 export function AddLocation() {
   const [isUploading, setIsUploading] = useState(false);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState<string>('');
 
-  const [location, setLocation] = useState<ICreateLocationDTO>(
-    {} as ICreateLocationDTO
-  );
-  const [openHour, setOpenHour] = useState('');
-  const [closeHour, setCloseHour] = useState('');
+  const [cnpj, setCnpj] = useState<string>('');
+  const [business_name, setBusinessName] = useState<string>('');
+  const [business_phone, setBusinessPhone] = useState<string>('');
+  const [business_email, setBusinessEmail] = useState<string>('');
+  const [address_line, setAddressLine] = useState<string>('');
+  const [number, setNumber] = useState<string>('');
+  const [district, setDistrict] = useState<string>('');
+  const [city, setCity] = useState<string>('');
+  const [state, setState] = useState<string>('');
+  const [zipcode, setZipCode] = useState<string>('');
 
-  const [correctZipCode, setCorrectZipCode] = useState(false);
+  const [latitude, setLatitude] = useState<string>('');
+  const [longitude, setLongitude] = useState<string>('');
 
-  const { user } = useAuth();
+  const [payment_methods, setPaymentMethods] = useState<number[]>([]);
+  const [openHoursWeekend, setOpenHoursWeekend] = useState<string[]>([]);
+  const [business_categories, setBusinessCategories] = useState<number[]>([]);
+  const [business_description, setBusinessDescription] = useState<string>('');
+
+  const [openHour, setOpenHour] = useState<string>('');
+  const [closeHour, setCloseHour] = useState<string>('');
+
+  const [correctZipCode, setCorrectZipCode] = useState<boolean>(false);
+
   const toast = useToast();
+  const { user } = useAuth();
 
   const navigation = useNavigation<PartnerNavigatorRoutesProps>();
-
-  const setPaymentMethodsHandler = useCallback(
-    (value: number) => {
-      const alreadySelected = location.payment_methods?.includes(value);
-      if (alreadySelected === undefined) {
-        setLocation((prevState) => ({
-          ...prevState,
-          payment_methods: [value],
-        }));
-        return;
-      }
-
-      if (!alreadySelected) {
-        setLocation((prevState) => ({
-          ...prevState,
-          payment_methods: [...prevState.payment_methods!, value],
-        }));
-        return;
-      }
-
-      if (alreadySelected) {
-        setLocation((prevState) => ({
-          ...prevState,
-          payment_methods: prevState.payment_methods?.filter(
-            (item) => item !== value
-          ),
-        }));
-      }
-    },
-    [location.payment_methods]
-  );
-
-  const setServicesHandler = useCallback(
-    (value: number) => {
-      const alreadySelected = location.business_categories?.includes(value);
-      if (alreadySelected === undefined) {
-        setLocation((prevState) => ({
-          ...prevState,
-          business_categories: [value],
-        }));
-        return;
-      }
-
-      if (!alreadySelected) {
-        setLocation((prevState) => ({
-          ...prevState,
-          business_categories: [...prevState.business_categories!, value],
-        }));
-        return;
-      }
-
-      if (alreadySelected) {
-        setLocation((prevState) => ({
-          ...prevState,
-          business_categories: prevState.business_categories?.filter(
-            (item) => item !== value
-          ),
-        }));
-      }
-    },
-    [location.business_categories]
-  );
-
-  const handleCEP = useCallback(async (value: string) => {
-    try {
-      setIsUploading(true);
-      setMessage('Verificando CEP...');
-      if (value.length === 8) {
-        setCorrectZipCode(false);
-        const address = await GetAddressByCEP(value);
-        if (address.data.erro || !address.data.logradouro) {
-          throw new AppError('CEP invalido');
-        }
-        const location = await ConvertAddressToLatLong(
-          `${address.data.logradouro}, ${address.data.bairro} - ${address.data.uf}`
-        );
-        if (!location) {
-          throw new AppError('Endereço invalido');
-        }
-
-        setLocation((prevState) => ({
-          ...prevState,
-          address_line: address.data.logradouro,
-          district: address.data.bairro,
-          city: address.data.localidade,
-          state: address.data.uf,
-          zipcode: address.data.cep,
-          latitude: String(location?.latitude),
-          longitude: String(location?.longitude),
-        }));
-      }
-    } catch (error) {
-      const isAppError = error instanceof AppError;
-      const title = isAppError ? error.message : 'O CEP informado é invalido';
-      toast.show({
-        title,
-        placement: 'top',
-        bgColor: 'red.500',
-      });
-    } finally {
-      setIsUploading(false);
-    }
-  }, []);
-
-  const handleOpenDays = useCallback(
-    (value: string) => {
-      const alreadySelected = location.open_hours_weekend?.includes(value);
-      if (alreadySelected === undefined) {
-        setLocation((prevState) => ({
-          ...prevState,
-          open_hours_weekend: [value],
-        }));
-        return;
-      }
-
-      if (!alreadySelected) {
-        setLocation((prevState) => ({
-          ...prevState,
-          open_hours_weekend: [...prevState.open_hours_weekend!, value],
-        }));
-        return;
-      }
-
-      if (alreadySelected) {
-        setLocation((prevState) => ({
-          ...prevState,
-          open_hours_weekend: prevState.open_hours_weekend?.filter(
-            (item) => item !== value
-          ),
-        }));
-      }
-    },
-    [location.open_hours_weekend]
-  );
 
   const handleHour = useCallback((date: Date | undefined, state: string) => {
     if (date) {
@@ -216,31 +107,91 @@ export function AddLocation() {
     }
   }, []);
 
+  const handleCEP = useCallback(async (value: string) => {
+    if (value.length === 8) {
+      try {
+        setIsUploading(true);
+        setMessage('Procurando endereco');
+        setCorrectZipCode(false);
+        const address = await GetAddressByCEP(value);
+        if (address.data.erro || !address.data.logradouro) {
+          throw new AppError('CEP invalido');
+        }
+
+        setAddressLine(address.data.logradouro);
+        setDistrict(address.data.bairro);
+        setCity(address.data.localidade);
+        setState(address.data.uf);
+
+        const location = await ConvertAddressToLatLong(
+          `${address.data.logradouro}, ${address.data.bairro} - ${address.data.uf}`
+        );
+
+        if (!location) {
+          throw new AppError('Endereço invalido');
+        }
+
+        setLatitude(String(location.latitude));
+        setLongitude(String(location.longitude));
+      } catch (error) {
+        const isAppError = error instanceof AppError;
+        const title = isAppError ? error.message : 'O CEP informado é invalido';
+        toast.show({
+          title,
+          placement: 'top',
+          bgColor: 'red.500',
+        });
+      } finally {
+        setIsUploading(false);
+      }
+    }
+  }, []);
+
   const handleSubmitBusiness = useCallback(async () => {
     try {
       setMessage('Salvando local...');
       setIsUploading(true);
 
+      console.log({
+        cnpj,
+        business_name,
+        business_phone,
+        business_email,
+        address_line,
+        number: Number(number),
+        district,
+        city,
+        state,
+        zipcode,
+        latitude,
+        longitude,
+        payment_methods,
+        business_categories,
+        open_hours: `${openHour} - ${closeHour}`,
+        open_hours_weekend: openHoursWeekend,
+        business_description,
+      });
+
       await api.post(
         '/locations',
         {
-          cnpj: location.cnpj,
-          business_name: location.business_name,
-          business_phone: location.business_phone,
-          business_email: location.business_email,
-          address_line: location.address_line,
-          number: Number(location.number),
-          district: location.district,
-          city: location.city,
-          state: location.state,
-          zipcode: location.zipcode,
-          latitude: location.latitude,
-          longitude: location.longitude,
-          payment_methods: location.payment_methods,
-          business_categories: location.business_categories,
+          cnpj,
+          business_name,
+          business_phone,
+          business_email,
+          address_line,
+          number: Number(number),
+          district,
+          city,
+          state,
+          zipcode,
+          latitude,
+          longitude,
+          payment_methods,
+          business_categories,
           open_hours: `${openHour} - ${closeHour}`,
-          open_hours_weekend: location.open_hours_weekend,
-          business_description: location.business_description,
+          open_hours_weekend: openHoursWeekend,
+          business_description,
         },
         {
           headers: {
@@ -269,17 +220,29 @@ export function AddLocation() {
     }
   }, []);
 
-  useFocusEffect(
-    useCallback(() => {
-      setLocation({} as ICreateLocationDTO);
-      return () => {
-        setLocation({} as ICreateLocationDTO);
-        setOpenHour('');
-        setCloseHour('');
-        setOpenHour('');
-      };
-    }, [])
-  );
+  useEffect(() => {
+    return () => {
+      setCorrectZipCode(false);
+      setCnpj('');
+      setBusinessName('');
+      setBusinessPhone('');
+      setBusinessEmail('');
+      setAddressLine('');
+      setNumber('');
+      setDistrict('');
+      setCity('');
+      setState('');
+      setZipCode('');
+      setLatitude('');
+      setLongitude('');
+      setPaymentMethods([]);
+      setOpenHoursWeekend([]);
+      setBusinessCategories([]);
+      setBusinessDescription('');
+      setOpenHour('');
+      setCloseHour('');
+    };
+  }, []);
 
   return (
     <VStack flex={1}>
@@ -307,49 +270,25 @@ export function AddLocation() {
               </Text>
               <Input
                 placeholder="CNPJ ou CPF"
-                value={location.cnpj}
-                fontSize={'xs'}
+                value={cnpj}
                 keyboardType="numeric"
-                onChangeText={(value) =>
-                  setLocation((prevState) => ({
-                    ...prevState,
-                    cnpj: value,
-                  }))
-                }
+                onChangeText={setCnpj}
               />
               <Input
                 placeholder="Nome Fantasia"
-                value={location.business_name}
-                onChangeText={(value) =>
-                  setLocation((prevState) => ({
-                    ...prevState,
-                    business_name: value,
-                  }))
-                }
-                fontSize={'xs'}
+                value={business_name}
+                onChangeText={setBusinessName}
               />
               <Input
                 placeholder="Telefone"
-                value={location.business_phone}
-                onChangeText={(value) =>
-                  setLocation((prevState) => ({
-                    ...prevState,
-                    business_phone: value,
-                  }))
-                }
-                fontSize={'xs'}
+                value={business_phone}
+                onChangeText={setBusinessPhone}
                 keyboardType="numeric"
               />
               <Input
                 placeholder="Email"
-                value={location.business_email}
-                onChangeText={(value) =>
-                  setLocation((prevState) => ({
-                    ...prevState,
-                    business_email: value,
-                  }))
-                }
-                fontSize={'xs'}
+                value={business_email}
+                onChangeText={setBusinessEmail}
               />
             </VStack>
 
@@ -358,91 +297,71 @@ export function AddLocation() {
                 Localizaçao
               </Text>
 
-              <Input
-                w={200}
-                placeholder="CEP"
-                value={location.zipcode}
-                onChangeText={(value) => handleCEP(value)}
-                fontSize={'xs'}
-                keyboardType="numeric"
-                isInvalid={correctZipCode}
-                errorMessage={correctZipCode ? 'CEP invalido' : ''}
-                InputRightElement={
-                  <Icon as={FontAwesome5} name={'crosshairs'} size={5} mr={2} />
-                }
-              />
+              <VStack>
+                <HStack>
+                  <VStack mr={5}>
+                    <Input
+                      w={200}
+                      placeholder="CEP"
+                      value={zipcode}
+                      onChangeText={setZipCode}
+                      keyboardType="numeric"
+                      isInvalid={correctZipCode}
+                      errorMessage={correctZipCode ? 'CEP invalido' : ''}
+                    />
+                  </VStack>
+                  <VStack>
+                    <Button
+                      title="Procurar"
+                      w={120}
+                      onPress={() => handleCEP(zipcode)}
+                      isLoading={isUploading}
+                    />
+                  </VStack>
+                </HStack>
+              </VStack>
 
               <Input
                 placeholder="Endereço"
-                value={location.address_line}
-                onChangeText={(value) =>
-                  setLocation((prevState) => ({
-                    ...prevState,
-                    address_line: value,
-                  }))
-                }
+                value={address_line}
+                onChangeText={setAddressLine}
                 editable={false}
                 isDisabled={true}
                 caretHidden={true}
                 showSoftInputOnFocus={false}
-                fontSize={'xs'}
               />
               <Input
                 placeholder="Número"
-                onChangeText={(value) =>
-                  setLocation((prevState) => ({
-                    ...prevState,
-                    number: value,
-                  }))
-                }
-                value={location.number}
-                fontSize={'xs'}
+                onChangeText={setNumber}
+                value={number}
                 keyboardType="numeric"
               />
               <Input
                 placeholder="Bairro"
-                value={location.district}
-                onChangeText={(value) =>
-                  setLocation((prevState) => ({
-                    ...prevState,
-                    district: value,
-                  }))
-                }
+                value={district}
+                onChangeText={setDistrict}
                 editable={false}
                 isDisabled={true}
                 caretHidden={true}
                 showSoftInputOnFocus={false}
-                fontSize={'xs'}
               />
               <Input
                 placeholder="Cidade"
-                value={location.city}
-                onChangeText={(value) =>
-                  setLocation((prevState) => ({
-                    ...prevState,
-                    city: value,
-                  }))
-                }
+                value={city}
+                onChangeText={setCity}
                 editable={false}
                 isDisabled={true}
                 caretHidden={true}
                 showSoftInputOnFocus={false}
-                fontSize={'xs'}
               />
               <Input
                 placeholder="Estado"
-                value={location.state}
-                onChangeText={(value) =>
-                  setLocation((prevState) => ({
-                    ...prevState,
-                    state: value,
-                  }))
-                }
+                value={state}
+                onChangeText={setState}
                 editable={false}
                 isDisabled={true}
                 caretHidden={true}
                 showSoftInputOnFocus={false}
-                fontSize={'xs'}
               />
             </VStack>
 
@@ -451,12 +370,18 @@ export function AddLocation() {
                 Meios de pagamentos oferecidos
               </Text>
               <HStack flexWrap={'wrap'}>
-                {payment_methods.map((item: PaymentMethodsType) => (
+                {payment_types.map((item) => (
                   <ButtonSelection
                     key={item.id}
                     data={item.name}
-                    isToggled={location.payment_methods?.includes(item.id)}
-                    handleOpenDays={() => setPaymentMethodsHandler(item.id)}
+                    isToggled={payment_methods?.includes(item.id)}
+                    handleOpenDays={() =>
+                      handleMultipleSelection(
+                        setPaymentMethods,
+                        payment_methods,
+                        item.id
+                      )
+                    }
                   />
                 ))}
               </HStack>
@@ -467,12 +392,18 @@ export function AddLocation() {
                 Tipos de serviços oferecidos
               </Text>
               <HStack flexWrap={'wrap'}>
-                {services_types.map((item: ServicesType) => (
+                {services_types.map((item) => (
                   <ButtonSelection
                     key={item.id}
                     data={item.name}
-                    isToggled={location.business_categories?.includes(item.id)}
-                    handleOpenDays={() => setServicesHandler(item.id)}
+                    isToggled={business_categories?.includes(item.id)}
+                    handleOpenDays={() =>
+                      handleMultipleSelection(
+                        setBusinessCategories,
+                        business_categories,
+                        item.id
+                      )
+                    }
                   />
                 ))}
               </HStack>
@@ -485,39 +416,81 @@ export function AddLocation() {
               <HStack flexWrap={'wrap'}>
                 <ButtonSelection
                   data={'segunda'}
-                  isToggled={location.open_hours_weekend?.includes('segunda')}
-                  handleOpenDays={() => handleOpenDays('segunda')}
+                  isToggled={openHoursWeekend?.includes('segunda')}
+                  handleOpenDays={() =>
+                    handleMultipleSelection(
+                      setOpenHoursWeekend,
+                      openHoursWeekend,
+                      'segunda'
+                    )
+                  }
                 />
 
                 <ButtonSelection
                   data={'terca'}
-                  isToggled={location.open_hours_weekend?.includes('terca')}
-                  handleOpenDays={() => handleOpenDays('terca')}
+                  isToggled={openHoursWeekend?.includes('terca')}
+                  handleOpenDays={() =>
+                    handleMultipleSelection(
+                      setOpenHoursWeekend,
+                      openHoursWeekend,
+                      'terca'
+                    )
+                  }
                 />
                 <ButtonSelection
                   data={'quarta'}
-                  isToggled={location.open_hours_weekend?.includes('quarta')}
-                  handleOpenDays={() => handleOpenDays('quarta')}
+                  isToggled={openHoursWeekend?.includes('quarta')}
+                  handleOpenDays={() =>
+                    handleMultipleSelection(
+                      setOpenHoursWeekend,
+                      openHoursWeekend,
+                      'quarta'
+                    )
+                  }
                 />
                 <ButtonSelection
                   data={'quinta'}
-                  isToggled={location.open_hours_weekend?.includes('quinta')}
-                  handleOpenDays={() => handleOpenDays('quinta')}
+                  isToggled={openHoursWeekend?.includes('quinta')}
+                  handleOpenDays={() =>
+                    handleMultipleSelection(
+                      setOpenHoursWeekend,
+                      openHoursWeekend,
+                      'quinta'
+                    )
+                  }
                 />
                 <ButtonSelection
                   data={'sexta'}
-                  isToggled={location.open_hours_weekend?.includes('sexta')}
-                  handleOpenDays={() => handleOpenDays('sexta')}
+                  isToggled={openHoursWeekend?.includes('sexta')}
+                  handleOpenDays={() =>
+                    handleMultipleSelection(
+                      setOpenHoursWeekend,
+                      openHoursWeekend,
+                      'sexta'
+                    )
+                  }
                 />
                 <ButtonSelection
                   data={'sabado'}
-                  isToggled={location.open_hours_weekend?.includes('sabado')}
-                  handleOpenDays={() => handleOpenDays('sabado')}
+                  isToggled={openHoursWeekend?.includes('sabado')}
+                  handleOpenDays={() =>
+                    handleMultipleSelection(
+                      setOpenHoursWeekend,
+                      openHoursWeekend,
+                      'sabado'
+                    )
+                  }
                 />
                 <ButtonSelection
                   data={'domingo'}
-                  isToggled={location.open_hours_weekend?.includes('domingo')}
-                  handleOpenDays={() => handleOpenDays('domingo')}
+                  isToggled={openHoursWeekend?.includes('domingo')}
+                  handleOpenDays={() =>
+                    handleMultipleSelection(
+                      setOpenHoursWeekend,
+                      openHoursWeekend,
+                      'domingo'
+                    )
+                  }
                 />
               </HStack>
             </VStack>
@@ -531,10 +504,8 @@ export function AddLocation() {
                   <Input
                     placeholder={'Abre'}
                     editable={false}
-                    h={10}
                     value={openHour}
                     caretHidden
-                    fontSize={'xs'}
                     textAlign="center"
                     onPressIn={() => {
                       DateTimePickerAndroid.open({
@@ -553,8 +524,6 @@ export function AddLocation() {
                   <Input
                     placeholder={'Fecha'}
                     editable={false}
-                    h={10}
-                    fontSize={'xs'}
                     value={closeHour}
                     caretHidden
                     textAlign="center"
@@ -578,14 +547,9 @@ export function AddLocation() {
               <TextArea
                 placeholder="Ele pode ser o diferencial para o cliente escolher o seu estabelecimento."
                 h={150}
-                value={location.business_description}
-                onChangeText={(value) =>
-                  setLocation((prevState) => ({
-                    ...prevState,
-                    business_description: value,
-                  }))
-                }
-                fontSize="sm"
+                value={business_description}
+                onChangeText={setBusinessDescription}
+                fontSize="md"
                 borderRadius={5}
               />
             </VStack>

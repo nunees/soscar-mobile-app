@@ -12,7 +12,7 @@ export function Select({ label, data, ...rest }: Props) {
     <SelectNative
       h={14}
       px={4}
-      borderRadius={8}
+      borderRadius={10}
       fontSize="md"
       fontFamily={'body'}
       borderWidth={1}

@@ -5,8 +5,9 @@ import {
   IImageProps,
   HStack,
   IPressableProps,
+  Pressable,
 } from 'native-base';
-import { ImageSourcePropType, Pressable } from 'react-native';
+import { ImageSourcePropType } from 'react-native';
 
 type Props = IImageProps &
   IPressableProps & {
@@ -18,8 +19,8 @@ type Props = IImageProps &
 
 export function ListServices({ image, alt, title, content, ...rest }: Props) {
   return (
-    <Pressable {...rest}>
-      <HStack w={390} mb={2} backgroundColor="white" p={5} borderRadius={10}>
+    <Pressable {...rest} px={1}>
+      <HStack w={400} mb={2} backgroundColor="white" p={5} borderRadius={10}>
         <Image source={image} alt={alt} w={20} h={20} {...rest} />
         <VStack pl={3} w={280}>
           <Text bold fontSize="md">

@@ -4,6 +4,7 @@ import { LoadingModal } from '@components/LoadingModal';
 import { Select } from '@components/Select';
 import { SelectBusinessCategories } from '@components/SelectBusinessCategories';
 import { TextArea } from '@components/TextArea';
+import UserPhoto from '@components/UserPhoto';
 import { ILocation } from '@dtos/ILocation';
 import { IVehicleDTO } from '@dtos/IVechicleDTO';
 import { useAuth } from '@hooks/useAuth';
@@ -280,30 +281,41 @@ export function NewQuote() {
           paddingBottom: 100,
         }}
       >
-        <VStack alignSelf="center" mb={3}>
-          <VStack w={350} backgroundColor="white" borderRadius={10} py={5}>
-            <Center>
-              <Text bold fontSize="md" textTransform="uppercase">
-                {location?.business_name}
-              </Text>
-              <Text fontSize="xs">{location?.address_line}</Text>
-              <Text fontSize="xs">
-                {location?.city} - {location?.state}
-              </Text>
+        <VStack px={5} mb={3}>
+          <HStack backgroundColor="white" borderRadius={10} py={5} px={5}>
+            <HStack mr={10}>
+              <UserPhoto
+                source={{
+                  uri: location?.avatar
+                    ? `${api.defaults.baseURL}/locations/avatar/${location?.id}/${location?.avatar}`
+                    : `https://ui-avatars.com/api/?format=png&name=${location?.business_name}`,
+                }}
+                alt="Foto de perfil"
+                size={90}
+                borderRadius={100}
+              />
+            </HStack>
 
-              <Text fontSize="xs">{location?.business_phone}</Text>
-            </Center>
-          </VStack>
+            <HStack>
+              <VStack>
+                <Text bold fontSize="md" textTransform="uppercase">
+                  {location?.business_name}
+                </Text>
+                <Center>
+                  <Text fontSize="xs">{location?.address_line}</Text>
+                  <Text fontSize="xs">
+                    {location?.city} - {location?.state}
+                  </Text>
+
+                  <Text fontSize="xs">{location?.business_phone}</Text>
+                </Center>
+              </VStack>
+            </HStack>
+          </HStack>
         </VStack>
 
-        <VStack alignSelf="center">
-          <VStack
-            w={350}
-            backgroundColor="white"
-            borderRadius={10}
-            py={5}
-            px={5}
-          >
+        <VStack px={5} py={1}>
+          <VStack backgroundColor="white" borderRadius={10} p={5}>
             <Text fontSize="md" bold mb={2}>
               Veiculo
             </Text>
@@ -326,14 +338,8 @@ export function NewQuote() {
           </VStack>
         </VStack>
 
-        <VStack alignSelf="center" mt={5}>
-          <VStack
-            w={350}
-            backgroundColor="white"
-            borderRadius={10}
-            py={5}
-            px={5}
-          >
+        <VStack px={5} py={1}>
+          <VStack backgroundColor="white" borderRadius={10} p={5}>
             <Text fontSize="md" bold>
               Seguradora
             </Text>
@@ -341,14 +347,8 @@ export function NewQuote() {
           </VStack>
         </VStack>
 
-        <VStack alignSelf="center" mt={5}>
-          <VStack
-            w={350}
-            backgroundColor="white"
-            borderRadius={10}
-            py={5}
-            px={5}
-          >
+        <VStack px={5} py={1}>
+          <VStack backgroundColor="white" borderRadius={10} p={5}>
             <Text fontSize="md" bold mb={2}>
               Tipo de Servico
             </Text>
@@ -360,14 +360,8 @@ export function NewQuote() {
           </VStack>
         </VStack>
 
-        <VStack alignSelf="center" mt={5}>
-          <VStack
-            w={350}
-            backgroundColor="white"
-            borderRadius={10}
-            py={5}
-            px={5}
-          >
+        <VStack px={5} py={1}>
+          <VStack backgroundColor="white" borderRadius={10} p={5}>
             <Text fontSize="md" bold mb={2}>
               Meus Dados
             </Text>
@@ -381,14 +375,8 @@ export function NewQuote() {
           </VStack>
         </VStack>
 
-        <VStack alignSelf="center" mt={5}>
-          <VStack
-            w={350}
-            backgroundColor="white"
-            borderRadius={10}
-            py={5}
-            px={5}
-          >
+        <VStack px={5} py={1}>
+          <VStack backgroundColor="white" borderRadius={10} p={5}>
             <Text fontSize="md" bold mb={2}>
               Informacoes adicionais
             </Text>
@@ -396,21 +384,15 @@ export function NewQuote() {
               h={150}
               placeholder="Insira informacoes que possam ajudar o profissional a entender
               melhor o seu problema e te ajudar da melhor forma possivel"
-              fontSize="xs"
+              fontSize="md"
               textAlign="justify"
               onChangeText={setUserNotes}
             />
           </VStack>
         </VStack>
 
-        <VStack alignSelf="center" mt={5}>
-          <VStack
-            w={350}
-            backgroundColor="white"
-            borderRadius={10}
-            py={5}
-            px={5}
-          >
+        <VStack px={5} py={1}>
+          <VStack backgroundColor="white" borderRadius={10} p={5}>
             <HStack justifyContent="space-between">
               <Text fontSize="md" bold mb={2}>
                 Arquivos de midia
@@ -529,14 +511,8 @@ export function NewQuote() {
           </VStack>
         </VStack>
 
-        <VStack alignSelf="center" mt={5}>
-          <VStack
-            w={350}
-            backgroundColor="white"
-            borderRadius={10}
-            py={5}
-            px={5}
-          >
+        <VStack px={5} py={1}>
+          <VStack backgroundColor="white" borderRadius={10} p={5}>
             <Text fontSize="md" bold mb={2}>
               Confirmacao
             </Text>

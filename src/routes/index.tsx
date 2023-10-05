@@ -5,7 +5,6 @@ import { AppRoutes } from '@routes/app.routes';
 import { AuthRoutes } from '@routes/auth.routes';
 import { PartnerRoutes } from '@routes/partner.routes';
 import { Box, useTheme } from 'native-base';
-import { LogBox } from 'react-native';
 
 export function Routes() {
   const theme = DefaultTheme;
@@ -19,8 +18,6 @@ export function Routes() {
   if (isLoadingUserStorageData) {
     return <Loading />;
   }
-
-  LogBox.ignoreLogs(['Warning: ...']); // Ignore log notification by message
 
   return (
     <Box flex={1} bg="white">

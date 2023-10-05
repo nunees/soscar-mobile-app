@@ -1,17 +1,23 @@
 import { AppHeader } from '@components/AppHeader';
 import { Button } from '@components/Button';
+import getLogoImage from '@components/LogosImages';
+import { StatusIcon } from '@components/StatusIcon';
 import { TextArea } from '@components/TextArea';
 import { ISchedules } from '@dtos/ISchedules';
 import { Feather } from '@expo/vector-icons';
 import { useAuth } from '@hooks/useAuth';
-import { useProfile } from '@hooks/useProfile';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useMapsLinking } from '@hooks/useMapsLinking';
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import { PartnerNavigatorRoutesProps } from '@routes/partner.routes';
 import { api } from '@services/api';
 import { AppError } from '@utils/AppError';
 import {
-  Center,
   HStack,
+  Heading,
   Icon,
   Image,
   ScrollView,
@@ -19,8 +25,9 @@ import {
   VStack,
   useToast,
 } from 'native-base';
+import { useFocus } from 'native-base/lib/typescript/components/primitives';
 import { useCallback, useEffect, useState } from 'react';
-import { Alert, TouchableOpacity } from 'react-native';
+import { Alert, Linking, TouchableOpacity } from 'react-native';
 
 type RouteParams = {
   scheduleId: string;
@@ -32,78 +39,54 @@ type SchedulesFiles = {
 };
 
 /**
+
  * 1 - Agendado
- * 2 - Em andamento
- * 3 - Finalizado
- * 4 - Cancelado
+ * 2 - Aguardando confirmacao
+ * 3 - Em analise
+ * 4 - Realizado
  */
 
 export function ScheduleDetail() {
-  const [schedule, setSchedule] = useState<ISchedules>();
-
-  const [schedulesFiles, setSchedulesFiles] = useState<any[]>([]);
-
-  const [partnerNotes, setPartnerNotes] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  const [schedule, setSchedule] = useState<ISchedules>();
   const [loadedImages, setLoadedImages] = useState<any[]>([]);
+  const [carLogo, setCarLogo] = useState<string>('');
+
+  const [observation, setObservation] = useState<string>('');
 
   const routes = useRoute();
-  const navigation = useNavigation<PartnerNavigatorRoutesProps>();
+  const toast = useToast();
   const { scheduleId } = routes.params as RouteParams;
 
   const { user } = useAuth();
-  const { profile } = useProfile();
-  const toast = useToast();
+  const { deviceMapNavigation } = useMapsLinking();
 
-  const handleChangeScheduleStatus = useCallback(async (code: number) => {
+  const navigation = useNavigation<PartnerNavigatorRoutesProps>();
+
+  const fetchScheduleDetails = useCallback(async () => {
     try {
-      await api.put(
-        `/schedules/${schedule?.id}`,
-        {
-          status: code,
+      const response = await api.get(`/schedules/find/${scheduleId}`, {
+        headers: {
+          id: user.id,
         },
-        {
-          headers: {
-            id: user.id,
-          },
-        }
+      });
+
+      console.log(response.data);
+
+      setSchedule(response.data);
+
+      setCarLogo(response.data.vehicles.brand.icon);
+      setSchedule(response.data);
+      response.data.SchedulesFiles.map((file: SchedulesFiles) =>
+        setLoadedImages((oldState) => [...oldState, file])
       );
-      toast.show({
-        title: 'Agendamento atualizado com sucesso',
-        placement: 'top',
-        bgColor: 'green.500',
-      });
     } catch (error) {
-      const isAppError = error instanceof AppError;
-      toast.show({
-        title: isAppError ? error.message : 'Erro ao anexar arquivos',
-        placement: 'top',
-        bgColor: 'red.500',
-      });
-    } finally {
-      setIsLoading(false);
+      console.log(error);
     }
   }, []);
 
-  async function fetchScheduleDetails() {
-    setLoadedImages([]);
-    const response = await api.get(`/schedules/${scheduleId}`);
-
-    setSchedule(response.data);
-    setSchedulesFiles(response.data.SchedulesFiles);
-
-    if (response.data.status === 1) {
-      await handleChangeScheduleStatus(2);
-    }
-
-    response.data.SchedulesFiles.map((file: SchedulesFiles) =>
-      setLoadedImages((oldState) => [...oldState, file])
-    );
-  }
-
   async function handleCancelSchedule() {
-    setIsLoading(true);
     Alert.alert(
       'Deseja realmente cancelar o agendamento?',
       'Essa acao nao pode ser desfeita',
@@ -115,51 +98,52 @@ export function ScheduleDetail() {
         {
           text: 'Confirmar',
           onPress: async () => {
-            try {
-              setIsLoading(true);
-              await api.put(
-                `/schedules/${schedule?.id}`,
-                {
-                  status: 4,
-                  partner_notes: partnerNotes,
+            await api.put(
+              `/schedules/${schedule?.id}`,
+              {
+                status: 4,
+              },
+              {
+                headers: {
+                  id: user.id,
                 },
-                {
-                  headers: {
-                    id: user.id,
-                  },
-                }
-              );
-              toast.show({
-                title: 'Agendamento cancelado',
-                placement: 'top',
-                bgColor: 'green.500',
-              });
-              setIsLoading(false);
-              navigation.navigate('home');
-            } catch (error) {
-              setIsLoading(false);
-              const isAppError = error instanceof AppError;
-              toast.show({
-                title: isAppError ? error.message : 'Erro ao anexar arquivos',
-                placement: 'top',
-                bgColor: 'red.500',
-              });
-            }
+              }
+            );
+            fetchScheduleDetails();
           },
         },
       ]
     );
-    setIsLoading(false);
   }
 
-  async function handleApproveSchedule() {
+  const handleChangeStatus = useCallback(async () => {
+    try {
+      if (schedule?.status === 1 || schedule?.status === 2) {
+        await api.put(
+          `/schedules/${scheduleId}`,
+          {
+            status: 2,
+          },
+          {
+            headers: {
+              id: user.id,
+            },
+          }
+        );
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
+
+  const handleSubmit = useCallback(async () => {
     try {
       setIsLoading(true);
       await api.put(
-        `/schedules/${schedule?.id}`,
+        `/schedules/${scheduleId}`,
         {
-          status: 2,
-          partner_notes: partnerNotes,
+          status: 3,
+          observation: observation ?? 'Nenhuma observação',
         },
         {
           headers: {
@@ -167,232 +151,298 @@ export function ScheduleDetail() {
           },
         }
       );
-      toast.show({
-        title: 'Agendamento aprovado com sucesso',
-        placement: 'top',
-        bgColor: 'green.500',
-      });
-      setIsLoading(false);
-      navigation.navigate('home');
+      navigation.navigate('orders');
     } catch (error) {
       const isAppError = error instanceof AppError;
+      const message = isAppError ? error.message : 'Ocorreu um erro ao enviar';
       toast.show({
-        title: isAppError ? error.message : 'Erro ao anexar arquivos',
+        title: message,
         placement: 'top',
         bgColor: 'red.500',
       });
     } finally {
       setIsLoading(false);
     }
-  }
-
-  useEffect(() => {
-    fetchScheduleDetails();
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchScheduleDetails();
+      return () => {
+        setSchedule({} as ISchedules);
+        setLoadedImages([]);
+        setCarLogo('');
+      };
+    }, [])
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      async function handleStatus() {
+        if (schedule?.status === 1 || schedule?.status === 2) {
+          await api.put(
+            `/schedules/${scheduleId}`,
+            {
+              status: 2,
+            },
+            {
+              headers: {
+                id: user.id,
+              },
+            }
+          );
+        }
+      }
+
+      handleStatus();
+    }, [])
+  );
 
   return (
     <VStack flex={1}>
-      <HStack>
+      <VStack>
         <AppHeader title="Detalhes do agendamento" />
-      </HStack>
+      </VStack>
 
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 120 }}
       >
-        <VStack flex={1} px={5} py={5}>
-          <HStack justifyContent="space-between">
-            <VStack>
-              <Text fontSize="md" bold>
-                Informacoes do cliente
+        <VStack px={5} py={5}>
+          {schedule?.status === 4 && (
+            <VStack
+              mb={10}
+              px={5}
+              backgroundColor="white"
+              borderRadius={10}
+              p={5}
+              alignItems="center"
+            >
+              <Heading bold color="red.500">
+                Agendamento cancelado!
+              </Heading>
+              <Text color="gray.400" px={5} textAlign="center">
+                O agendamento foi cancelado e por isso não pode ser alterado.
               </Text>
             </VStack>
-            <VStack>
-              <TouchableOpacity onPress={() => fetchScheduleDetails()}>
-                <Icon
-                  as={Feather}
-                  name="message-square"
-                  size={8}
-                  color="purple.500"
-                />
-              </TouchableOpacity>
+          )}
+
+          <VStack mt={5} backgroundColor="white" p={5} borderRadius={10}>
+            <Text bold pb={3}>
+              {' '}
+              Status
+            </Text>
+            <StatusIcon
+              status={Number(schedule?.status)}
+              accepted={schedule?.status === 3}
+            />
+            <VStack alignItems="center">
+              {schedule?.status === 4 && (
+                <VStack alignItems="center">
+                  <Text>Cancelado</Text>
+                  <Text fontSize={'xs'} color="gray.400">
+                    Seu agendamento foi cancelado
+                  </Text>
+                </VStack>
+              )}
+              {schedule?.status === 1 && (
+                <VStack alignItems="center">
+                  <Text>Aguardando confirmacao</Text>
+                  <Text fontSize={'xs'} color="gray.400">
+                    Seu agendamento esta pendente de confirmacao
+                  </Text>
+                </VStack>
+              )}
+              {schedule?.status === 2 && (
+                <VStack alignItems="center">
+                  <Text>Em processo de analise</Text>
+                  <Text fontSize={'xs'} color="gray.400">
+                    Seu agendamento esta em processo de analise e o prestador de
+                    servico entrara em contato.
+                  </Text>
+                </VStack>
+              )}
+              {schedule?.status === 3 && (
+                <VStack alignItems="center">
+                  <Text>Finalizado</Text>
+                  <Text fontSize={'xs'} color="gray.400">
+                    Seu agendamento foi confirmado, aguarde o prestador de
+                    servico entrar em contato.
+                  </Text>
+                </VStack>
+              )}
             </VStack>
-          </HStack>
-
-          <VStack mt={5}>
-            <HStack>
-              <VStack>
-                <Icon as={Feather} name="disc" size={8} color="purple.500" />
-              </VStack>
-              <VStack ml={3}>
-                <Text bold>{schedule?.vehicles?.brand.name}</Text>
-                <Text>{schedule?.vehicles?.name.name}</Text>
-              </VStack>
-            </HStack>
           </VStack>
 
           <VStack mt={5}>
-            <HStack>
-              <VStack>
-                <Icon
-                  as={Feather}
-                  name="life-buoy"
-                  size={8}
-                  color="purple.500"
-                />
-              </VStack>
-              <VStack ml={3}>
-                <Text>{schedule?.vehicles?.InsuranceCompanies.name}</Text>
-              </VStack>
-            </HStack>
+            <Text fontSize="md" bold>
+              Meus Dados
+            </Text>
           </VStack>
-          <VStack mt={5}>
-            <HStack>
+
+          <VStack mt={5} backgroundColor="white" p={5} borderRadius={10}>
+            <HStack
+              justifyContent="space-between"
+              backgroundColor="white"
+              borderRadius={10}
+            >
               <VStack>
-                <Icon as={Feather} name="user" size={8} color="purple.500" />
+                <Text bold>Veiculo</Text>
+                <Text bold fontSize={'lg'}>
+                  {schedule?.vehicles?.brand.name}
+                </Text>
+                <HStack>
+                  <Text fontSize={'md'}>{schedule?.vehicles?.name.name}</Text>
+                  <Text> / </Text>
+                  <Text fontSize={'md'}>{schedule?.vehicles?.year}</Text>
+                </HStack>
+                <Text fontSize={'xs'}>{schedule?.vehicles?.plate}</Text>
               </VStack>
-              <VStack ml={3}>
-                <Text
-                  bold
-                >{`${schedule?.users?.name} ${schedule?.users?.last_name}`}</Text>
-                <Text>{schedule?.users?.email}</Text>
-              </VStack>
-            </HStack>
-          </VStack>
-          <VStack mt={5}>
-            <HStack>
               <VStack>
-                <Icon as={Feather} name="map-pin" size={8} color="purple.500" />
-              </VStack>
-              <VStack ml={3}>
-                <Text bold>
-                  {schedule?.users?.UsersAddresses?.address_line}
-                </Text>
-                <Text>
-                  {profile.latitude},{profile.longitude}
-                </Text>
-              </VStack>
-            </HStack>
-          </VStack>
-          <VStack mt={5}>
-            <HStack>
-              <VStack>
-                <Icon as={Feather} name="info" size={8} color="purple.500" />
-              </VStack>
-              <VStack ml={3} w={250}>
-                <Text>
-                  {schedule?.notes ? schedule?.notes : 'Sem observações'}
-                </Text>
-              </VStack>
-            </HStack>
-          </VStack>
-          <VStack mt={5}>
-            <HStack>
-              <VStack>
-                <Icon
-                  as={Feather}
-                  name="calendar"
-                  size={8}
-                  color="purple.500"
-                />
-              </VStack>
-              <VStack ml={3}>
-                <Text>
-                  {schedule?.date
-                    .toString()
-                    .split('T')[0]
-                    .split('-')
-                    .reverse()
-                    .toLocaleString()
-                    .replace(/,/g, '/')}
-                </Text>
+                {schedule?.vehicles?.brand.icon && (
+                  <Image
+                    source={getLogoImage(schedule?.vehicles?.brand.icon)}
+                    alt={'Carro'}
+                    size={100}
+                  />
+                )}
               </VStack>
             </HStack>
           </VStack>
 
-          <VStack mt={5}>
-            <HStack>
-              <VStack>
-                <Icon as={Feather} name="clock" size={8} color="purple.500" />
-              </VStack>
-              <VStack ml={3}>
-                <Text>{schedule?.time}</Text>
-              </VStack>
-            </HStack>
+          <VStack mt={5} backgroundColor="white" p={5} borderRadius={10}>
+            <Text bold>Seguradora</Text>
+            <VStack>
+              <Text>{schedule?.vehicles?.InsuranceCompanies.name}</Text>
+            </VStack>
           </VStack>
 
-          <VStack mt={5}>
-            <HStack>
-              <VStack>
-                <Icon as={Feather} name="tool" size={8} color="purple.500" />
-              </VStack>
-              <VStack ml={3}>
-                <Text>{schedule?.service_type?.name}</Text>
-              </VStack>
-            </HStack>
+          <VStack mt={5} backgroundColor="white" p={5} borderRadius={10}>
+            <VStack>
+              <Text bold>Usuario</Text>
+              <Text>
+                {user.name}#{user.username}
+              </Text>
+            </VStack>
+          </VStack>
+
+          <VStack mt={5} backgroundColor="white" p={5} borderRadius={10}>
+            <Text bold>Informacoes do usuario</Text>
+            <Text>{schedule?.notes ? schedule?.notes : 'Sem observações'}</Text>
           </VStack>
         </VStack>
 
         <VStack flex={1} px={5}>
           <Text bold>Dados do prestador</Text>
 
-          <VStack mt={5}>
-            <HStack>
+          <VStack mt={5} backgroundColor="white" p={5} borderRadius={10}>
+            <Text bold>Local de servico</Text>
+            <Text>{schedule?.location?.business_name}</Text>
+          </VStack>
+
+          <VStack mt={5} backgroundColor="white" p={5} borderRadius={10}>
+            <Text bold>Endereco</Text>
+            <Text>
+              {schedule?.location?.address_line}, {schedule?.location?.number} -{' '}
+              {schedule?.location?.district} / {schedule?.location?.state}
+            </Text>
+
+            <TouchableOpacity
+              onPress={() =>
+                schedule?.location &&
+                Linking.openURL(
+                  deviceMapNavigation(
+                    schedule.location.latitude,
+                    schedule.location.longitude,
+                    schedule.location.business_name
+                  )
+                )
+              }
+            >
+              <Text color="purple.500" bold>
+                Ver no mapa
+              </Text>
+            </TouchableOpacity>
+          </VStack>
+
+          <VStack mt={5} backgroundColor="white" p={5} borderRadius={10}>
+            <Text bold>Data</Text>
+            <Text>
+              {schedule?.date
+                ?.toString()
+                .split('T')[0]
+                .split('-')
+                .reverse()
+                .toLocaleString()
+                .replace(/,/g, '/')}
+            </Text>
+          </VStack>
+
+          <VStack mt={5} backgroundColor="white" p={5} borderRadius={10}>
+            <Text bold>Horario</Text>
+            <Text>{schedule?.time}</Text>
+          </VStack>
+
+          <VStack mt={5} backgroundColor="white" p={5} borderRadius={10}>
+            <Text bold>Servico</Text>
+            <Text>{schedule?.service_type?.name}</Text>
+          </VStack>
+
+          <VStack mt={5} backgroundColor="white" p={5} borderRadius={10}>
+            <Text bold>Imagens e Videos</Text>
+            <HStack pt={2}>
               <VStack>
-                <Icon as={Feather} name="image" size={8} color="purple.500" />
-              </VStack>
-              <VStack ml={3}>
-                <Text>Midia</Text>
-                <VStack>
-                  {loadedImages.map((image) => (
-                    <Image
-                      key={image.id}
-                      source={{
-                        uri: `${api.defaults.baseURL}/schedules/documents/${schedule?.id}/${image.file_url}`,
-                      }}
-                      alt="Imagem do agendamento"
-                      size={300}
-                    />
-                  ))}
-                </VStack>
+                {loadedImages.map((image) => (
+                  <Image
+                    borderRadius={10}
+                    key={image.id}
+                    source={{
+                      uri: `${api.defaults.baseURL}/schedules/documents/${schedule?.id}/${image.file_url}`,
+                    }}
+                    alt="Imagem do agendamento"
+                    size={350}
+                  />
+                ))}
               </VStack>
             </HStack>
           </VStack>
 
-          <VStack mt={10}>
-            <VStack ml={3}>
-              <Text bold>Seus comentarios</Text>
-              <TextArea
-                placeholder={'Digite aqui suas observacoes'}
-                w={'full'}
-                h={150}
-                fontSize="sm"
-                color="gray.300"
-                onChangeText={(text) => setPartnerNotes(text)}
-              />
-            </VStack>
+          <VStack mt={5} backgroundColor="white" p={5} borderRadius={10}>
+            <HStack>
+              <VStack>
+                <Icon as={Feather} name="info" size={8} color="purple.500" />
+              </VStack>
+              <VStack ml={3}>
+                <Text bold>Informacoes adicionais</Text>
+              </VStack>
+            </HStack>
+            <HStack py={3}>
+              <VStack>
+                <TextArea
+                  w={350}
+                  h={150}
+                  value={observation}
+                  onChangeText={setObservation}
+                  placeholder="Voce pode adicionar informacoes adicionais para o cliente."
+                />
+              </VStack>
+            </HStack>
           </VStack>
 
           <VStack mt={20}>
-            {schedule?.status === 0 ? (
-              <Center>
-                <Text bold fontSize="md">
-                  Agendamento cancelado
-                </Text>
-              </Center>
-            ) : (
+            {schedule?.status !== 4 && schedule?.status !== 3 && (
               <VStack>
                 <Button
-                  title="Aprovar agendamento"
-                  onPress={handleApproveSchedule}
-                  mb={2}
-                  backgroundColor="green.500"
+                  title="Enviar orcamento"
+                  onPress={handleSubmit}
+                  mb={3}
                   isLoading={isLoading}
                 />
                 <Button
                   title="Cancelar agendamento"
                   onPress={handleCancelSchedule}
-                  backgroundColor="red.500"
+                  variant="outline"
+                  mb={3}
                   isLoading={isLoading}
                 />
               </VStack>

@@ -4,12 +4,16 @@ import { LoadingModal } from '@components/LoadingModal';
 import { PartnerCard } from '@components/PartnerCard';
 import { ILocation } from '@dtos/ILocation';
 import { useAuth } from '@hooks/useAuth';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
 import { api } from '@services/api';
 import { AppError } from '@utils/AppError';
 import { VStack, useToast, FlatList } from 'native-base';
-import { useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 type RouteParamsProps = {
   serviceId: string;
@@ -49,9 +53,11 @@ export function SearchQuote() {
     }
   }
 
-  useEffect(() => {
-    findLocations(serviceId);
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      findLocations(serviceId);
+    }, [])
+  );
 
   return (
     <VStack>
@@ -81,11 +87,6 @@ export function SearchQuote() {
                   })
                 }
                 location={item}
-                image={{
-                  uri:
-                    `${api.defaults.baseURL}/user/avatar/${item.user_id}/${item.users?.avatar}` ||
-                    `https://ui-avatars.com/api/?name=${item.business_name}&background=random&length=1&rounded=true&size=128`,
-                }}
               />
             );
           }}
