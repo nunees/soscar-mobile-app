@@ -13,12 +13,11 @@ import {
   Text,
   Fab,
   Icon,
-  Heading,
   HStack,
   useToast,
   Badge,
 } from 'native-base';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { TouchableOpacity, Alert } from 'react-native';
 
 export function Locations() {
@@ -30,22 +29,6 @@ export function Locations() {
   const [isLoading, setIsLoading] = useState(false);
 
   const navigation = useNavigation<PartnerNavigatorRoutesProps>();
-
-  const loadData = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      const response = await api.get('/locations', {
-        headers: {
-          id: user.id,
-        },
-      });
-      setLocations(response.data.locations);
-    } catch (error) {
-      throw new AppError('Erro ao buscar locais');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [locations]);
 
   async function handleDeleteLocation(locationId: string) {
     try {
@@ -100,11 +83,23 @@ export function Locations() {
 
   useFocusEffect(
     useCallback(() => {
-      loadData();
+      async function loadData() {
+        try {
+          setIsLoading(true);
+          const response = await api.get('/locations', {
+            headers: {
+              id: user.id,
+            },
+          });
+          setLocations(response.data.locations);
+        } catch (error) {
+          throw new AppError('Erro ao buscar locais');
+        } finally {
+          setIsLoading(false);
+        }
+      }
 
-      return () => {
-        setLocations([]);
-      };
+      loadData();
     }, [])
   );
 
@@ -166,14 +161,14 @@ export function Locations() {
                         </Badge>
                       )}
                     </HStack>
-                    <Heading pb={5}>
+                    <Text fontSize="lg" pb={3} bold>
                       {location.business_name.length > 20
                         ? `${location.business_name.slice(
                             0,
                             20
                           )}...`.toUpperCase()
                         : location.business_name.toUpperCase()}
-                    </Heading>
+                    </Text>
                     <Text pb={2}>
                       <Text bold>CNPJ/CPF:</Text> {location.business_phone}
                     </Text>

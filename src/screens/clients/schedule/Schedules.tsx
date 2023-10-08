@@ -25,7 +25,7 @@ export function Schedules() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 120 }}
       >
-        <VStack px={3} pt={3}>
+        <VStack px={5} pt={3}>
           <ListServices
             image={EngineService}
             alt={'Mecânico'}
@@ -43,7 +43,7 @@ export function Schedules() {
             alt={'Elétrica'}
             title={'Elétrica'}
             content={
-              'Resolva problemas instalações eletricas, baterias e problemas relacionados'
+              'Resolva problemas com instalações eletricas, baterias e problemas relacionados'
             }
             onPress={() =>
               navigation.navigate('searchSchedule', { serviceId: '3' })
@@ -55,7 +55,7 @@ export function Schedules() {
             alt={'Funilaria'}
             title={'Funilaria e Pintura'}
             content={
-              'Resolva problemas funilaria, pintura e problemas relacionados'
+              'Resolva problemas com funilaria, pintura e problemas relacionados'
             }
             onPress={() =>
               navigation.navigate('searchSchedule', { serviceId: '5' })

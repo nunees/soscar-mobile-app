@@ -14,6 +14,7 @@ import { ChangePassword } from '@screens/partners/profile/ChangePassword';
 import EditProfileInformation from '@screens/partners/profile/EditProfileInformation';
 import MyAccountInformation from '@screens/partners/profile/MyAccountInformation';
 import { Profile } from '@screens/partners/profile/Profile';
+import { QuoteDetail } from '@screens/partners/quotes/QuoteDetail';
 import { ScheduleDetail } from '@screens/partners/schedules/ScheduleDetail';
 import { Icon, useTheme } from 'native-base';
 
@@ -30,6 +31,7 @@ type PartnerRoutes = {
   locationDetails: { locationId: string };
   editLocation: { locationId: string };
   scheduleDetail: { scheduleId: string };
+  quoteDetail: { quoteId: string; locationId: string };
 };
 
 export type PartnerNavigatorRoutesProps =
@@ -172,6 +174,15 @@ export function PartnerRoutes() {
       <Screen
         name="scheduleDetail"
         component={ScheduleDetail}
+        options={{
+          tabBarButton: () => null,
+          tabBarStyle: { display: 'none' },
+        }}
+      />
+
+      <Screen
+        name="quoteDetail"
+        component={QuoteDetail}
         options={{
           tabBarButton: () => null,
           tabBarStyle: { display: 'none' },

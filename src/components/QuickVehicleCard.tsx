@@ -46,8 +46,10 @@ export function QuickVehicleCard({ vehicle, ...rest }: QuickVehicleCardProps) {
                 <Text bold fontSize={'lg'}>
                   {vehicle.brand.name}
                 </Text>
-                <Text fontSize={'md'}>{vehicle.name.name}</Text>
-                <Text fontSize={'xs'}>{vehicle.year}</Text>
+                <Text fontSize={'md'}>
+                  {vehicle.name.name} / {vehicle.year}
+                </Text>
+                <Text fontSize={'xs'}>{vehicle.plate}</Text>
               </VStack>
               <VStack>
                 <Image

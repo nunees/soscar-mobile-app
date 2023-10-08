@@ -7,14 +7,15 @@ import { TextArea } from '@components/TextArea';
 import { ILocation } from '@dtos/ILocation';
 import { useAuth } from '@hooks/useAuth';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { PartnerNavigatorRoutesProps } from '@routes/partner.routes';
 import { api } from '@services/api';
 import { AppError } from '@utils/AppError';
+import { ConvertAddressToLatLong } from '@utils/CalculatePositionDistance';
 import { GetAddressByCEP } from '@utils/GetAddressByCEP';
-import * as Location from 'expo-location';
-import { ScrollView, VStack, Text, HStack, useToast } from 'native-base';
+import { ScrollView, VStack, Text, useToast, HStack } from 'native-base';
 import { useCallback, useState } from 'react';
+import { set } from 'react-hook-form';
 
 const payment_types = [
   { id: 1, name: 'Dinheiro' },
@@ -60,82 +61,76 @@ function handleMultipleSelection(
   }
 }
 
-async function ConvertAddressToLatLong(address: string) {
-  try {
-    const { status } = await Location.requestForegroundPermissionsAsync();
-
-    if (status !== 'granted') {
-      console.error('Permissão de localização negada');
-      return null;
-    }
-
-    const location = await Location.geocodeAsync(address);
-
-    if (location && location.length > 0) {
-      const primeiraCoordenada = location[0];
-      return {
-        latitude: primeiraCoordenada.latitude,
-        longitude: primeiraCoordenada.longitude,
-      };
-    }
-  } catch (error) {
-    throw new AppError('Não foi possível obter as coordenadas do endereço');
-  }
-}
-
 export function AddLocation() {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<string>('');
 
   const [location, setLocation] = useState<ILocation>({} as ILocation);
 
+  const [cnpj, setCnpj] = useState<string>('');
+  const [business_name, setBusinessName] = useState<string>('');
+  const [business_phone, setBusinessPhone] = useState<string>('');
+  const [business_email, setBusinessEmail] = useState<string>('');
+  const [address_line, setAddressLine] = useState<string>('');
+  const [number, setNumber] = useState<string>('');
+  const [district, setDistrict] = useState<string>('');
+  const [city, setCity] = useState<string>('');
+  const [state, setState] = useState<string>('');
   const [zipcode, setZipCode] = useState<string>('');
+
+  const [latitude, setLatitude] = useState<string>('');
+  const [longitude, setLongitude] = useState<string>('');
 
   const [payment_methods, setPaymentMethods] = useState<number[]>([]);
   const [openHoursWeekend, setOpenHoursWeekend] = useState<string[]>([]);
   const [business_categories, setBusinessCategories] = useState<number[]>([]);
+  const [business_description, setBusinessDescription] = useState<string>('');
 
   const [openHour, setOpenHour] = useState<string>('');
   const [closeHour, setCloseHour] = useState<string>('');
 
-  const { user } = useAuth();
+  const [correctZipCode, setCorrectZipCode] = useState<boolean>(false);
+
   const toast = useToast();
+  const { user } = useAuth();
+
   const navigation = useNavigation<PartnerNavigatorRoutesProps>();
 
-  // eslint-disable-next-line consistent-return
   async function handleCepInput(cep: string) {
     try {
       setIsLoading(true);
       setMessage('Buscando endereço...');
-
       if (zipcode.length === 8) {
         const address = await GetAddressByCEP(cep);
         if (address.data.erro || !address.data.logradouro) {
           return null;
         }
 
-        const position = await ConvertAddressToLatLong(
-          `${address.data.logradouro}, ${address.data.bairro} - ${address.data.uf}`
+        const location = await ConvertAddressToLatLong(
+          `${address.data.logradouro}, ${address.data.bairro}, ${address.data.localidade}, ${address.data.uf}`
         );
 
-        if (position) {
-          setLocation({
-            ...location,
-            address_line: address.data.logradouro,
-            district: address.data.bairro,
-            city: address.data.localidade,
-            state: address.data.uf,
-            zipcode: address.data.cep,
-            latitude: String(position.latitude),
-            longitude: String(position.longitude),
-          });
+        if (location) {
+          setLatitude(String(location.latitude));
+          setLongitude(String(location.longitude));
+        }
+
+        if (address) {
+          setAddressLine(address.data.logradouro);
+          setDistrict(address.data.bairro);
+          setCity(address.data.localidade);
+          setState(address.data.uf);
+          setCorrectZipCode(false);
+        } else {
+          setCorrectZipCode(true);
         }
       }
     } catch (error) {
-      console.log(error);
+      setCorrectZipCode(true);
     } finally {
       setIsLoading(false);
     }
+    return true;
   }
 
   function handleHour(date: Date | undefined, state: string) {
@@ -161,28 +156,27 @@ export function AddLocation() {
       await api.post(
         '/locations',
         {
-          cnpj: location.cnpj,
-          business_name: location.business_name,
-          business_phone: location.business_phone,
-          business_email: location.business_email,
-          address_line: location.address_line,
-          number: Number(location.number),
-          district: location.district,
-          city: location.city,
-          state: location.state,
-          zipcode: location.zipcode,
-          latitude: location.latitude,
-          longitude: location.longitude,
+          cnpj,
+          business_name,
+          business_phone,
+          business_email,
+          address_line,
+          number: Number(number),
+          district,
+          city,
+          state,
+          zipcode,
+          latitude,
+          longitude,
           payment_methods,
           business_categories,
           open_hours: `${openHour} - ${closeHour}`,
           open_hours_weekend: openHoursWeekend,
-          business_description: location.business_description,
+          business_description,
         },
         {
           headers: {
             id: user.id,
-            'Content-Type': 'application/json',
           },
         }
       );
@@ -233,33 +227,25 @@ export function AddLocation() {
               </Text>
               <Input
                 placeholder="CNPJ ou CPF"
-                value={location.cnpj}
+                value={cnpj}
                 keyboardType="numeric"
-                onChangeText={(value) =>
-                  setLocation({ ...location, cnpj: value })
-                }
+                onChangeText={setCnpj}
               />
               <Input
                 placeholder="Nome Fantasia"
-                value={location.business_name}
-                onChangeText={(value) =>
-                  setLocation({ ...location, business_name: value })
-                }
+                value={business_name}
+                onChangeText={setBusinessName}
               />
               <Input
                 placeholder="Telefone"
-                value={location.business_phone}
-                onChangeText={(value) =>
-                  setLocation({ ...location, business_phone: value })
-                }
+                value={business_phone}
+                onChangeText={setBusinessPhone}
                 keyboardType="numeric"
               />
               <Input
                 placeholder="Email"
-                value={location.business_email}
-                onChangeText={(value) =>
-                  setLocation({ ...location, business_email: value })
-                }
+                value={business_email}
+                onChangeText={setBusinessEmail}
               />
             </VStack>
 
@@ -270,7 +256,7 @@ export function AddLocation() {
 
               <VStack>
                 <HStack>
-                  <VStack mr={2}>
+                  <VStack mr={5}>
                     <Input
                       w={200}
                       placeholder="CEP"
@@ -292,7 +278,8 @@ export function AddLocation() {
 
               <Input
                 placeholder="Endereço"
-                value={location.address_line}
+                value={address_line}
+                onChangeText={setAddressLine}
                 editable={false}
                 isDisabled={true}
                 caretHidden={true}
@@ -300,15 +287,14 @@ export function AddLocation() {
               />
               <Input
                 placeholder="Número"
-                onChangeText={(value) =>
-                  setLocation({ ...location, number: value })
-                }
-                value={location.number}
+                onChangeText={setNumber}
+                value={number}
                 keyboardType="numeric"
               />
               <Input
                 placeholder="Bairro"
-                value={location.district}
+                value={district}
+                onChangeText={setDistrict}
                 editable={false}
                 isDisabled={true}
                 caretHidden={true}
@@ -316,7 +302,8 @@ export function AddLocation() {
               />
               <Input
                 placeholder="Cidade"
-                value={location.city}
+                value={city}
+                onChangeText={setCity}
                 editable={false}
                 isDisabled={true}
                 caretHidden={true}
@@ -324,7 +311,8 @@ export function AddLocation() {
               />
               <Input
                 placeholder="Estado"
-                value={location.state}
+                value={state}
+                onChangeText={setState}
                 editable={false}
                 isDisabled={true}
                 caretHidden={true}
@@ -514,10 +502,8 @@ export function AddLocation() {
               <TextArea
                 placeholder="Ele pode ser o diferencial para o cliente escolher o seu estabelecimento."
                 h={150}
-                value={location.business_description}
-                onChangeText={(value) =>
-                  setLocation({ ...location, business_description: value })
-                }
+                value={business_description}
+                onChangeText={setBusinessDescription}
                 fontSize="md"
                 borderRadius={5}
               />

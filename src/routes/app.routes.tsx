@@ -47,7 +47,7 @@ type AppRotes = {
   quotes: undefined;
   newQuote: { locationId: string; serviceId: string };
   quotesList: undefined;
-  quoteDetails: { quoteId: string; hashId: string };
+  quoteDetails: { quoteId: string; locationId: string; vehicleId: string };
   searchQuote: { serviceId: string };
   schedulesDetails: { scheduleId: string };
   schedulesList: undefined;

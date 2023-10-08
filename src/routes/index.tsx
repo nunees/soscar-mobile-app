@@ -15,12 +15,13 @@ export function Routes() {
   theme.colors.background = colors.gray[100];
   const { user, isLoadingUserStorageData } = useAuth();
 
-  if (isLoadingUserStorageData) {
-    return <Loading />;
-  }
+  // if (isLoadingUserStorageData) {
+  //   return <Loading />;
+  // }
 
   return (
     <Box flex={1} bg="white">
+      {isLoadingUserStorageData && <Loading />}
       <NavigationContainer theme={theme}>
         {/* {
           // eslint-disable-next-line no-nested-ternary

@@ -50,8 +50,6 @@ export function HomeScreen() {
     return response;
   }, []);
 
-  console.log(coords);
-
   useFocusEffect(
     useCallback(() => {
       fetchUserData(user.id).then((response) => {

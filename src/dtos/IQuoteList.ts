@@ -11,7 +11,9 @@ export interface IQuoteList {
   service_type_id: number | null;
   franchise_price: number | null;
   service_price: number | null;
+  service_decription: string | null;
   user_notes: string | null;
+  status?: number | null;
   partner_notes: string | null;
   created_at: Date | null;
   updated_at: Date | null;
@@ -21,12 +23,31 @@ export interface IQuoteList {
   // }[];
   UserQuotesDocuments: IQuotesDocumentDTO[];
   users: {
+    id?: string;
     name: string;
     email: string;
-    mobile: string;
+    mobile_phone: string;
+    avatar: string;
+    last_name?: string;
   };
   insurance_company: {
     name: string;
     id: number;
+  };
+  vehicles: {
+    brand_id: number;
+    color: string;
+    created_at: Date | null;
+    engineMiles: number;
+    id: string;
+    insuranceCompaniesId: number;
+    isPrimary: boolean;
+    name_id: number;
+    notes: string | null;
+    photo: string | null;
+    plate: string;
+    updated_at: Date | null;
+    user_id: string;
+    year: number;
   };
 }

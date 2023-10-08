@@ -1,6 +1,8 @@
 import { AppHeader } from '@components/AppHeader';
 import { LoadingModal } from '@components/LoadingModal';
 import UserPhoto from '@components/UserPhoto';
+import { VechiclesBrands } from '@data/VechiclesBrands';
+import { VehiclesModels } from '@data/VehiclesModels';
 import { ILocation } from '@dtos/ILocation';
 import { IQuoteList } from '@dtos/IQuoteList';
 import { ISchedules } from '@dtos/ISchedules';
@@ -21,33 +23,9 @@ import {
   Badge,
   useToast,
   Center,
-  ScrollView,
 } from 'native-base';
 import { useCallback, useState } from 'react';
-import { set } from 'react-hook-form';
 import { TouchableOpacity } from 'react-native';
-
-async function fetchUserDetails(
-  schedule_list: ISchedules[],
-  partner_id: string
-) {
-  const users: IUserDTO[] = [];
-  schedule_list.map(async (schedule) => {
-    const response = await api.get(`/user/profile/${schedule.user_id}`, {
-      headers: {
-        id: partner_id,
-      },
-    });
-    console.log(response.data);
-  });
-}
-
-type userInfo = {
-  id: string;
-  name: string;
-  email: string;
-  avatar: string;
-};
 
 export function Orders() {
   const [isLoading, setIsLoading] = useState(false);
@@ -57,6 +35,7 @@ export function Orders() {
   const [toggleQuotes, setToggleQuotes] = useState(false);
 
   const [schedules, setSchedules] = useState<ISchedules[]>({} as ISchedules[]);
+
   const [quotes, setQuotes] = useState<IQuoteList[]>({} as IQuoteList[]);
 
   const [userInfo, setUserInfo] = useState<IUserDTO[]>([]);
@@ -68,7 +47,20 @@ export function Orders() {
 
   const toast = useToast();
 
-  // const fetchVehicleDetails = useCallback(async () => {}, []);
+  const fetchVehicleDetails = useCallback(async (vehicle_id: string) => {
+    try {
+      const response = await api.get(`/vehicles/${vehicle_id}`, {
+        headers: {
+          id: user.id,
+        },
+      });
+
+      return response.data;
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
+
   // const fetchLocationDetails = useCallback(async () => {}, []);
 
   const fetchSchedules = useCallback(async () => {
@@ -107,13 +99,15 @@ export function Orders() {
           },
         });
 
+        setQuotes(response.data);
+
+        console.log(quotes);
+
         const responseLocations = await api.get('/locations/', {
           headers: {
             id: user.id,
           },
         });
-
-        setQuotes(response.data);
         setLocations(responseLocations.data);
       }
     } catch (error) {
@@ -198,270 +192,320 @@ export function Orders() {
       </VStack>
 
       {/** Hold the container */}
-      <ScrollView>
-        {toggleSchedules && (
-          <VStack px={5} py={3}>
-            <FlatList
-              data={schedules}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  onPress={() =>
-                    navigation.navigate('scheduleDetail', {
-                      scheduleId: String(item.id),
-                    })
-                  }
-                  style={{
-                    paddingBottom: 10,
-                  }}
-                >
-                  <VStack backgroundColor="white" borderRadius={10} p={5}>
-                    {/* {} */}
-                    <VStack mb={5}>
-                      <VStack pr={3}>
+      {toggleSchedules && (
+        <VStack px={5} py={3}>
+          <FlatList
+            data={schedules}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate('scheduleDetail', {
+                    scheduleId: String(item.id),
+                  })
+                }
+                style={{
+                  paddingBottom: 10,
+                }}
+              >
+                <VStack backgroundColor="white" borderRadius={10} p={5}>
+                  {/* {} */}
+                  <VStack mb={5}>
+                    <VStack pr={3}>
+                      <HStack>
                         <HStack>
-                          <HStack>
-                            <UserPhoto
-                              source={{
-                                uri: item.location?.avatar
-                                  ? `${api.defaults.baseURL}/locations/avatar/${item.location?.id}/${item.location?.avatar}`
-                                  : `https://ui-avatars.com/api/?format=png&name=${item.location?.business_name}`,
-                              }}
-                              alt="Foto de perfil"
-                              size={60}
-                              borderRadius={100}
-                            />
-                          </HStack>
-                          <HStack>
-                            <VStack ml={10}>
-                              <Text fontSize={'md'} bold>
-                                {item.location?.business_name}
-                              </Text>
-                              <Text fontSize={'md'}>{item.location?.city}</Text>
-                            </VStack>
-                          </HStack>
-
-                          <HStack ml={60}>
-                            {item.status === 1 && (
-                              <Badge
-                                colorScheme="warning"
-                                variant={'outline'}
-                                h={8}
-                              >
-                                Novo
-                              </Badge>
-                            )}
-                          </HStack>
-                        </HStack>
-                      </VStack>
-                    </VStack>
-                    {/* {} */}
-                    <HStack justifyContent={'space-between'}>
-                      <VStack>
-                        <HStack>
-                          <Icon
-                            as={FontAwesome5}
-                            name="calendar-check"
-                            size={5}
-                            color="purple.500"
+                          <UserPhoto
+                            source={{
+                              uri: item.location?.avatar
+                                ? `${api.defaults.baseURL}/locations/avatar/${item.location?.id}/${item.location?.avatar}`
+                                : `https://ui-avatars.com/api/?format=png&name=${item.location?.business_name}`,
+                            }}
+                            alt="Foto de perfil"
+                            size={60}
+                            borderRadius={100}
                           />
-                          <Text pl={2}>
-                            {item.created_at
-                              ?.toString()
-                              .split('T')[0]
-                              .split('-')
-                              .reverse()
-                              .join('/')}
-                          </Text>
                         </HStack>
-                      </VStack>
-
-                      <VStack pl={5}>
                         <HStack>
-                          <Icon
-                            as={Feather}
-                            name="clock"
-                            size={5}
-                            color="purple.500"
-                          />
-                          <Text pl={1}>{item.time}</Text>
+                          <VStack ml={10}>
+                            <Text fontSize={'md'} bold>
+                              {item.location?.business_name}
+                            </Text>
+                            <Text fontSize={'md'}>{item.location?.city}</Text>
+                          </VStack>
                         </HStack>
-                      </VStack>
-                    </HStack>
-                    <Divider my={2} />
-                    <Text fontSize="xs" color="gray.400">
-                      {item.id}
-                    </Text>
-                    <VStack>
-                      {item.status === 1 && (
-                        <Badge
-                          colorScheme="purple"
-                          variant={'solid'}
-                          h={10}
-                          borderRadius={10}
-                        >
-                          Solicitacao recebida
-                        </Badge>
-                      )}
 
-                      {item.status === 2 && (
-                        <Badge
-                          colorScheme="warning"
-                          variant={'solid'}
-                          h={10}
-                          borderRadius={10}
-                        >
-                          Aguardando sua confirmacao
-                        </Badge>
-                      )}
-
-                      {item.status === 3 && (
-                        <Badge
-                          colorScheme="green"
-                          variant={'solid'}
-                          h={10}
-                          borderRadius={10}
-                        >
-                          Aceita
-                        </Badge>
-                      )}
-
-                      {item.status === 4 && (
-                        <Badge
-                          colorScheme="danger"
-                          variant={'solid'}
-                          h={10}
-                          borderRadius={10}
-                        >
-                          Cancelado
-                        </Badge>
-                      )}
-                    </VStack>
-                  </VStack>
-                </TouchableOpacity>
-              )}
-              ListEmptyComponent={() => (
-                <Center>
-                  <Text color="gray.400" bold>
-                    Nao existem agendamentos registrados
-                  </Text>
-                </Center>
-              )}
-            />
-          </VStack>
-        )}
-
-        {toggleQuotes && quotes && (
-          <VStack px={5} py={3}>
-            <FlatList
-              data={quotes}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  onPress={() =>
-                    navigation.navigate('scheduleDetail', {
-                      scheduleId: String(item.id),
-                    })
-                  }
-                  style={{
-                    paddingBottom: 10,
-                  }}
-                  key={item.id}
-                >
-                  <VStack backgroundColor="white" borderRadius={10} p={5}>
-                    <VStack mb={5}>
-                      <HStack justifyContent={'flex-start'}>
-                        <VStack pr={3}></VStack>
-
-                        <VStack>
-                          {/* <Text fontSize={'md'} bold>
+                        <HStack ml={60}>
+                          {item.status === 1 && (
+                            <Badge
+                              colorScheme="warning"
+                              variant={'outline'}
+                              h={8}
+                            >
+                              Novo
+                            </Badge>
                           )}
-                          {/* <Text fontSize={'md'} bold>
-                          {item.location?.business_name}
-                        </Text>
-                        <Text fontSize={'md'}>{item.location?.city}</Text> */}
-                        </VStack>
+                        </HStack>
                       </HStack>
                     </VStack>
-                    <HStack justifyContent={'space-between'}>
-                      <VStack>
-                        <HStack>
-                          <Icon
-                            as={FontAwesome5}
-                            name="calendar-check"
-                            size={5}
-                            color="purple.500"
-                          />
-                          {/* <Text pl={2}>
+                  </VStack>
+                  {/* {} */}
+                  <HStack justifyContent={'space-between'}>
+                    <VStack>
+                      <HStack>
+                        <Icon
+                          as={FontAwesome5}
+                          name="calendar-check"
+                          size={5}
+                          color="purple.500"
+                        />
+                        <Text pl={2}>
                           {item.created_at
                             ?.toString()
                             .split('T')[0]
                             .split('-')
                             .reverse()
                             .join('/')}
-                        </Text> */}
-                        </HStack>
-                      </VStack>
+                        </Text>
+                      </HStack>
+                    </VStack>
 
-                      <VStack pl={5}>
-                        <HStack>
-                          <Icon
-                            as={Feather}
-                            name="clock"
-                            size={5}
-                            color="purple.500"
-                          />
-                          <Text pl={1}>
-                            {/* {item.created_at
-                            ?.toString()
-                            .split('T')[1]
-                            .split(':')
-                            .slice(0, 2)
-                            .join(':')} */}
-                          </Text>
-                        </HStack>
-                      </VStack>
-                    </HStack>
-                    <Divider my={2} />
-                    <Text fontSize="xs" color="gray.400">
-                      {item.id}
-                    </Text>
-                    {item.is_juridical && (
-                      <Icon as={Octicons} name="law" size={5} />
-                    )}
-                    {/* <VStack>
+                    <VStack pl={5}>
+                      <HStack>
+                        <Icon
+                          as={Feather}
+                          name="clock"
+                          size={5}
+                          color="purple.500"
+                        />
+                        <Text pl={1}>{item.time}</Text>
+                      </HStack>
+                    </VStack>
+                  </HStack>
+                  <Divider my={2} />
+                  <Text fontSize="xs" color="gray.400">
+                    {item.id}
+                  </Text>
+                  <VStack>
                     {item.status === 1 && (
-                      <Badge colorScheme="purple" variant={'solid'}>
+                      <Badge
+                        colorScheme="purple"
+                        variant={'solid'}
+                        h={10}
+                        borderRadius={10}
+                      >
                         Solicitacao recebida
                       </Badge>
                     )}
 
                     {item.status === 2 && (
-                      <Badge colorScheme="warning">
+                      <Badge
+                        colorScheme="warning"
+                        variant={'solid'}
+                        h={10}
+                        borderRadius={10}
+                      >
                         Aguardando sua confirmacao
                       </Badge>
                     )}
 
                     {item.status === 3 && (
-                      <Badge colorScheme="orange">Aceita</Badge>
+                      <Badge
+                        colorScheme="green"
+                        variant={'solid'}
+                        h={10}
+                        borderRadius={10}
+                      >
+                        Aceita
+                      </Badge>
                     )}
 
                     {item.status === 4 && (
-                      <Badge colorScheme="danger">Cancelado</Badge>
+                      <Badge
+                        colorScheme="danger"
+                        variant={'solid'}
+                        h={10}
+                        borderRadius={10}
+                      >
+                        Cancelado
+                      </Badge>
                     )}
-                  </VStack> */}
                   </VStack>
-                </TouchableOpacity>
-              )}
-              ListEmptyComponent={() => (
-                <Center>
-                  <Text color="gray.400" bold>
-                    Nao existem orcamentos registrados
+                </VStack>
+              </TouchableOpacity>
+            )}
+            ListEmptyComponent={() => (
+              <Center>
+                <Text color="gray.400" bold>
+                  Nao existem agendamentos registrados
+                </Text>
+              </Center>
+            )}
+          />
+        </VStack>
+      )}
+
+      {toggleQuotes && quotes && (
+        <VStack px={5} py={3}>
+          <FlatList
+            data={quotes}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate('quoteDetail', {
+                    quoteId: String(item.id),
+                    locationId: item.location_id,
+                  })
+                }
+                style={{
+                  paddingBottom: 10,
+                }}
+                key={item.id}
+              >
+                <VStack backgroundColor="white" borderRadius={10} p={5}>
+                  <HStack position="absolute" right={5} top={5}>
+                    {item.status === 1 && (
+                      <Badge
+                        colorScheme="warning"
+                        variant={'solid'}
+                        h={8}
+                        borderRadius={5}
+                      >
+                        Enviado
+                      </Badge>
+                    )}
+
+                    {item.status === 2 && (
+                      <Badge
+                        colorScheme="info"
+                        variant={'solid'}
+                        h={8}
+                        borderRadius={5}
+                      >
+                        Em processo
+                      </Badge>
+                    )}
+
+                    {item.status === 3 && (
+                      <Badge
+                        colorScheme="success"
+                        variant={'solid'}
+                        h={8}
+                        borderRadius={5}
+                      >
+                        Aceito
+                      </Badge>
+                    )}
+
+                    {item.status === 4 && (
+                      <Badge
+                        colorScheme="danger"
+                        variant={'solid'}
+                        h={8}
+                        borderRadius={5}
+                      >
+                        Recusado ou cancelado
+                      </Badge>
+                    )}
+                  </HStack>
+                  <VStack mb={5}>
+                    <HStack justifyContent={'flex-start'}></HStack>
+                  </VStack>
+                  <VStack>
+                    <VStack>
+                      <HStack pb={1}>
+                        <Icon
+                          as={FontAwesome5}
+                          name="user-alt"
+                          size={5}
+                          color={'purple.500'}
+                        />
+                        <Text pl={1} color="gray.500">
+                          {' '}
+                          {item.users.name}
+                        </Text>
+                      </HStack>
+
+                      <HStack pb={1}>
+                        <Icon
+                          as={FontAwesome5}
+                          name="car"
+                          size={5}
+                          color={'purple.500'}
+                        />
+                        <Text pl={2} color="gray.500">
+                          {VechiclesBrands.map((brand) =>
+                            item.vehicles.brand_id === brand.id
+                              ? brand.name
+                              : ''
+                          )}{' '}
+                          -{' '}
+                          {VehiclesModels.map((model) =>
+                            item.vehicles.name_id === model.id ? model.name : ''
+                          )}{' '}
+                          / {item.vehicles.year}
+                        </Text>
+                      </HStack>
+                    </VStack>
+                  </VStack>
+                  <HStack justifyContent={'flex-start'}>
+                    <VStack>
+                      <HStack>
+                        <Icon
+                          as={FontAwesome5}
+                          name="calendar-check"
+                          size={5}
+                          color="purple.500"
+                        />
+                        <Text pl={2} color="gray.500">
+                          {item.created_at
+                            ?.toString()
+                            .split('T')[0]
+                            .split('-')
+                            .reverse()
+                            .join('/')}
+                        </Text>
+                      </HStack>
+                    </VStack>
+
+                    <VStack pl={5}>
+                      <HStack>
+                        <Icon
+                          as={Feather}
+                          name="clock"
+                          size={5}
+                          color="purple.500"
+                        />
+                        <Text pl={1} color="gray.500">
+                          {item.created_at
+                            ?.toString()
+                            .split('T')[1]
+                            .split(':')
+                            .slice(0, 2)
+                            .join(':')}
+                        </Text>
+                      </HStack>
+                    </VStack>
+                  </HStack>
+
+                  <Divider my={2} />
+                  <Text fontSize="xs" color="gray.400">
+                    Chave: {item.id}
                   </Text>
-                </Center>
-              )}
-            />
-          </VStack>
-        )}
-      </ScrollView>
+                  {item.is_juridical && (
+                    <Icon as={Octicons} name="law" size={5} />
+                  )}
+                </VStack>
+              </TouchableOpacity>
+            )}
+            ListEmptyComponent={() => (
+              <Center>
+                <Text color="gray.400" bold>
+                  Nao existem orcamentos registrados
+                </Text>
+              </Center>
+            )}
+          />
+        </VStack>
+      )}
     </VStack>
   );
 }

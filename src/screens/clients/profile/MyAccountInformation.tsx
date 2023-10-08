@@ -55,8 +55,6 @@ export default function MyAccountInformation() {
     }
   }, []);
 
-  console.log(profile);
-
   return (
     <VStack>
       <VStack>

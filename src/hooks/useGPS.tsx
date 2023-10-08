@@ -17,7 +17,6 @@ export function useGPS() {
     async function handleGPS() {
       const { granted } = await requestForegroundPermissionsAsync();
       if (granted) {
-        console.log('Granted');
         const currentPosition = await getCurrentPositionAsync({
           accuracy: 6,
         });

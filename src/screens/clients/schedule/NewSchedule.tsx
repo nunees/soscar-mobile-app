@@ -11,7 +11,11 @@ import { IVehicleDTO } from '@dtos/IVechicleDTO';
 import { Feather } from '@expo/vector-icons';
 import { useAuth } from '@hooks/useAuth';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
 import { api } from '@services/api';
 import { AppError } from '@utils/AppError';
@@ -28,7 +32,7 @@ import {
   Icon,
   Image,
 } from 'native-base';
-import { useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Alert, TouchableOpacity } from 'react-native';
 
 type RouteParamsProps = {
@@ -45,13 +49,14 @@ export function NewSchedule() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [message, setMessage] = useState<string>('');
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [files, setfiles] = useState<any[]>([]);
 
   const [location, setLocation] = useState<ILocation>();
 
   const [userVehicles, setUserVehicles] = useState<IVehicleDTO[]>();
   const [vehicle_id, setVehicle_id] = useState<string>();
-  const [services, setServices] = useState<number[]>();
+  // const [services, setServices] = useState<number[]>();
 
   const [date, setDate] = useState<string>('');
   const [time, setTime] = useState<string>('');
@@ -71,6 +76,8 @@ export function NewSchedule() {
 
   async function handleUserProfilePictureSelect() {
     try {
+      setIsLoading(true);
+      setMessage('Anexando imagem...');
       const media = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.All,
         quality: 1,
@@ -135,60 +142,15 @@ export function NewSchedule() {
         placement: 'top',
         bgColor: 'red.500',
       });
-    }
-  }
-
-  async function fetchData() {
-    try {
-      const response = await api.get(`/locations/${locationId}`, {
-        headers: {
-          id: user.id,
-        },
-      });
-      setLocation(response.data);
-      setServices(response.data.business_categories);
-
-      const vehicles = await api.get(`/vehicles`, {
-        headers: {
-          id: user.id,
-        },
-      });
-
-      if (vehicles.data.length === 0) {
-        Alert.alert(
-          'Você não possui veículos cadastrados',
-          'Por favor, cadastre um veículo para continuar',
-          [
-            {
-              text: 'Cadastrar',
-              onPress: () => {
-                navigation.navigate('addVehicle');
-              },
-            },
-
-            {
-              text: 'Voltar',
-              onPress: () => {
-                navigation.goBack();
-              },
-            },
-          ]
-        );
-        return;
-      }
-
-      setUserVehicles(vehicles.data);
-    } catch (error) {
-      toast.show({
-        title: 'Erro ao buscar parceiros',
-        placement: 'top',
-        bgColor: 'red.500',
-      });
+    } finally {
+      setIsLoading(false);
     }
   }
 
   async function handleSubmit() {
     try {
+      setIsLoading(true);
+      setMessage('Agendando...');
       const response = await api.post(
         '/schedules',
         {
@@ -241,18 +203,76 @@ export function NewSchedule() {
         placement: 'top',
         bgColor: 'red.500',
       });
+    } finally {
+      setIsLoading(false);
     }
   }
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      async function fetchData() {
+        try {
+          setIsLoading(true);
+          setMessage('Buscando informacoes...');
+          const response = await api.get(`/locations/${locationId}`, {
+            headers: {
+              id: user.id,
+            },
+          });
+          setLocation(response.data);
+          // setServices(response.data.business_categories);
+
+          const vehicles = await api.get(`/vehicles`, {
+            headers: {
+              id: user.id,
+            },
+          });
+
+          if (vehicles.data.length === 0) {
+            Alert.alert(
+              'Você não possui veículos cadastrados',
+              'Por favor, cadastre um veículo para continuar',
+              [
+                {
+                  text: 'Cadastrar',
+                  onPress: () => {
+                    navigation.navigate('addVehicle');
+                  },
+                },
+
+                {
+                  text: 'Voltar',
+                  onPress: () => {
+                    navigation.goBack();
+                  },
+                },
+              ]
+            );
+            return;
+          }
+
+          setUserVehicles(vehicles.data);
+        } catch (error) {
+          toast.show({
+            title: 'Erro ao buscar parceiros',
+            placement: 'top',
+            bgColor: 'red.500',
+          });
+        } finally {
+          setIsLoading(false);
+        }
+      }
+
+      fetchData();
+    }, [])
+  );
 
   return (
     <VStack>
       <VStack>
         <AppHeader title="Novo agendamento" />
       </VStack>
+
       {isLoading && (
         <LoadingModal
           showModal={isLoading}
@@ -321,7 +341,7 @@ export function NewSchedule() {
                 </Text>
                 <Input
                   placeholder={'Data'}
-                  w={120}
+                  w={150}
                   editable={false}
                   value={date}
                   caretHidden
@@ -381,7 +401,7 @@ export function NewSchedule() {
 
           <VStack p={5} mb={5} backgroundColor="white" borderRadius={10}>
             <VStack>
-              <Text bold>Informacoes adicionais</Text>
+              <Text bold>Informacoes adicionais (Opcional)</Text>
             </VStack>
             <VStack>
               <TextArea

@@ -69,29 +69,7 @@ export function LocationDetails() {
   const { locationId } = routes.params as RouteParamsProps;
   const navigation = useNavigation<PartnerNavigatorRoutesProps>();
 
-  async function handleFetchLocationDetails() {
-    try {
-      setIsLoading(true);
-      setLoadingMessage('Carregando detalhes da localização');
-      const response = await api.get(`/locations/${locationId}`, {
-        headers: {
-          id: user.id,
-        },
-      });
-
-      setLocation(response.data);
-    } catch (error) {
-      toast.show({
-        title: 'Erro ao carregar detalhes da localização',
-        placement: 'top',
-        bgColor: 'red.500',
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  }
-
-  async function handleUserProfilePictureSelect() {
+  async function handleLocationPhotos() {
     try {
       setIsPhotoLoading(true);
       const photoSelected = await ImagePicker.launchImageLibraryAsync({
@@ -158,74 +136,6 @@ export function LocationDetails() {
       });
     } finally {
       setIsPhotoLoading(false);
-      await handleFetchLocationDetails();
-    }
-  }
-
-  async function handleAvatarLocation() {
-    try {
-      setIsPhotoLoading(true);
-      const photoSelected = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        quality: 1,
-        aspect: [4, 4],
-        allowsEditing: true,
-      });
-
-      if (photoSelected.canceled) {
-        return;
-      }
-
-      if (photoSelected.assets[0].uri) {
-        const photoInfo = (await FileSystem.getInfoAsync(
-          photoSelected.assets[0].uri
-        )) as IFileInfo;
-
-        if (photoInfo?.size && photoInfo.size / 1021 / 1024 > 5) {
-          toast.show({
-            title: 'A imagem deve ter no máximo 5MB',
-            placement: 'top',
-            bgColor: 'red.500',
-          });
-        }
-
-        const fileExtension = photoSelected.assets[0].uri.split('.').pop();
-
-        const photoFile = {
-          name: `${user.username}.${fileExtension}`.toLowerCase(),
-          uri: photoSelected.assets[0].uri,
-          type: `${photoSelected.assets[0].type}/${fileExtension}`,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } as any;
-
-        const userPhotoUploadForm = new FormData();
-        userPhotoUploadForm.append('avatar', photoFile);
-
-        await api.put(`/locations/avatar/${location.id}`, userPhotoUploadForm, {
-          headers: {
-            id: user.id,
-            'Content-Type': 'multipart/form-data',
-          },
-        });
-
-        toast.show({
-          title: 'Foto atualizada',
-          placement: 'top',
-          bgColor: 'green.500',
-        });
-        setIsPhotoLoading(false);
-      }
-    } catch (error) {
-      const isAppError = error instanceof AppError;
-      const title = isAppError ? error.message : 'Erro na atualização';
-      toast.show({
-        title,
-        placement: 'top',
-        bgColor: 'red.500',
-      });
-    } finally {
-      setIsPhotoLoading(false);
-      await handleFetchLocationDetails();
     }
   }
 
@@ -242,7 +152,6 @@ export function LocationDetails() {
         placement: 'top',
         bgColor: 'green.500',
       });
-      await handleFetchLocationDetails();
     } catch (error) {
       toast.show({
         title: 'Erro ao deletar foto',
@@ -253,12 +162,30 @@ export function LocationDetails() {
   }
 
   useEffect(() => {
-    handleFetchLocationDetails();
+    async function fetchLocationDetails() {
+      try {
+        setIsLoading(true);
+        setLoadingMessage('Carregando detalhes da localização');
+        const response = await api.get(`/locations/${locationId}`, {
+          headers: {
+            id: user.id,
+          },
+        });
 
-    return () => {
-      setLocation({} as ILocation);
-    };
-  }, []);
+        setLocation(response.data);
+      } catch (error) {
+        toast.show({
+          title: 'Erro ao carregar detalhes da localização',
+          placement: 'top',
+          bgColor: 'red.500',
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchLocationDetails();
+  }, [locationId]);
 
   return (
     <VStack>
@@ -281,51 +208,7 @@ export function LocationDetails() {
             />
           )}
 
-          <VStack>
-            <Center px={5}>
-              {isPhotoLoading ? (
-                <Skeleton
-                  w={40}
-                  height={40}
-                  rounded={'full'}
-                  startColor={'purple.400'}
-                  endColor={'purple.900'}
-                />
-              ) : (
-                <UserPhoto
-                  source={{
-                    uri: location.avatar
-                      ? `${api.defaults.baseURL}/locations/avatar/${location.id}/${location.avatar}`
-                      : `https://ui-avatars.com/api/?format=png&name=${location.business_name}&size=512`,
-                  }}
-                  alt="Foto de perfil"
-                  size={40}
-                />
-              )}
-
-              <Pressable
-                w={10}
-                h={10}
-                ml={20}
-                mt={-10}
-                backgroundColor="purple.500"
-                borderRadius="full"
-                justifyContent="center"
-                alignItems="center"
-                shadow={3}
-                onPress={handleAvatarLocation}
-                _pressed={{ backgroundColor: 'purple.600' }}
-              >
-                <Icon as={Entypo} name="edit" size="lg" color="white" />
-              </Pressable>
-
-              <Text pb={1} bold>
-                Adicione a logo de sua empresa
-              </Text>
-            </Center>
-          </VStack>
-
-          <VStack backgroundColor="white" borderRadius={10} p={5} mt={10}>
+          <VStack backgroundColor="white" borderRadius={10} p={5}>
             <HStack>
               <VStack>
                 <UserPhoto
@@ -674,7 +557,7 @@ export function LocationDetails() {
                         ? '+ Adicionar photo'
                         : '+ Adicionar mais fotos'
                     }
-                    onPress={handleUserProfilePictureSelect}
+                    onPress={handleLocationPhotos}
                     h={50}
                     variant={'outline'}
                   />

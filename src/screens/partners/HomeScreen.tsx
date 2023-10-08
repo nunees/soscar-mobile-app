@@ -3,7 +3,7 @@ import { ISchedules } from '@dtos/ISchedules';
 import { Feather } from '@expo/vector-icons';
 import { useAuth } from '@hooks/useAuth';
 import { useProfile } from '@hooks/useProfile';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { PartnerNavigatorRoutesProps } from '@routes/partner.routes';
 import { api } from '@services/api';
 import { AppError } from '@utils/AppError';
@@ -20,8 +20,7 @@ import {
   Pressable,
   Badge,
 } from 'native-base';
-import { useCallback, useEffect, useState } from 'react';
-import { set } from 'react-hook-form';
+import { useEffect, useState } from 'react';
 
 /**
  * 0 - Cancelado
@@ -29,20 +28,6 @@ import { set } from 'react-hook-form';
  * 2 - Em andamento
  * 3 - Finalizado
  */
-
-type ScheduleCardType = {
-  created_at: string;
-  date: Date;
-  id: string;
-  location_id: string;
-  notes: string;
-  partner_notes: string | null;
-  service_type_id: number;
-  status: number;
-  time: string;
-  user_id: string;
-  vehicle_id: string;
-};
 
 export function HomeScreen() {
   const [schedules, setSchedules] = useState<ISchedules[]>({} as ISchedules[]);
@@ -52,52 +37,51 @@ export function HomeScreen() {
 
   const toast = useToast();
 
-  async function fetchSchedules() {
-    try {
-      const response = await api.get('/schedules/partner', {
+  const navigation = useNavigation<PartnerNavigatorRoutesProps>();
+
+  useEffect(() => {
+    async function fetchUserData() {
+      const response = await api.get(`/user/profile/${user.id}`, {
         headers: {
           id: user.id,
         },
       });
-
-      setSchedules(response.data);
-    } catch (error) {
-      if (error instanceof AppError) {
-        toast.show({
-          title: 'Erro ao carregar agendamentos',
-          placement: 'top',
-          bgColor: 'red.500',
-        });
-      }
+      updateProfile({
+        birth_date: response.data.birth_date,
+        cpf: response.data.cpf,
+        genderId: response.data.genderId,
+        last_name: response.data.last_name,
+        name: response.data.name,
+        phone: response.data.mobile_phone,
+      });
     }
-  }
 
-  const fetchUserData = useCallback(async (user_id: string) => {
-    const response = await api.get(`/user/profile/${user_id}`, {
-      headers: {
-        id: user_id,
-      },
-    });
-    return response;
+    fetchUserData();
   }, []);
 
-  const navigation = useNavigation<PartnerNavigatorRoutesProps>();
-
-  useFocusEffect(
-    useCallback(() => {
-      fetchUserData(user.id).then((response) => {
-        updateProfile({
-          birth_date: response.data.birth_date,
-          cpf: response.data.cpf,
-          genderId: response.data.genderId,
-          last_name: response.data.last_name,
-          name: response.data.name,
-          phone: response.data.mobile_phone,
+  useEffect(() => {
+    async function fetchSchedules() {
+      try {
+        const response = await api.get('/schedules/partner', {
+          headers: {
+            id: user.id,
+          },
         });
-      });
-      fetchSchedules();
-    }, [])
-  );
+
+        setSchedules(response.data);
+      } catch (error) {
+        if (error instanceof AppError) {
+          toast.show({
+            title: 'Erro ao carregar agendamentos',
+            placement: 'top',
+            bgColor: 'red.500',
+          });
+        }
+      }
+    }
+
+    fetchSchedules();
+  }, [schedules.length]);
 
   return (
     <ScrollView showsVerticalScrollIndicator={false}>

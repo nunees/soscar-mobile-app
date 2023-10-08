@@ -1,14 +1,12 @@
 import UserPhoto from '@components/UserPhoto';
 import { ILocation } from '@dtos/ILocation';
 import { Feather } from '@expo/vector-icons';
-import { useGPS } from '@hooks/useGPS';
 import { useProfile } from '@hooks/useProfile';
 import { api } from '@services/api';
 import { CalculatePositionDistance } from '@utils/CalculatePositionDistance';
 import {
   VStack,
   HStack,
-  Heading,
   Text,
   IImageProps,
   IIconProps,
@@ -26,7 +24,6 @@ type Props = IImageProps &
 
 export function PartnerCard({ location, ...rest }: Props) {
   const { profile } = useProfile();
-  const { coords } = useGPS();
 
   function functionMapsNavigate() {
     const scheme = Platform.select({
@@ -63,8 +60,6 @@ export function PartnerCard({ location, ...rest }: Props) {
     ).toPrecision(3)
   );
 
-  console.log(coords);
-
   return (
     <VStack
       w={380}
@@ -79,17 +74,18 @@ export function PartnerCard({ location, ...rest }: Props) {
         <HStack>
           <UserPhoto
             source={{
-              uri: location?.avatar
-                ? `${api.defaults.baseURL}/locations/avatar/${location?.id}/${location?.avatar}`
-                : `https://ui-avatars.com/api/?format=png&name=${location?.business_name}`,
+              uri: location.users?.avatar
+                ? `${api.defaults.baseURL}/user/avatar/${location.user_id}/${location.users.avatar}`
+                : `https://ui-avatars.com/api/?format=png&name=${location.users?.name}+${location.users?.email}&size=512`,
             }}
             alt="Foto de perfil"
-            size={90}
-            borderRadius={100}
+            size={100}
           />
           <VStack ml={2} mb={3}>
             <HStack justifyContent="space-between" mb={1}>
-              <Heading>{location?.business_name} </Heading>
+              <Text bold fontSize="md">
+                {location?.business_name}{' '}
+              </Text>
             </HStack>
 
             <VStack>

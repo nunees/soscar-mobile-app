@@ -247,7 +247,7 @@ export default function EditProfileInformation() {
           paddingBottom: 100,
         }}
       >
-        <VStack px={10} py={5}>
+        <VStack px={5} py={5}>
           <Center px={10}>
             {isPhotoLoading ? (
               <Skeleton
@@ -288,116 +288,120 @@ export default function EditProfileInformation() {
             <Text pb={1}>{user.username}</Text>
           </Center>
 
-          <Text bold fontSize="xs">
-            Nome
-          </Text>
-          <Controller
-            control={control}
-            name="name"
-            render={({ field: { value, onChange } }) => (
-              <Input
-                placeholder={user.name}
-                onChangeText={onChange}
-                value={value}
-                errorMessage={errors.name?.message}
-              />
-            )}
-          />
+          <VStack backgroundColor={'white'} p={5} borderRadius={10}>
+            <Text bold fontSize="xs">
+              Nome
+            </Text>
+            <Controller
+              control={control}
+              name="name"
+              render={({ field: { value, onChange } }) => (
+                <Input
+                  placeholder={user.name}
+                  onChangeText={onChange}
+                  value={value}
+                  errorMessage={errors.name?.message}
+                />
+              )}
+            />
 
-          <Text bold fontSize="xs">
-            Sobrenome
-          </Text>
-          <Controller
-            control={control}
-            name="lastName"
-            render={({ field: { value, onChange } }) => (
-              <Input
-                placeholder={profile.last_name}
-                onChangeText={onChange}
-                value={value}
-                errorMessage={errors.lastName?.message}
-              />
-            )}
-          />
+            <Text bold fontSize="xs">
+              Sobrenome
+            </Text>
+            <Controller
+              control={control}
+              name="lastName"
+              render={({ field: { value, onChange } }) => (
+                <Input
+                  placeholder={profile.last_name}
+                  onChangeText={onChange}
+                  value={value}
+                  errorMessage={errors.lastName?.message}
+                />
+              )}
+            />
 
-          <Text bold fontSize="xs">
-            CPF
-          </Text>
-          <Input
-            placeholder={profile.cpf}
-            editable={false}
-            value={profile.cpf}
-            caretHidden={true}
-            backgroundColor="gray.700"
-            borderBottomColor={'gray.700'}
-          />
+            <Text bold fontSize="xs">
+              CPF
+            </Text>
+            <Input
+              placeholder={profile.cpf}
+              editable={false}
+              isDisabled={true}
+              value={profile.cpf}
+              caretHidden={true}
+              helperText="Seu numero de CPF não pode ser alterado"
+            />
 
-          <Text bold fontSize="xs">
-            Tel. Celular
-          </Text>
+            <Text bold fontSize="xs">
+              Tel. Celular
+            </Text>
 
-          <Controller
-            control={control}
-            name="phone"
-            render={({ field: { value, onChange } }) => (
-              <Input
-                placeholder={profile.phone}
-                onChangeText={onChange}
-                value={value}
-                errorMessage={errors.phone?.message}
-              />
-            )}
-          />
+            <Controller
+              control={control}
+              name="phone"
+              render={({ field: { value, onChange } }) => (
+                <Input
+                  placeholder={profile.phone}
+                  onChangeText={onChange}
+                  value={value}
+                  errorMessage={errors.phone?.message}
+                />
+              )}
+            />
 
-          <Text bold fontSize="xs">
-            Email
-          </Text>
-          <Input
-            value={user.email}
-            placeholder={user.email}
-            editable={false}
-            caretHidden={true}
-            backgroundColor="gray.700"
-            borderBottomColor={'gray.700'}
-          />
+            <Text bold fontSize="xs">
+              Email
+            </Text>
+            <Input
+              value={user.email}
+              placeholder={user.email}
+              editable={false}
+              isDisabled={true}
+              caretHidden={true}
+              helperText="Seu email não pode ser alterado"
+            />
 
-          <Text bold fontSize="xs">
-            Nome de usuário
-          </Text>
-          <Controller
-            control={control}
-            name="username"
-            render={({ field: { value, onChange } }) => (
-              <Input
-                placeholder={user.username}
-                onChangeText={onChange}
-                value={value}
-                errorMessage={errors.username?.message}
-              />
-            )}
-          />
-          <Text bold fontSize="xs">
-            Data de nascimento
-          </Text>
+            <Text bold fontSize="xs">
+              Nome de usuário
+            </Text>
+            <Controller
+              control={control}
+              name="username"
+              render={({ field: { value, onChange } }) => (
+                <Input
+                  placeholder={user.username}
+                  onChangeText={onChange}
+                  value={value}
+                  errorMessage={errors.username?.message}
+                />
+              )}
+            />
+            <Text bold fontSize="xs">
+              Data de nascimento
+            </Text>
 
-          <Input
-            placeholder={tempDate}
-            editable={false}
-            value={tempDate || profile?.birth_date?.toString()}
-            caretHidden
-            onPressIn={() => {
-              DateTimePickerAndroid.open({
-                mode: 'date',
-                value: new Date(),
-                onChange: (event, date) => handleDate(date as Date),
-              });
-            }}
-          />
-
+            <Input
+              placeholder={tempDate}
+              editable={false}
+              isDisabled={true}
+              value={
+                tempDate || profile?.birth_date
+                  ? profile.birth_date
+                      .toString()
+                      .split('T')[0]
+                      .split('-')
+                      .reverse()
+                      .join('/') || 'Nao informado'
+                  : 'Nao informado'
+              }
+              caretHidden
+            />
+          </VStack>
           <Button
+            mt={10}
             isLoading={showModal}
             title="Atualizar informações"
-            mt={10}
             onPress={handleSubmit(handleSubmitProfile)}
           />
         </VStack>

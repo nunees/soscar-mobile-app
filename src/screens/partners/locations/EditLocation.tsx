@@ -4,16 +4,21 @@ import ButtonSelection from '@components/ButtonSelection';
 import { Input } from '@components/Input';
 import { LoadingModal } from '@components/LoadingModal';
 import { TextArea } from '@components/TextArea';
+import { ILocation } from '@dtos/ILocation';
 import { useAuth } from '@hooks/useAuth';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import { PartnerNavigatorRoutesProps } from '@routes/partner.routes';
 import { api } from '@services/api';
 import { AppError } from '@utils/AppError';
 import { ConvertAddressToLatLong } from '@utils/CalculatePositionDistance';
 import { GetAddressByCEP } from '@utils/GetAddressByCEP';
 import { VStack, Text, useToast, ScrollView, HStack } from 'native-base';
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 
 type RouteParamProps = {
   locationId: string;
@@ -64,39 +69,26 @@ function handleMultipleSelection(
 }
 
 export function EditLocation() {
-  const [isUploading, setIsUploading] = useState(false);
-  const [message, setMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState<string>('');
 
-  const [cnpj, setCnpj] = useState<string>('');
-  const [business_name, setBusinessName] = useState<string>('');
-  const [business_phone, setBusinessPhone] = useState<string>('');
-  const [business_email, setBusinessEmail] = useState<string>('');
-  const [address_line, setAddressLine] = useState<string>('');
-  const [number, setNumber] = useState<string>('');
-  const [district, setDistrict] = useState<string>('');
-  const [city, setCity] = useState<string>('');
-  const [state, setState] = useState<string>('');
+  const [location, setLocation] = useState<ILocation>({} as ILocation);
+
   const [zipcode, setZipCode] = useState<string>('');
-
-  const [latitude, setLatitude] = useState<string>('');
-  const [longitude, setLongitude] = useState<string>('');
 
   const [payment_methods, setPaymentMethods] = useState<number[]>([]);
   const [openHoursWeekend, setOpenHoursWeekend] = useState<string[]>([]);
   const [business_categories, setBusinessCategories] = useState<number[]>([]);
-  const [business_description, setBusinessDescription] = useState<string>('');
 
   const [openHour, setOpenHour] = useState<string>('');
   const [closeHour, setCloseHour] = useState<string>('');
 
-  const [correctZipCode, setCorrectZipCode] = useState<boolean>(false);
+  const { user } = useAuth();
+  const toast = useToast();
+  const navigation = useNavigation<PartnerNavigatorRoutesProps>();
 
   const routes = useRoute();
-  const toast = useToast();
-  const { user } = useAuth();
-
   const { locationId } = routes.params as RouteParamProps;
-  const navigation = useNavigation<PartnerNavigatorRoutesProps>();
 
   const handleHour = useCallback((date: Date | undefined, state: string) => {
     if (date) {
@@ -113,80 +105,77 @@ export function EditLocation() {
     }
   }, []);
 
-  const handleCEP = useCallback(async (value: string) => {
-    if (value.length === 8) {
-      try {
-        setIsUploading(true);
-        setMessage('Procurando endereco');
-        setCorrectZipCode(false);
-        const address = await GetAddressByCEP(value);
+  // eslint-disable-next-line consistent-return
+  async function handleCepInput(cep: string) {
+    try {
+      setIsLoading(true);
+      setMessage('Buscando endereço...');
+
+      if (zipcode.length === 8) {
+        const address = await GetAddressByCEP(cep);
         if (address.data.erro || !address.data.logradouro) {
-          throw new AppError('CEP invalido');
+          return null;
         }
 
-        setAddressLine(address.data.logradouro);
-        setDistrict(address.data.bairro);
-        setCity(address.data.localidade);
-        setState(address.data.uf);
-
-        const location = await ConvertAddressToLatLong(
+        const position = await ConvertAddressToLatLong(
           `${address.data.logradouro}, ${address.data.bairro} - ${address.data.uf}`
         );
 
-        if (!location) {
-          throw new AppError('Endereço invalido');
+        if (position) {
+          setLocation({
+            ...location,
+            address_line: address.data.logradouro,
+            district: address.data.bairro,
+            city: address.data.localidade,
+            state: address.data.uf,
+            zipcode: address.data.cep,
+            latitude: String(position.latitude),
+            longitude: String(position.longitude),
+          });
         }
-
-        setLatitude(String(location.latitude));
-        setLongitude(String(location.longitude));
-      } catch (error) {
-        const isAppError = error instanceof AppError;
-        const title = isAppError ? error.message : 'O CEP informado é invalido';
-        toast.show({
-          title,
-          placement: 'top',
-          bgColor: 'red.500',
-        });
-      } finally {
-        setIsUploading(false);
       }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
     }
-  }, []);
+  }
 
   const handleSubmitBusiness = useCallback(async () => {
     try {
-      setMessage('Salvando');
-      setIsUploading(true);
+      setMessage('Salvando local...');
+      setIsLoading(true);
 
       await api.patch(
         `/locations/${locationId}`,
         {
-          cnpj,
-          business_name,
-          business_phone,
-          business_email,
-          address_line,
-          number: Number(number),
-          district,
-          city,
-          state,
-          zipcode,
-          latitude,
-          longitude,
-          payment_methods,
+          cnpj: location.cnpj,
+          business_name: location.business_name,
+          business_phone: location.business_phone,
+          business_email: location.business_email,
+          address_line: location.address_line,
+          number: Number(location.number),
+          district: location.district,
+          city: location.city,
+          state: location.state,
+          zipcode: location.zipcode,
+
+          business_description: location.business_description,
           business_categories,
+          payment_methods,
+
           open_hours: `${openHour} - ${closeHour}`,
           open_hours_weekend: openHoursWeekend,
-          business_description,
         },
         {
           headers: {
             id: user.id,
+            'Content-Type': 'application/json',
           },
         }
       );
 
-      setIsUploading(false);
+      setIsLoading(false);
       toast.show({
         title: 'Local cadastrado com sucesso!',
         placement: 'top',
@@ -202,35 +191,41 @@ export function EditLocation() {
         bgColor: 'red.500',
       });
     } finally {
-      setIsUploading(false);
+      setIsLoading(false);
     }
   }, []);
 
   const handleFetchLocationDetails = useCallback(async () => {
     try {
-      setIsUploading(true);
-      setMessage('Carregando detalhes do local');
+      setIsLoading(true);
+      setMessage('Carregando informacoes do local');
       const response = await api.get(`/locations/${locationId}`, {
         headers: {
           id: user.id,
         },
       });
 
-      setCnpj(response.data.cnpj);
-      setBusinessName(response.data.business_name);
-      setBusinessPhone(response.data.business_phone);
-      setBusinessEmail(response.data.business_email);
-      setAddressLine(response.data.address_line);
-      setNumber(String(response.data.number));
-      setDistrict(response.data.district);
-      setCity(response.data.city);
-      setState(response.data.state);
+      setLocation({
+        ...location,
+        cnpj: response.data.cnpj,
+        business_name: response.data.business_name,
+        business_phone: response.data.business_phone,
+        business_email: response.data.business_email,
+        address_line: response.data.address_line,
+        number: String(response.data.number),
+        district: response.data.district,
+        city: response.data.city,
+        state: response.data.state,
+        zipcode: response.data.zipcode,
+        latitude: response.data.latitude,
+        longitude: response.data.longitude,
+        business_description: response.data.business_description,
+      });
+
       setZipCode(response.data.zipcode);
-      setLatitude(String(response.data.latitude));
-      setLongitude(String(response.data.longitude));
       setPaymentMethods(response.data.payment_methods);
       setBusinessCategories(response.data.business_categories);
-      setBusinessDescription(response.data.business_description);
+
       setOpenHour(response.data.open_hours.split('-')[0].trim());
       setCloseHour(response.data.open_hours.split('-')[1].trim());
       setOpenHoursWeekend(response.data.open_hours_weekend);
@@ -245,23 +240,28 @@ export function EditLocation() {
         bgColor: 'red.500',
       });
     } finally {
-      setIsUploading(false);
+      setIsLoading(false);
     }
   }, []);
 
-  useEffect(() => {
-    handleFetchLocationDetails();
-  }, []);
+  console.log(location);
+
+  useFocusEffect(
+    useCallback(() => {
+      handleFetchLocationDetails();
+    }, [locationId])
+  );
 
   return (
-    <VStack>
+    <VStack flex={1}>
       <VStack>
-        <AppHeader title="Editar local" />
+        <AppHeader title="Editar Local" />
       </VStack>
-      {isUploading && (
+
+      {setIsLoading && (
         <LoadingModal
-          showModal={isUploading}
-          setShowModal={setIsUploading}
+          showModal={isLoading}
+          setShowModal={setIsLoading}
           message={message}
         />
       )}
@@ -269,64 +269,67 @@ export function EditLocation() {
       <VStack>
         <ScrollView
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 200 }}
-          style={{
-            paddingTop: 20,
-          }}
+          contentContainerStyle={{ paddingBottom: 100 }}
         >
-          <VStack px={5}>
-            <VStack p={5} mt={5} borderRadius={10} backgroundColor="white">
-              <Text fontSize="md" bold mb={3}>
+          <VStack py={10} px={19}>
+            <VStack p={5} mb={5} borderRadius={10} backgroundColor="white">
+              <Text fontSize="md" fontFamily="heading" bold mb={3}>
                 Informacoes pessoais
               </Text>
               <Input
                 placeholder="CNPJ ou CPF"
-                value={cnpj}
+                value={location.cnpj}
                 keyboardType="numeric"
-                onChangeText={setCnpj}
+                onChangeText={(value) =>
+                  setLocation({ ...location, cnpj: value })
+                }
               />
-
               <Input
                 placeholder="Nome Fantasia"
-                value={business_name}
-                onChangeText={setBusinessName}
+                value={location.business_name}
+                onChangeText={(value) =>
+                  setLocation({ ...location, business_name: value })
+                }
               />
               <Input
                 placeholder="Telefone"
-                value={business_phone}
-                onChangeText={setBusinessPhone}
+                value={location.business_phone}
+                onChangeText={(value) =>
+                  setLocation({ ...location, business_phone: value })
+                }
+                keyboardType="numeric"
               />
               <Input
                 placeholder="Email"
-                value={business_email}
-                onChangeText={setBusinessEmail}
+                value={location.business_email}
+                onChangeText={(value) =>
+                  setLocation({ ...location, business_email: value })
+                }
               />
             </VStack>
 
             <VStack mb={5} p={5} backgroundColor="white" borderRadius={10}>
-              <Text fontSize="md" bold mb={3}>
+              <Text fontSize="md" fontFamily={'heading'} bold mb={3}>
                 Localizaçao
               </Text>
 
               <VStack>
                 <HStack>
-                  <VStack mr={5}>
+                  <VStack mr={2}>
                     <Input
                       w={200}
                       placeholder="CEP"
                       value={zipcode}
                       onChangeText={setZipCode}
                       keyboardType="numeric"
-                      isInvalid={correctZipCode}
-                      errorMessage={correctZipCode ? 'CEP invalido' : ''}
                     />
                   </VStack>
                   <VStack>
                     <Button
                       title="Procurar"
                       w={120}
-                      onPress={() => handleCEP(zipcode)}
-                      isLoading={isUploading}
+                      onPress={() => handleCepInput(zipcode)}
+                      isLoading={isLoading}
                     />
                   </VStack>
                 </HStack>
@@ -334,8 +337,7 @@ export function EditLocation() {
 
               <Input
                 placeholder="Endereço"
-                value={address_line}
-                onChangeText={setAddressLine}
+                value={location.address_line}
                 editable={false}
                 isDisabled={true}
                 caretHidden={true}
@@ -343,13 +345,15 @@ export function EditLocation() {
               />
               <Input
                 placeholder="Número"
-                onChangeText={setNumber}
-                value={String(number)}
+                onChangeText={(value) =>
+                  setLocation({ ...location, number: value })
+                }
+                value={location.number}
+                keyboardType="numeric"
               />
               <Input
                 placeholder="Bairro"
-                value={district}
-                onChangeText={setDistrict}
+                value={location.district}
                 editable={false}
                 isDisabled={true}
                 caretHidden={true}
@@ -357,8 +361,7 @@ export function EditLocation() {
               />
               <Input
                 placeholder="Cidade"
-                value={city}
-                onChangeText={setCity}
+                value={location.city}
                 editable={false}
                 isDisabled={true}
                 caretHidden={true}
@@ -366,8 +369,7 @@ export function EditLocation() {
               />
               <Input
                 placeholder="Estado"
-                value={state}
-                onChangeText={setState}
+                value={location.state}
                 editable={false}
                 isDisabled={true}
                 caretHidden={true}
@@ -557,17 +559,19 @@ export function EditLocation() {
               <TextArea
                 placeholder="Ele pode ser o diferencial para o cliente escolher o seu estabelecimento."
                 h={150}
-                value={business_description}
-                onChangeText={setBusinessDescription}
+                value={location.business_description}
+                onChangeText={(value) =>
+                  setLocation({ ...location, business_description: value })
+                }
                 fontSize="md"
                 borderRadius={5}
               />
             </VStack>
 
             <Button
-              title="Salvar alteracoes"
+              title="Criar local"
               onPress={handleSubmitBusiness}
-              isLoading={isUploading}
+              isLoading={isLoading}
             />
           </VStack>
         </ScrollView>

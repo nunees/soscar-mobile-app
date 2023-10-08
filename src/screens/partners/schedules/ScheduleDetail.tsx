@@ -72,8 +72,6 @@ export function ScheduleDetail() {
         },
       });
 
-      console.log(response.data);
-
       setSchedule(response.data);
 
       setCarLogo(response.data.vehicles.brand.icon);

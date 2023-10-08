@@ -36,7 +36,7 @@
     "native-base": "^3.4.28",
     "react": "18.2.0",
     "react-hook-form": "^7.45.4",
-    "react-native": "0.71.8",
+    "react-native": "0.71.13",
     "react-native-calendar-picker": "^7.1.4",
     "react-native-calendars": "^1.1301.0",
     "react-native-dotenv": "^3.4.9",
@@ -47,7 +47,8 @@
     "react-native-svg": "13.4.0",
     "react-native-video": "^5.2.1",
     "yup": "^1.2.0",
-    "@react-native-community/netinfo": "9.3.7"
+    "@react-native-community/netinfo": "9.3.7",
+    "expo-document-picker": "~11.2.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

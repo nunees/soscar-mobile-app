@@ -7,7 +7,7 @@ export interface ILocation {
   business_phone: string;
   business_email: string;
   address_line: string;
-  number: number;
+  number: string;
   city: string;
   district: string;
   state: string;

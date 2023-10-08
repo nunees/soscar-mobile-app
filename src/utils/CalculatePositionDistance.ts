@@ -37,8 +37,6 @@ export async function ConvertAddressToLatLong(address: string) {
     // }
 
     // Obter as coordenadas do endereço
-
-    console.log('OK');
     const location = await Location.geocodeAsync(address);
 
     if (location && location.length > 0) {

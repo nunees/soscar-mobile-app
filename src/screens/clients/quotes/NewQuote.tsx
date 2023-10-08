@@ -7,12 +7,14 @@ import { TextArea } from '@components/TextArea';
 import UserPhoto from '@components/UserPhoto';
 import { ILocation } from '@dtos/ILocation';
 import { IVehicleDTO } from '@dtos/IVechicleDTO';
+import { FontAwesome5 } from '@expo/vector-icons';
 import { useAuth } from '@hooks/useAuth';
 import { useProfile } from '@hooks/useProfile';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
 import { api } from '@services/api';
 import { AppError } from '@utils/AppError';
+import { CalculatePositionDistance } from '@utils/CalculatePositionDistance';
 import { Video, ResizeMode } from 'expo-av';
 import { IFileInfo } from 'expo-file-system';
 import * as FileSystem from 'expo-file-system';
@@ -26,6 +28,7 @@ import {
   useToast,
   Image,
   Modal,
+  Icon,
 } from 'native-base';
 import React, { useEffect, useState } from 'react';
 import { Pressable } from 'react-native';
@@ -283,35 +286,61 @@ export function NewQuote() {
       >
         <VStack px={5} mb={3}>
           <HStack backgroundColor="white" borderRadius={10} py={5} px={5}>
-            <HStack mr={10}>
+            <HStack mr={3}>
               <UserPhoto
                 source={{
-                  uri: location?.avatar
-                    ? `${api.defaults.baseURL}/locations/avatar/${location?.id}/${location?.avatar}`
-                    : `https://ui-avatars.com/api/?format=png&name=${location?.business_name}`,
+                  uri: location?.users?.avatar
+                    ? `${api.defaults.baseURL}/user/avatar/${location.user_id}/${location.users.avatar}`
+                    : `https://ui-avatars.com/api/?format=png&name=${user.name}+${profile.last_name}&size=512`,
                 }}
                 alt="Foto de perfil"
                 size={90}
-                borderRadius={100}
               />
             </HStack>
 
             <HStack>
-              <VStack>
+              <VStack maxW={250}>
                 <Text bold fontSize="md" textTransform="uppercase">
                   {location?.business_name}
                 </Text>
-                <Center>
-                  <Text fontSize="xs">{location?.address_line}</Text>
-                  <Text fontSize="xs">
-                    {location?.city} - {location?.state}
-                  </Text>
 
-                  <Text fontSize="xs">{location?.business_phone}</Text>
-                </Center>
+                <Text fontSize="xs">
+                  {location?.address_line}, {location?.number}
+                </Text>
+                <Text fontSize="xs">
+                  {location?.city} - {location?.state}
+                </Text>
+
+                <Text fontSize="xs">{location?.business_phone}</Text>
+                <HStack>
+                  <Icon
+                    as={FontAwesome5}
+                    name="map-marker-alt"
+                    size={3}
+                    mt={1}
+                  />
+                  <Text fontSize="xs">
+                    {CalculatePositionDistance(
+                      [Number(profile.latitude), Number(profile.longitude)],
+                      [Number(location?.latitude), Number(location?.longitude)]
+                    ).toFixed(2)}
+                    {' km de distancia'}
+                  </Text>
+                </HStack>
               </VStack>
             </HStack>
+
+            {/* */}
           </HStack>
+        </VStack>
+
+        <VStack px={5} mb={3}>
+          <VStack backgroundColor="white" borderRadius={10} py={5} px={5}>
+            <Text fontSize="md" bold mb={2}>
+              Avaliacoes
+            </Text>
+            <Icon as={FontAwesome5} name="star" size={3} mt={1} />
+          </VStack>
         </VStack>
 
         <VStack px={5} py={1}>
@@ -378,13 +407,11 @@ export function NewQuote() {
         <VStack px={5} py={1}>
           <VStack backgroundColor="white" borderRadius={10} p={5}>
             <Text fontSize="md" bold mb={2}>
-              Informacoes adicionais
+              Informacoes adicionais (opcional)
             </Text>
             <TextArea
               h={150}
-              placeholder="Insira informacoes que possam ajudar o profissional a entender
-              melhor o seu problema e te ajudar da melhor forma possivel"
-              fontSize="md"
+              fontSize="sm"
               textAlign="justify"
               onChangeText={setUserNotes}
             />
@@ -400,11 +427,11 @@ export function NewQuote() {
 
               <Button
                 colorScheme="purple"
-                w={50}
-                h={30}
+                w={100}
+                h={50}
                 onPress={handleMediaSelect}
-                hasIcon
-                iconName="plus"
+                title="Adicionar"
+                variant={'outline'}
               />
             </HStack>
             <VStack>
@@ -422,7 +449,7 @@ export function NewQuote() {
                 ) {
                   return (
                     <VStack>
-                      <Pressable onLongPress={() => setShowMediaMenu(true)}>
+                      <Pressable onPress={() => setShowMediaMenu(true)}>
                         {showMediaMenu && (
                           <Modal
                             isOpen={showMediaMenu}
@@ -455,6 +482,7 @@ export function NewQuote() {
                           resizeMode="contain"
                           w={320}
                           h={200}
+                          key={file.uri}
                         />
                       </Pressable>
                     </VStack>

@@ -19,14 +19,25 @@ type Props = IImageProps &
 
 export function ListServices({ image, alt, title, content, ...rest }: Props) {
   return (
-    <Pressable {...rest} px={1}>
-      <HStack w={400} mb={2} backgroundColor="white" p={5} borderRadius={10}>
-        <Image source={image} alt={alt} w={20} h={20} {...rest} />
-        <VStack pl={3} w={280}>
-          <Text bold fontSize="md">
+    <Pressable {...rest}>
+      <HStack
+        mb={2}
+        backgroundColor="white"
+        p={5}
+        borderRadius={10}
+        flexWrap={'nowrap'}
+      >
+        <Image source={image} alt={alt} size={20} {...rest} />
+        <VStack pl={3} w={250}>
+          <Text bold fontSize="xs">
             {title}
           </Text>
-          <Text textAlign="justify" color="gray.400">
+          <Text
+            fontSize="sm"
+            fontFamily="body"
+            textAlign="left"
+            color="gray.400"
+          >
             {content}
           </Text>
         </VStack>

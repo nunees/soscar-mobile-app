@@ -21,6 +21,7 @@ type RouteParamsProps = {
 
 export function SearchSchedule() {
   const [isLoading, setIsLoading] = useState(false);
+
   const [locations, setLocations] = useState<ILocation[]>({} as ILocation[]);
 
   const navigation = useNavigation<AppNavigatorRoutesProps>();
@@ -33,6 +34,7 @@ export function SearchSchedule() {
   const findLocations = useCallback(
     async (serviceId: string, user_id: string) => {
       try {
+        setIsLoading(true);
         const response = await api.get(`/locations/services/${serviceId}`, {
           headers: {
             id: user_id,
@@ -48,6 +50,8 @@ export function SearchSchedule() {
           placement: 'top',
           bgColor: 'red.500',
         });
+      } finally {
+        setIsLoading(false);
       }
     },
     [locations]
@@ -78,6 +82,7 @@ export function SearchSchedule() {
 
       <VStack>
         <FlatList
+          contentContainerStyle={{ paddingBottom: 100 }}
           data={locations}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => {

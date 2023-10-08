@@ -172,15 +172,13 @@ export function SignUp() {
     setIsLoading(false);
   }
 
-  console.log(isClient, isPartner);
-
   return (
     <ScrollView
       contentContainerStyle={{ flexGrow: 1 }}
       showsVerticalScrollIndicator={false}
     >
       <VStack px={5} py={5}>
-        <VStack p={5} backgroundColor="white">
+        <VStack p={5} backgroundColor="white" borderRadius={10}>
           <Center py={5}>
             <Heading fontSize="xlg" color="gray.800">
               Registre-se gratuitamente
@@ -196,7 +194,8 @@ export function SignUp() {
             <HStack justifyContent={'space-around'} mb={3}>
               <VStack
                 p={3}
-                borderWidth={2}
+                borderWidth={1}
+                borderColor="gray.200"
                 backgroundColor={isClient ? 'purple.600' : 'transparent'}
                 borderRadius={15}
               >
@@ -209,7 +208,8 @@ export function SignUp() {
 
               <VStack
                 p={3}
-                borderWidth={2}
+                borderWidth={1}
+                borderColor="gray.200"
                 backgroundColor={isPartner ? 'purple.600' : 'transparent'}
                 borderRadius={15}
               >

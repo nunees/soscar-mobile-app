@@ -1,85 +1,25 @@
 import { AppHeader } from '@components/AppHeader';
-import { Loading } from '@components/Loading';
 import { LoadingModal } from '@components/LoadingModal';
+import { ServicesList } from '@data/ServicesList';
 import { IQuoteList } from '@dtos/IQuoteList';
-import { Entypo, Feather } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
 import { useAuth } from '@hooks/useAuth';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
 import { api } from '@services/api';
 import { AppError } from '@utils/AppError';
-import { VStack, Text, FlatList, HStack, Icon, Pressable } from 'native-base';
-import { useEffect, useState } from 'react';
-
-const serviceTypes = [
-  // Acessórios
-  { id: 1, category_id: 1, name: 'Calotas' },
-  { id: 2, category_id: 1, name: 'Carregadores' },
-  { id: 3, category_id: 1, name: 'Suportes' },
-  { id: 4, category_id: 1, name: 'Outros' },
-
-  // Câmbio
-  { id: 5, category_id: 2, name: 'Retifica' },
-  { id: 6, category_id: 2, name: 'Revisão' },
-  { id: 7, category_id: 2, name: 'Troca de fluido' },
-  { id: 8, category_id: 2, name: 'Outros' },
-
-  // Elétrico
-  { id: 9, category_id: 3, name: 'Bateria' },
-  { id: 10, category_id: 3, name: 'Lâmpadas' },
-  { id: 11, category_id: 3, name: 'Revisão' },
-  { id: 12, category_id: 3, name: 'Vidros' },
-  { id: 13, category_id: 3, name: 'Outros' },
-
-  // Fluidos
-  { id: 14, category_id: 4, name: 'Arrefecimento' },
-  { id: 15, category_id: 4, name: 'Freio' },
-  { id: 16, category_id: 4, name: 'Óleo' },
-  { id: 17, category_id: 4, name: 'Outros' },
-
-  // Funilaria e Pintura
-  { id: 18, category_id: 5, name: 'Funilaria' },
-  { id: 19, category_id: 5, name: 'Pintura' },
-  { id: 20, category_id: 5, name: 'Outros' },
-
-  // Lavagem
-  { id: 21, category_id: 6, name: 'Completa' },
-  { id: 22, category_id: 6, name: 'Simples' },
-  { id: 23, category_id: 6, name: 'Outros' },
-
-  // Mecânico
-  { id: 24, category_id: 7, name: 'Alinhamento' },
-  { id: 25, category_id: 7, name: 'Balanceamento' },
-  { id: 26, category_id: 7, name: 'Correia dentada' },
-  { id: 27, category_id: 7, name: 'Embreagem' },
-  { id: 28, category_id: 7, name: 'Escapamento' },
-  { id: 29, category_id: 7, name: 'Freio' },
-  { id: 30, category_id: 7, name: 'Injeção eletrônica' },
-  { id: 31, category_id: 7, name: 'Motor' },
-  { id: 32, category_id: 7, name: 'Revisão' },
-  { id: 33, category_id: 7, name: 'Suspensão' },
-  { id: 34, category_id: 7, name: 'Outros' },
-
-  // Pneus
-  { id: 35, category_id: 8, name: 'Alinhamento' },
-  { id: 36, category_id: 8, name: 'Balanceamento' },
-  { id: 37, category_id: 8, name: 'Troca' },
-  { id: 38, category_id: 8, name: 'Reparos' },
-  { id: 39, category_id: 8, name: 'Outros' },
-
-  // Suspensão
-  { id: 40, category_id: 9, name: 'Amortecedor' },
-  { id: 41, category_id: 9, name: 'Molas' },
-  { id: 42, category_id: 9, name: 'Outros' },
-
-  // Vidros
-  { id: 43, category_id: 10, name: 'Reparo' },
-  { id: 44, category_id: 10, name: 'Troca' },
-  { id: 45, category_id: 10, name: 'Outros' },
-
-  // Outros
-  { id: 46, category_id: 11, name: 'Outros' },
-];
+import {
+  VStack,
+  Text,
+  FlatList,
+  HStack,
+  Icon,
+  Pressable,
+  Center,
+  useToast,
+  Divider,
+} from 'native-base';
+import { useCallback, useEffect, useState } from 'react';
 
 export function QuotesList() {
   const [isLoading, setIsLoading] = useState(false);
@@ -89,30 +29,39 @@ export function QuotesList() {
   const { user } = useAuth();
   const navigation = useNavigation<AppNavigatorRoutesProps>();
 
-  async function fetchData() {
-    try {
-      setIsLoading(true);
-      setIsLoadingMessage('Buscando orçamentos...');
-      const response = await api.get('/quotes/', {
-        headers: {
-          id: user.id,
-        },
-      });
+  const toast = useToast();
 
-      setQuotes(response.data);
-      setIsLoading(false);
-      setIsLoadingMessage('');
-    } catch (error) {
-      throw new AppError(error.message);
-    } finally {
-      setIsLoadingMessage('');
-      setIsLoading(false);
-    }
-  }
+  useFocusEffect(
+    useCallback(() => {
+      async function fetchData() {
+        try {
+          setIsLoading(true);
+          setIsLoadingMessage('Buscando orçamentos...');
+          const response = await api.get('/quotes/client', {
+            headers: {
+              id: user.id,
+            },
+          });
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+          setQuotes(response.data);
+        } catch (error) {
+          const isAppError = error instanceof AppError;
+          const errorMessage = isAppError
+            ? error.message
+            : 'Ocorreu um erro ao buscar os orçamentos';
+          toast.show({
+            title: errorMessage,
+            placement: 'top',
+            bgColor: 'red.500',
+          });
+        } finally {
+          setIsLoading(false);
+        }
+      }
+
+      fetchData();
+    }, [])
+  );
 
   return (
     <VStack pb={10}>
@@ -135,8 +84,9 @@ export function QuotesList() {
             alignSelf="center"
             onPress={() =>
               navigation.navigate('quoteDetails', {
-                hashId: item.hashId,
+                locationId: item.location_id,
                 quoteId: item.id,
+                vehicleId: item.vehicle_id,
               })
             }
           >
@@ -198,7 +148,7 @@ export function QuotesList() {
                     />
                     <Text fontWeight={'normal'} pl={2}>
                       {
-                        serviceTypes.find(
+                        ServicesList.find(
                           (service) => service.id === item.service_type_id
                         )?.name
                       }
@@ -222,8 +172,8 @@ export function QuotesList() {
                   </HStack>
                 </VStack>
               </HStack>
-
-              <HStack mt={5}>
+              <Divider mt={2} />
+              <HStack>
                 <Text fontSize="xs" color="gray.600">
                   key: {item.hashId}
                 </Text>
@@ -233,7 +183,11 @@ export function QuotesList() {
         )}
         keyExtractor={(item) => item.id}
         ListEmptyComponent={() => (
-          <Text>Nao exitem orcamentos registrados</Text>
+          <Center>
+            <Text bold color="gray.400">
+              Nao exitem orcamentos registrados
+            </Text>
+          </Center>
         )}
       />
     </VStack>
