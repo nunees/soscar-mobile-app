@@ -12,7 +12,7 @@ export function Routes() {
   const { colors } = useTheme();
 
   // eslint-disable-next-line prefer-destructuring
-  theme.colors.background = colors.purple[800];
+  theme.colors.background = colors.gray[100];
   const { user, isLoadingUserStorageData } = useAuth();
 
   // if (isLoadingUserStorageData) {
