@@ -1,26 +1,39 @@
+/* eslint-disable import/no-extraneous-dependencies */
+import AvatarSVG from '@assets/avatar.svg';
 import { Button } from '@components/Button';
 import { Input } from '@components/Input';
 import { Select } from '@components/Select';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useAuth } from '@hooks/useAuth';
+import { useDateFormater } from '@hooks/useDateFormater';
+import { useIdGenerator } from '@hooks/useIdGenerator';
 import { useProfile } from '@hooks/useProfile';
+import { useUploadImage } from '@hooks/useUploadImage';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
 import { AuthNavigatorRoutesProps } from '@routes/auth.routes';
 import { api } from '@services/api';
 import { AppError } from '@utils/AppError';
 import {
-  Heading,
   ScrollView,
   VStack,
   Text,
   Center,
   useToast,
-  HStack,
+  Avatar,
+  Pressable,
+  Icon,
+  Skeleton,
 } from 'native-base';
+import {
+  PencilSimpleLine,
+  Eye,
+  EyeClosed,
+  Calendar,
+} from 'phosphor-react-native';
 import { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import * as yup from 'yup';
 
 import { genders } from '../data/genders';
@@ -53,20 +66,32 @@ const registrationSchema = yup.object().shape({
 
 export function SignUp() {
   const [isLoading, setIsLoading] = useState(false);
+  const [isPhotoLoading, setIsPhotoLoading] = useState(false);
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [userPhoto, setUserPhoto] = useState<any>('');
+  const [userPhotoUploadForm, setUserPhotoUploadForm] = useState<
+    FormData | undefined
+  >({} as FormData);
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const [allGenders] = useState(genders);
   const [selectedGender, setSelectedGender] = useState(0);
 
-  const [date, setDate] = useState('');
+  const [date, setDate] = useState<string>('');
 
-  const [isClient, setIsClient] = useState(false);
   const [isPartner, setIsPartner] = useState(false);
-
-  const toast = useToast();
-
-  const navigation = useNavigation<AuthNavigatorRoutesProps>();
 
   const { signIn } = useAuth();
   const { saveProfile } = useProfile();
+  const { handleUserProfilePictureSelect } = useUploadImage();
+  const { generateId } = useIdGenerator();
+  const { formatDate } = useDateFormater();
+
+  const toast = useToast();
+  const navigation = useNavigation<AuthNavigatorRoutesProps>();
 
   const {
     control,
@@ -76,24 +101,44 @@ export function SignUp() {
     resolver: yupResolver(registrationSchema),
   });
 
-  function handleDate(date: Date) {
-    const day = date.getDate();
-    const month = date.getMonth() + 1;
-    const year = date.getFullYear();
-    setDate(`${day}/${month}/${year}`);
+  async function uploadUserImage(user_id: string) {
+    try {
+      await api.patch(`/user/avatar/${user_id}`, userPhotoUploadForm, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+    } catch (error) {
+      const isAppError = error instanceof AppError;
+      const title = isAppError ? error.message : 'Erro na atualização';
+      toast.show({
+        title,
+        placement: 'top',
+        bgColor: 'red.500',
+      });
+    }
   }
 
-  function handleGoBack() {
-    navigation.goBack();
-  }
-
-  function handleToggleButton() {
-    if (isClient) {
-      setIsClient(false);
-      setIsPartner(true);
-    } else {
-      setIsClient(true);
-      setIsPartner(false);
+  async function getUserPhoto() {
+    try {
+      setIsPhotoLoading(true);
+      const profilePicture = await handleUserProfilePictureSelect(
+        generateId(32)
+      );
+      setUserPhoto(profilePicture?.photoFile.uri);
+      setUserPhotoUploadForm(profilePicture?.userPhotoUploadForm);
+    } catch (error) {
+      const isAppError = error instanceof AppError;
+      const title = isAppError
+        ? error.message
+        : 'Erro ao atualizar foto de perfil';
+      toast.show({
+        title,
+        placement: 'top',
+        bgColor: 'red.500',
+      });
+    } finally {
+      setIsPhotoLoading(false);
     }
   }
 
@@ -109,30 +154,10 @@ export function SignUp() {
     try {
       setIsLoading(true);
 
-      if (isClient && isPartner) {
-        setIsLoading(false);
-        toast.show({
-          title: 'Selecione apenas um perfil de usuário',
-          placement: 'top',
-          bgColor: 'red.500',
-        });
-        return;
-      }
-
-      if (!isClient && !isPartner) {
-        setIsLoading(false);
-        toast.show({
-          title: 'Selecione um perfil de usuário',
-          placement: 'top',
-          bgColor: 'red.500',
-        });
-        return;
-      }
-
       const localDate = date.split('/');
       const serverDate = `${localDate[2]}-${localDate[1]}-${localDate[0]}`;
 
-      await api.post('/user/new', {
+      const response = await api.post('/user/new', {
         name,
         last_name: lastName,
         cpf,
@@ -142,9 +167,11 @@ export function SignUp() {
         genderId: selectedGender,
         username,
         password,
-        isPartner: !isClient,
+        isPartner: !!isPartner,
         isTermsAccepted: true,
       });
+
+      await uploadUserImage(response.data.id);
 
       await saveProfile({
         name,
@@ -155,7 +182,6 @@ export function SignUp() {
         genderId: Number(selectedGender),
       });
 
-      setIsLoading(false);
       await signIn(email, password);
     } catch (error) {
       const isAppError = error instanceof AppError;
@@ -173,65 +199,77 @@ export function SignUp() {
   }
 
   return (
-    <ScrollView
-      contentContainerStyle={{ flexGrow: 1 }}
-      showsVerticalScrollIndicator={false}
-    >
-      <VStack px={5} py={5}>
-        <VStack p={5} backgroundColor="white" borderRadius={10}>
-          <Center py={5}>
-            <Heading fontSize="xlg" color="gray.800">
-              Registre-se gratuitamente
-            </Heading>
+    <SafeAreaView>
+      <ScrollView
+        contentContainerStyle={{ paddingBottom: 50 }}
+        showsVerticalScrollIndicator={false}
+      >
+        <VStack borderBottomRadius={10} bg={'white'} pb={10}>
+          <Center mt={5} px={10}>
+            <Text bold fontFamily={'body'} fontSize={'lg'}>
+              Boas vindas
+            </Text>
+            <Text fontSize={'sm'} color={'gray.700'} textAlign={'center'}>
+              Crie sua conta e encontre os melhores serviços
+            </Text>
           </Center>
 
-          <VStack>
-            <Center>
-              <Text color="gray.500" fontFamily={'body'} fontSize="md" pb={5}>
-                Qual o seu tipo de perfil?
-              </Text>
-            </Center>
-            <HStack justifyContent={'space-around'} mb={3}>
-              <VStack
-                p={3}
-                borderWidth={1}
-                borderColor="gray.200"
-                backgroundColor={isClient ? 'purple.600' : 'transparent'}
-                borderRadius={15}
+          <Center mt={5}>
+            {isPhotoLoading ? (
+              <Skeleton
+                borderRadius={100}
+                w={100}
+                h={100}
+                startColor="purple.200"
+                endColor="purple.900"
+              />
+            ) : (
+              <Avatar
+                w={100}
+                h={100}
+                borderWidth={3}
+                borderColor={'purple.500'}
+                source={
+                  userPhoto && {
+                    uri: userPhoto,
+                  }
+                }
               >
-                <TouchableOpacity onPress={handleToggleButton}>
-                  <Text bold color={isClient ? 'white' : 'gray.400'}>
-                    Sou um cliente
-                  </Text>
-                </TouchableOpacity>
-              </VStack>
+                {!userPhoto && <AvatarSVG width={100} height={100} />}
+                <Avatar.Badge
+                  bg={'purple.800'}
+                  size={10}
+                  justifyContent={'center'}
+                  alignItems={'center'}
+                  borderWidth={0}
+                >
+                  <Pressable
+                    onPress={getUserPhoto}
+                    _pressed={{
+                      opacity: 0.5,
+                    }}
+                  >
+                    <PencilSimpleLine size={16} color="white" />
+                  </Pressable>
+                </Avatar.Badge>
+              </Avatar>
+            )}
+          </Center>
 
-              <VStack
-                p={3}
-                borderWidth={1}
-                borderColor="gray.200"
-                backgroundColor={isPartner ? 'purple.600' : 'transparent'}
-                borderRadius={15}
-              >
-                <TouchableOpacity onPress={handleToggleButton}>
-                  <Text bold color={isPartner ? 'white' : 'gray.400'}>
-                    Sou um parceiro
-                  </Text>
-                </TouchableOpacity>
-              </VStack>
-            </HStack>
-          </VStack>
-
-          <Center>
-            <Text
-              color="gray.500"
-              pt={5}
-              fontFamily={'body'}
+          <Center mt={3} px={10}>
+            <Select
               fontSize="md"
-              pb={5}
-            >
-              Seus dados pessoais
-            </Text>
+              width={'full'}
+              mb={5}
+              placeholder="Qual o seu tipo de usuário?"
+              data={['Cliente', 'Parceiro'].map((item, index) => {
+                return { label: item, value: index };
+              })}
+              label={isPartner ? 'Parceiro' : 'Cliente'}
+              onValueChange={(value) => setIsPartner(!!value)}
+              key={isPartner ? 'Parceiro' : 'Cliente'}
+            />
+
             <Controller
               control={control}
               name="name"
@@ -312,18 +350,23 @@ export function SignUp() {
               editable={false}
               value={date}
               caretHidden
-              onPressIn={() => {
-                DateTimePickerAndroid.open({
-                  mode: 'date',
-                  value: new Date(),
-                  onChange: (event, date) => handleDate(date as Date),
-                });
-              }}
+              selectTextOnFocus={false}
+              showSoftInputOnFocus={false}
+              InputRightElement={
+                <Pressable
+                  onPress={() => {
+                    DateTimePickerAndroid.open({
+                      mode: 'date',
+                      value: new Date(),
+                      onChange: (event, date) =>
+                        setDate(formatDate(date as Date)),
+                    });
+                  }}
+                >
+                  <Icon as={<Calendar />} size={20} color={'gray.400'} mr={2} />
+                </Pressable>
+              }
             />
-
-            <Text mb={5} fontFamily="body" fontSize="md">
-              Seus dados de acesso
-            </Text>
 
             <Controller
               control={control}
@@ -358,11 +401,21 @@ export function SignUp() {
               name="password"
               render={({ field: { onChange, value } }) => (
                 <Input
-                  placeholder="Senha"
+                  placeholder={'Senha'}
+                  secureTextEntry={!showPassword}
                   autoCapitalize="none"
-                  secureTextEntry
                   onChangeText={onChange}
                   value={value}
+                  InputRightElement={
+                    <Pressable onPress={() => setShowPassword(!showPassword)}>
+                      <Icon
+                        as={showPassword ? <Eye /> : <EyeClosed />}
+                        size={20}
+                        color={'gray.400'}
+                        mr={2}
+                      />
+                    </Pressable>
+                  }
                   errorMessage={errors.password?.message}
                 />
               )}
@@ -375,48 +428,62 @@ export function SignUp() {
                 <Input
                   placeholder="Confirmar senha"
                   autoCapitalize="none"
-                  secureTextEntry
+                  secureTextEntry={!showConfirmPassword}
                   onChangeText={onChange}
                   value={value}
+                  InputRightElement={
+                    <Pressable
+                      onPress={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
+                    >
+                      <Icon
+                        as={showConfirmPassword ? <Eye /> : <EyeClosed />}
+                        size={20}
+                        color={'gray.400'}
+                        mr={2}
+                      />
+                    </Pressable>
+                  }
                   errorMessage={errors.confirmPassword?.message}
                 />
               )}
             />
 
-            <VStack>
+            <VStack mb={5}>
               <Text
                 color="gray.400"
                 fontFamily="body"
                 fontSize="sm"
-                textAlign="justify"
+                textAlign="center"
               >
                 Ao prosseguir você concorda com os termos e condições de uso do
-                aplicativo que estão disponíveis abaixo.
+                aplicativo.
               </Text>
-
-              <TouchableOpacity onPress={() => navigation.navigate('terms')}>
-                <Text fontWeight="bold" textAlign="center">
-                  Termos e condições de uso
-                </Text>
-              </TouchableOpacity>
             </VStack>
 
             <Button
-              title="Cadastrar"
+              variant={'dark'}
+              title="Criar conta"
               onPress={handleSubmit(handleSignClientSignUp)}
               isLoading={isLoading}
-              mt={5}
-            />
-
-            <Button
-              title="Voltar"
-              variant={'outline'}
-              onPress={handleGoBack}
-              mt={3}
             />
           </Center>
         </VStack>
-      </VStack>
-    </ScrollView>
+
+        <VStack px={10}>
+          <Center mt={50}>
+            <Text fontSize={'md'} color="gray.200" pb={3}>
+              Já tem uma conta?
+            </Text>
+            <Button
+              variant={'light'}
+              title={'Fazer login'}
+              onPress={() => navigation.goBack()}
+            />
+          </Center>
+        </VStack>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
