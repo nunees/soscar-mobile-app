@@ -1,7 +1,5 @@
-import BackgroundPNG from '@assets/login/background.png';
 import { Button } from '@components/Button';
 import { Input } from '@components/Input';
-import { Feather } from '@expo/vector-icons';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useAuth } from '@hooks/useAuth';
 import { useNavigation } from '@react-navigation/native';
@@ -13,13 +11,15 @@ import {
   VStack,
   Text,
   useToast,
-  HStack,
   Icon,
-  Image,
+  Box,
 } from 'native-base';
-import { useState } from 'react';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { Eye, EyeClosed } from 'phosphor-react-native';
+import React, { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { Pressable, TouchableOpacity, ScrollView } from 'react-native';
+import { Pressable } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import * as yup from 'yup';
 
 type FormDataProps = {
@@ -34,6 +34,7 @@ const loginSchema = yup.object().shape({
 
 export function SignIn() {
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const { signIn } = useAuth();
   const navigation = useNavigation<AuthNavigatorRoutesProps>();
@@ -61,7 +62,7 @@ export function SignIn() {
 
       toast.show({
         title,
-        placement: 'bottom',
+        placement: 'top',
         bgColor: 'red.500',
       });
     } finally {
@@ -70,124 +71,106 @@ export function SignIn() {
   }
 
   return (
-    <VStack flex={1} backgroundColor="purple.900">
-      <ScrollView
-        contentContainerStyle={{
-          paddingBottom: 20,
-        }}
-      >
-        <VStack>
-          <VStack width={'full'} height={400}>
-            <Image
-              source={BackgroundPNG}
-              alt="background image"
-              resizeMode="cover"
-            />
-          </VStack>
-        </VStack>
-
-        <VStack
-          backgroundColor="purple.900"
-          borderTopLeftRadius={10}
-          borderTopRightRadius={10}
-          flex={1}
-        >
-          <VStack px={10} py={3}>
-            <Heading color="gray.100">Bem-vindo!</Heading>
-            <Text color="gray.200">Faça login para continuar</Text>
-          </VStack>
-
+    <SafeAreaView>
+      <Box>
+        <VStack borderBottomRadius={40} pb={70} bg={'white'}>
           <VStack>
-            <VStack>
-              <VStack ml={5}></VStack>
-              <Center px={10} mt={2}>
-                <Controller
-                  control={control}
-                  name="email"
-                  rules={{ required: 'Informe seu e-mail' }}
-                  render={({ field: { onChange, value } }) => (
-                    <Input
-                      InputLeftElement={
+            <Center mt={20}>
+              <Heading size="xl" fontFamily={'body'} color="gray.900">
+                sos.
+                <Heading size="xl" fontFamily={'body'} color="purple.700">
+                  auto
+                </Heading>
+              </Heading>
+              <Text color={'gray.500'} px={20} textAlign={'center'}>
+                Encontre profissionais ou preste servicos, tudo em um so lugar.
+              </Text>
+            </Center>
+
+            <Center mt={110} px={10}>
+              <Text pb={5} fontSize={'sm'} color="gray.700">
+                Acesse sua conta
+              </Text>
+
+              <Controller
+                control={control}
+                name="email"
+                rules={{ required: 'Informe seu e-mail' }}
+                render={({ field: { onChange, value } }) => (
+                  <Input
+                    placeholder="E-mail"
+                    autoCapitalize="none"
+                    fontSize={'md'}
+                    keyboardType="email-address"
+                    onChangeText={onChange}
+                    value={value}
+                    errorMessage={errors.email?.message}
+                  />
+                )}
+              />
+
+              <Controller
+                control={control}
+                name="password"
+                rules={{ required: 'Informe sua senha' }}
+                render={({ field: { onChange, value } }) => (
+                  <Input
+                    placeholder="Senha"
+                    autoCapitalize="none"
+                    fontSize={'md'}
+                    secureTextEntry={!showPassword}
+                    onChangeText={onChange}
+                    value={value}
+                    InputRightElement={
+                      <Pressable onPress={() => setShowPassword(!showPassword)}>
                         <Icon
-                          as={Feather}
-                          name="mail"
-                          size={5}
-                          ml={2}
-                          color="gray.400"
+                          as={showPassword ? <Eye /> : <EyeClosed />}
+                          size={20}
+                          color={'gray.400'}
+                          mr={2}
                         />
-                      }
-                      selectionColor={'white'}
-                      backgroundColor={'transparent'}
-                      color="gray.100"
-                      fontSize="md"
-                      placeholder="Email"
-                      autoCapitalize="none"
-                      keyboardType="email-address"
-                      onChangeText={onChange}
-                      value={value}
-                      errorMessage={errors.email?.message}
-                    />
-                  )}
-                />
+                      </Pressable>
+                    }
+                    errorMessage={errors.password?.message}
+                  />
+                )}
+              />
 
-                <Controller
-                  control={control}
-                  name="password"
-                  rules={{ required: 'Informe sua senha' }}
-                  render={({ field: { onChange, value } }) => (
-                    <Input
-                      InputLeftElement={
-                        <Icon
-                          as={Feather}
-                          name="key"
-                          size={5}
-                          ml={2}
-                          color="gray.400"
-                        />
-                      }
-                      backgroundColor={'transparent'}
-                      color="gray.100"
-                      fontSize="md"
-                      placeholder="Senha"
-                      autoCapitalize="none"
-                      secureTextEntry
-                      onChangeText={onChange}
-                      value={value}
-                      errorMessage={errors.password?.message}
-                    />
-                  )}
-                />
-
-                <HStack justifyContent={'space-between'}>
-                  <TouchableOpacity>
-                    <Text bold color="purple.200" fontSize="xs">
-                      Esqueci minha senha
-                    </Text>
-                  </TouchableOpacity>
-                </HStack>
-
-                <Button
-                  title="Acessar"
-                  mt={5}
-                  onPress={handleSubmit(handleSignIn)}
-                  isLoading={isLoading}
-                />
-
-                <HStack mt={5}>
-                  <Text fontSize="xs" color="gray.100">
-                    Não tem uma conta?
-                  </Text>
-                  <Pressable onPress={handleSignUp}>
-                    <Text bold color="purple.200" pl={1} fontSize="xs">
-                      Registre-se
-                    </Text>
-                  </Pressable>
-                </HStack>
+              <Center mb={5}>
+                <Text fontSize={'xs'} color="purple.700" bold>
+                  Esqueceu sua senha?
+                </Text>
               </Center>
-            </VStack>
+
+              <Button
+                title="Acessar"
+                variant={'dark'}
+                onPress={handleSubmit(handleSignIn)}
+                isLoading={isLoading}
+              />
+            </Center>
           </VStack>
         </VStack>
-      </ScrollView>
-    </VStack>
+
+        <VStack px={10}>
+          <Center mt={5}>
+            <Text fontSize={'md'} color="gray.200" pb={5}>
+              Ainda nao tem acesso?
+            </Text>
+            <Button
+              title="Criar uma conta"
+              variant={'light'}
+              onPress={handleSignUp}
+            />
+          </Center>
+        </VStack>
+
+        <Center mt={5}>
+          <Text color="white" fontSize={'xs'}>
+            Versao 1.0.0 (alpha)
+          </Text>
+        </Center>
+      </Box>
+    </SafeAreaView>
   );
 }

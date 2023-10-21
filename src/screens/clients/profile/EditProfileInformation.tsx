@@ -6,6 +6,7 @@ import { Entypo } from '@expo/vector-icons';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useAuth } from '@hooks/useAuth';
 import { useProfile } from '@hooks/useProfile';
+import { useUploadImage } from '@hooks/useUploadImage';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
@@ -26,7 +27,7 @@ import {
   VStack,
   useToast,
 } from 'native-base';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
@@ -230,6 +231,52 @@ export default function EditProfileInformation() {
       setIsPhotoLoading(false);
     }
   }
+
+  // const { handleUserProfilePictureSelect } = useUploadImage();
+
+  // const uploadUserImage = useCallback(async () => {
+  //   const userPhotoUploadForm = await handleUserProfilePictureSelect(user);
+
+  //   if (!userPhotoUploadForm) {
+  //     return;
+  //   }
+
+  //   try {
+  //     const avatarResponse = await api.patch(
+  //       '/user/avatar',
+  //       userPhotoUploadForm,
+  //       {
+  //         headers: {
+  //           id: user.id,
+  //           'Content-Type': 'multipart/form-data',
+  //         },
+  //       }
+  //     );
+
+  //     const userUpdated = user;
+  //     if (avatarResponse.data.avatar) {
+  //       userUpdated.avatar = avatarResponse.data.avatar;
+  //     } else {
+  //       userUpdated.avatar = '';
+  //     }
+  //     updateUserAuth(userUpdated);
+
+  //     toast.show({
+  //       title: 'Foto atualizada',
+  //       placement: 'top',
+  //       bgColor: 'green.500',
+  //     });
+  //     setIsPhotoLoading(false);
+  //   } catch (error) {
+  //     const isAppError = error instanceof AppError;
+  //     const title = isAppError ? error.message : 'Erro na atualização';
+  //     toast.show({
+  //       title,
+  //       placement: 'top',
+  //       bgColor: 'red.500',
+  //     });
+  //   }
+  // }, []);
 
   useEffect(() => {
     loadData();

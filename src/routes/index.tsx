@@ -12,7 +12,7 @@ export function Routes() {
   const { colors } = useTheme();
 
   // eslint-disable-next-line prefer-destructuring
-  theme.colors.background = colors.gray[100];
+  theme.colors.background = colors.purple[800];
   const { user, isLoadingUserStorageData } = useAuth();
 
   // if (isLoadingUserStorageData) {
@@ -20,7 +20,7 @@ export function Routes() {
   // }
 
   return (
-    <Box flex={1} bg="white">
+    <Box flex={1} bg={'white'}>
       {isLoadingUserStorageData && <Loading />}
       <NavigationContainer theme={theme}>
         {/* {
