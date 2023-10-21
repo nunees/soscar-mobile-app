@@ -1,14 +1,13 @@
 import CalendarImage from '@assets/services/calendar.png';
 import CompliantImage from '@assets/services/compliant.png';
 import PaperImage from '@assets/services/paper.png';
-import { Button } from '@components/Button';
 import { SearchBar } from '@components/SearchBar';
 import { ServiceCardTypes } from '@components/ServiceCardTypes';
 import { SmallSchedulleCard } from '@components/SmallSchedulleCard';
 import UserPhoto from '@components/UserPhoto';
 import { ISchedules } from '@dtos/ISchedules';
 import { useAuth } from '@hooks/useAuth';
-import { useGPS } from '@hooks/useGPS';
+// import { useGPS } from '@hooks/useGPS';
 import { useProfile } from '@hooks/useProfile';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
@@ -21,18 +20,19 @@ import {
   Badge,
   FlatList,
   Center,
+  Pressable,
 } from 'native-base';
 import { useCallback, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export function HomeScreen() {
   const { user } = useAuth();
-  const { profile, updateProfile } = useProfile();
+  const { updateProfile } = useProfile();
 
   const [schedules, setSchedules] = useState<ISchedules[]>([]);
 
   const navigation = useNavigation<AppNavigatorRoutesProps>();
-  const { coords } = useGPS();
+  // const { coords } = useGPS();
 
   const fetchUserData = useCallback(async (user_id: string) => {
     const response = await api.get(`/user/profile/${user_id}`, {
@@ -84,7 +84,7 @@ export function HomeScreen() {
                   {user.name}!
                 </Text>
               </VStack>
-              <VStack>
+              <Pressable onPress={() => navigation.navigate('profile')}>
                 <UserPhoto
                   source={{
                     uri: user.avatar
@@ -96,7 +96,7 @@ export function HomeScreen() {
                   borderWidth={3}
                   borderColor="purple.700"
                 />
-              </VStack>
+              </Pressable>
             </HStack>
             <HStack mt={3}>
               <SearchBar />

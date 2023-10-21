@@ -3,6 +3,9 @@ import {
   createBottomTabNavigator,
   BottomTabNavigationProp,
 } from '@react-navigation/bottom-tabs';
+import { ChangePassword } from '@screens/ChangePassword';
+import EditProfileInformation from '@screens/EditProfileInformation';
+import MyAccountInformation from '@screens/MyAccountInformation';
 import { Assistance } from '@screens/partners/Assistance';
 import { HomeScreen } from '@screens/partners/HomeScreen';
 import { AddLocation } from '@screens/partners/locations/AddLocation';
@@ -10,12 +13,9 @@ import { EditLocation } from '@screens/partners/locations/EditLocation';
 import { LocationDetails } from '@screens/partners/locations/LocationDetails';
 import { Locations } from '@screens/partners/locations/Locations';
 import { Orders } from '@screens/partners/Orders';
-import { ChangePassword } from '@screens/partners/profile/ChangePassword';
-import EditProfileInformation from '@screens/partners/profile/EditProfileInformation';
-import MyAccountInformation from '@screens/partners/profile/MyAccountInformation';
-import { Profile } from '@screens/partners/profile/Profile';
 import { QuoteDetail } from '@screens/partners/quotes/QuoteDetail';
 import { ScheduleDetail } from '@screens/partners/schedules/ScheduleDetail';
+import { Profile } from '@screens/Profile';
 import { Icon, useTheme } from 'native-base';
 
 type PartnerRoutes = {

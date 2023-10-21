@@ -3,13 +3,10 @@ import {
   createBottomTabNavigator,
   BottomTabNavigationProp,
 } from '@react-navigation/bottom-tabs';
+import { ChangePassword } from '@screens/ChangePassword';
 import { Assistance } from '@screens/clients/Assistance';
 import { HomeScreen } from '@screens/clients/HomeScreen';
 import { PartnerDetails } from '@screens/clients/PartnerDetails';
-import { ChangePassword } from '@screens/clients/profile/ChangePassword';
-import EditProfileInformation from '@screens/clients/profile/EditProfileInformation';
-import MyAccountInformation from '@screens/clients/profile/MyAccountInformation';
-import { Profile } from '@screens/clients/profile/Profile';
 import { LegalQuotes } from '@screens/clients/quotes/LegalQuotes';
 import { NewLegalQuote } from '@screens/clients/quotes/NewLegalQuote';
 import { NewQuote } from '@screens/clients/quotes/NewQuote';
@@ -27,6 +24,9 @@ import { Services } from '@screens/clients/Services';
 import { AddVehicle } from '@screens/clients/vehicles/AddVehicle';
 import { VehicleDetails } from '@screens/clients/vehicles/VehicleDetails';
 import { Vechicles } from '@screens/clients/vehicles/Vehicles';
+import EditProfileInformation from '@screens/EditProfileInformation';
+import MyAccountInformation from '@screens/MyAccountInformation';
+import { Profile } from '@screens/Profile';
 import { Icon, useTheme } from 'native-base';
 
 type AppRotes = {
