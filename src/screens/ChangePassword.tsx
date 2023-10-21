@@ -70,7 +70,11 @@ export function ChangePassword() {
   return (
     <VStack>
       <VStack>
-        <AppHeader title="Alterar senha" />
+        <AppHeader
+          title="Alterar senha"
+          navigation={navigation}
+          screen="profile"
+        />
       </VStack>
 
       <VStack px={10} py={10}>

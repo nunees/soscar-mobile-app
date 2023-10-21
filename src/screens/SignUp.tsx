@@ -220,7 +220,7 @@ export function SignUp() {
                 borderRadius={100}
                 w={100}
                 h={100}
-                startColor="purple.200"
+                startColor="purple.100"
                 endColor="purple.900"
               />
             ) : (

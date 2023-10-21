@@ -5,6 +5,7 @@ import { useAuth } from '@hooks/useAuth';
 import { useProfile } from '@hooks/useProfile';
 import { useNavigation } from '@react-navigation/native';
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
+import { PartnerNavigatorRoutesProps } from '@routes/partner.routes';
 import { api } from '@services/api';
 import {
   ScrollView,
@@ -25,7 +26,9 @@ export default function MyAccountInformation() {
 
   const toast = useToast();
 
-  const navigation = useNavigation<AppNavigatorRoutesProps>();
+  const navigation = user.isPartner
+    ? useNavigation<PartnerNavigatorRoutesProps>()
+    : useNavigation<AppNavigatorRoutesProps>();
 
   const handleChangeUserType = useCallback(async () => {
     user.isPartner = !user.isPartner;
@@ -58,7 +61,11 @@ export default function MyAccountInformation() {
   return (
     <VStack>
       <VStack>
-        <AppHeader title="Minha conta" />
+        <AppHeader
+          title="Minha conta"
+          navigation={navigation}
+          screen={'profile'}
+        />
       </VStack>
 
       {showModal && (
@@ -188,16 +195,6 @@ export default function MyAccountInformation() {
               {profile.genderId === 5 && 'Outro'}
               {!profile.genderId && 'Nao informado'}
             </Text>
-          </VStack>
-
-          <VStack mt={3}>
-            <Button
-              title="Editar informacoes"
-              onPress={() => navigation.navigate('editProfileInformation')}
-            />
-          </VStack>
-          <VStack mt={3}>
-            <Button title="Excluir conta" variant="outline" />
           </VStack>
         </VStack>
       </ScrollView>

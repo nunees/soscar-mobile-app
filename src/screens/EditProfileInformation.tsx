@@ -7,6 +7,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { useAuth } from '@hooks/useAuth';
 import { useProfile } from '@hooks/useProfile';
 import { useNavigation } from '@react-navigation/native';
+import { AppNavigatorRoutesProps } from '@routes/app.routes';
 import { PartnerNavigatorRoutesProps } from '@routes/partner.routes';
 import { api } from '@services/api';
 import { AppError } from '@utils/AppError';
@@ -53,7 +54,9 @@ export default function EditProfileInformation() {
   const [showModal, setShowModal] = useState(false);
 
   const toast = useToast();
-  const navigation = useNavigation<PartnerNavigatorRoutesProps>();
+  const navigation = user.isPartner
+    ? useNavigation<PartnerNavigatorRoutesProps>()
+    : useNavigation<AppNavigatorRoutesProps>();
 
   const {
     control,
@@ -112,7 +115,6 @@ export default function EditProfileInformation() {
         placement: 'top',
         bgColor: 'green.500',
       });
-      navigation.navigate('myaccountInformation');
     } catch (error) {
       setShowModal(false);
       const isAppError = error instanceof AppError;
@@ -228,7 +230,11 @@ export default function EditProfileInformation() {
   return (
     <VStack>
       <VStack>
-        <AppHeader title="Editar informacoes pessoais" />
+        <AppHeader
+          title="Editar informacoes pessoais"
+          navigation={navigation}
+          screen="profile"
+        />
       </VStack>
 
       <ScrollView
