@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import { Feather } from '@expo/vector-icons';
 import {
   Button as ButtonNativeBase,
@@ -8,7 +9,7 @@ import {
 
 type ButtonProps = IButtonProps & {
   title?: string;
-  variant?: 'solid' | 'outline';
+  variant?: 'dark' | 'outline' | 'light';
   hasIcon?: boolean;
   iconName?: string;
   iconSize?: number;
@@ -16,7 +17,7 @@ type ButtonProps = IButtonProps & {
 
 export function Button({
   title,
-  variant = 'solid',
+  variant = 'dark',
   hasIcon,
   iconName,
   iconSize = 8,
@@ -26,7 +27,15 @@ export function Button({
     <ButtonNativeBase
       w="full"
       h={14}
-      bg={variant === 'solid' ? 'purple.800' : 'transparent'}
+      bg={
+        variant === 'dark'
+          ? 'purple.800'
+          : variant === 'light'
+          ? 'white'
+          : variant === 'outline'
+          ? 'transparent'
+          : 'purple.800'
+      }
       rounded="lg"
       _pressed={{ bg: variant === 'outline' ? 'purple.600' : 'purple.900' }}
       borderWidth={variant === 'outline' ? 2 : 0}
@@ -34,7 +43,17 @@ export function Button({
       {...rest}
     >
       {!hasIcon && (
-        <Text bold color={variant === 'solid' ? 'white' : 'purple.600'}>
+        <Text
+          bold
+          color={
+            variant === 'dark'
+              ? 'white'
+              : variant === 'light'
+              ? 'black'
+              : 'white'
+          }
+          fontSize={'md'}
+        >
           {title}
         </Text>
       )}
