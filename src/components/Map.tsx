@@ -25,7 +25,7 @@ import MapView, { Marker } from 'react-native-maps';
 import MapViewDirections from 'react-native-maps-directions';
 import { Circle } from 'react-native-svg';
 
-import { ServicesSmallCard } from './ServicesSmallCard';
+import { ServicesSmallCard } from './ServicesCard';
 
 type LocationObject = {
   latitude: number;

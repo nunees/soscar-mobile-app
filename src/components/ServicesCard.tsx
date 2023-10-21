@@ -15,12 +15,12 @@ type Props = IIconProps &
     title: string;
   };
 
-export function ServicesSmallCard({ image, alt, title, ...rest }: Props) {
+export function ServicesCard({ image, alt, title, ...rest }: Props) {
   return (
     <HStack
       mr={2}
-      w={100}
-      h={100}
+      w={150}
+      h={150}
       alignItems={'center'}
       justifyContent={'center'}
       borderRadius={5}
