@@ -154,7 +154,7 @@ export function SignIn() {
 
         <VStack px={10}>
           <Center mt={5}>
-            <Text fontSize={'md'} color="gray.200" pb={5}>
+            <Text fontSize={'md'} color="gray.600" pb={5}>
               Ainda nao tem acesso?
             </Text>
             <Button

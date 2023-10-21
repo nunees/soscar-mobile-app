@@ -123,20 +123,41 @@ export function HomeScreen() {
                       key={item.id}
                     >
                       <Badge colorScheme={'purple'} borderRadius={10}>
-                        <SmallSchedulleCard data={item} key={item.id} />
+                        <HStack>
+                          <SmallSchedulleCard data={item} key={item.id} />
+                        </HStack>
                       </Badge>
                     </VStack>
                   );
                 }}
                 ListEmptyComponent={() => (
-                  <Badge colorScheme={'green'} borderRadius={10} p={5} w={350}>
-                    <Center>
-                      <Text color="green.600">Tudo certo!</Text>
-                      <Text color="green.600" bold>
-                        Você não possui agendamentos
-                      </Text>
-                    </Center>
-                  </Badge>
+                  <HStack
+                    backgroundColor="white"
+                    w={350}
+                    borderRadius={10}
+                    p={3}
+                    justifyContent={'space-around'}
+                  >
+                    <VStack w={20} h={20}>
+                      <VStack
+                        backgroundColor={'purple.700'}
+                        borderRadius={10}
+                        alignItems={'center'}
+                      >
+                        <Text bold fontSize={'4xl'} p={3} color="white">
+                          {new Date().getDate().toString()}
+                        </Text>
+                      </VStack>
+                    </VStack>
+                    <VStack pt={5}>
+                      <Center>
+                        <Text color="green.600">Tudo certo! 👍</Text>
+                        <Text color="green.600" bold>
+                          Você não possui agendamentos
+                        </Text>
+                      </Center>
+                    </VStack>
+                  </HStack>
                 )}
               />
             </VStack>
