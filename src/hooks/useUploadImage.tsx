@@ -8,7 +8,10 @@ import { useToast } from 'native-base';
 export function useUploadImage() {
   const toast = useToast();
 
-  async function handleUserProfilePictureSelect(id: string): Promise<
+  async function handleUserProfilePictureSelect(
+    id: string,
+    field = 'avatar'
+  ): Promise<
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     { userPhotoUploadForm: FormData; photoFile: any } | undefined
   > {
@@ -47,7 +50,7 @@ export function useUploadImage() {
         } as any;
 
         const userPhotoUploadForm = new FormData();
-        userPhotoUploadForm.append('avatar', photoFile);
+        userPhotoUploadForm.append(field, photoFile);
 
         return { userPhotoUploadForm, photoFile };
       }

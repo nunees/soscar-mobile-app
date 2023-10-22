@@ -2,63 +2,41 @@ import { AppHeader } from '@components/AppHeader';
 import { Button } from '@components/Button';
 import { LoadingModal } from '@components/LoadingModal';
 import UserPhoto from '@components/UserPhoto';
+import { PAYMENT_TYPES } from '@data/PaymentTypes';
+import { SERVICES_TYPES } from '@data/ServicesTypes';
 import { ILocation } from '@dtos/ILocation';
-import { Entypo, Feather } from '@expo/vector-icons';
+import { FontAwesome5 } from '@expo/vector-icons';
 import { useAuth } from '@hooks/useAuth';
 import { useProfile } from '@hooks/useProfile';
+import { useUploadImage } from '@hooks/useUploadImage';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { PartnerNavigatorRoutesProps } from '@routes/partner.routes';
 import { api } from '@services/api';
 import { AppError } from '@utils/AppError';
-import { IFileInfo } from 'expo-file-system';
-import * as FileSystem from 'expo-file-system';
-import * as ImagePicker from 'expo-image-picker';
 import {
   VStack,
   Text,
   useToast,
   ScrollView,
   HStack,
-  Icon,
   Image,
-  Skeleton,
-  Center,
-  Pressable,
+  FlatList,
+  Icon,
+  Progress,
 } from 'native-base';
 import { useEffect, useState } from 'react';
-import { TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 type RouteParamsProps = {
   locationId: string;
 };
 
-const paymentMethods = [
-  { id: 1, name: 'Dinheiro' },
-  { id: 2, name: 'Crédito' },
-  { id: 3, name: 'Débito' },
-  { id: 4, name: 'PIX' },
-  { id: 5, name: 'Transferencia' },
-  { id: 6, name: 'Outros' },
-];
-
-const servicesCategories = [
-  { id: 1, name: 'Acessorios' },
-  { id: 2, name: 'Cambio' },
-  { id: 3, name: 'Eletrica' },
-  { id: 4, name: 'Fluidos' },
-  { id: 5, name: 'Funilaria e Pintura' },
-  { id: 6, name: 'Lavagem' },
-  { id: 7, name: 'Mecanica' },
-  { id: 8, name: 'Pneus' },
-  { id: 9, name: 'Suspensão' },
-  { id: 10, name: 'Vidros' },
-  { id: 11, name: 'Outros' },
-];
-
 export function LocationDetails() {
   const [location, setLocation] = useState<ILocation>({} as ILocation);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState('');
+
+  const [progressValue, setProgressValue] = useState(0);
   const [isPhotoLoading, setIsPhotoLoading] = useState(false);
 
   const routes = useRoute();
@@ -69,63 +47,41 @@ export function LocationDetails() {
   const { locationId } = routes.params as RouteParamsProps;
   const navigation = useNavigation<PartnerNavigatorRoutesProps>();
 
+  const { handleUserProfilePictureSelect } = useUploadImage();
+
   async function handleLocationPhotos() {
     try {
       setIsPhotoLoading(true);
-      const photoSelected = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        quality: 1,
-        aspect: [4, 4],
-        allowsEditing: true,
-      });
+      setProgressValue(25);
 
-      if (photoSelected.canceled) {
-        return;
+      const fields = await handleUserProfilePictureSelect(user.id, 'photo');
+
+      if (!fields?.userPhotoUploadForm || !fields?.photoFile) {
+        throw new AppError('Erro ao selecionar foto');
       }
 
-      if (photoSelected.assets[0].uri) {
-        const photoInfo = (await FileSystem.getInfoAsync(
-          photoSelected.assets[0].uri
-        )) as IFileInfo;
+      setProgressValue(50);
 
-        if (photoInfo?.size && photoInfo.size / 1021 / 1024 > 5) {
-          toast.show({
-            title: 'A imagem deve ter no máximo 5MB',
-            placement: 'top',
-            bgColor: 'red.500',
-          });
+      await api.patch(
+        `/locations/upload/new/${location.id}`,
+        fields.userPhotoUploadForm,
+        {
+          headers: {
+            id: user.id,
+            'Content-Type': 'multipart/form-data',
+          },
         }
-
-        const fileExtension = photoSelected.assets[0].uri.split('.').pop();
-
-        const photoFile = {
-          name: `${user.username}.${fileExtension}`.toLowerCase(),
-          uri: photoSelected.assets[0].uri,
-          type: `${photoSelected.assets[0].type}/${fileExtension}`,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } as any;
-
-        const userPhotoUploadForm = new FormData();
-        userPhotoUploadForm.append('photo', photoFile);
-
-        await api.patch(
-          `/locations/upload/new/${location.id}`,
-          userPhotoUploadForm,
-          {
-            headers: {
-              id: user.id,
-              'Content-Type': 'multipart/form-data',
-            },
-          }
-        );
-
-        toast.show({
-          title: 'Foto atualizada',
-          placement: 'top',
-          bgColor: 'green.500',
-        });
-        setIsPhotoLoading(false);
-      }
+      );
+      setProgressValue(100);
+      navigation.navigate('locationDetails', {
+        locationId: location.id,
+      });
+      toast.show({
+        title: 'Foto atualizada',
+        placement: 'top',
+        bgColor: 'green.500',
+      });
+      setIsPhotoLoading(false);
     } catch (error) {
       const isAppError = error instanceof AppError;
       const title = isAppError ? error.message : 'Erro na atualização';
@@ -139,27 +95,30 @@ export function LocationDetails() {
     }
   }
 
-  async function deletePhoto(photo: string) {
-    try {
-      const response = await api.delete(`/locations/photo/${photo}`, {
-        headers: {
-          id: user.id,
-        },
-      });
+  // /*
+  //   @TODO: Implementar a deleção de fotos
+  // */
+  // async function deletePhoto(photo: string) {
+  //   try {
+  //     const response = await api.delete(`/locations/photo/${photo}`, {
+  //       headers: {
+  //         id: user.id,
+  //       },
+  //     });
 
-      toast.show({
-        title: response.data.message ?? 'Foto deletada',
-        placement: 'top',
-        bgColor: 'green.500',
-      });
-    } catch (error) {
-      toast.show({
-        title: 'Erro ao deletar foto',
-        placement: 'top',
-        bgColor: 'red.500',
-      });
-    }
-  }
+  //     toast.show({
+  //       title: response.data.message ?? 'Foto deletada',
+  //       placement: 'top',
+  //       bgColor: 'green.500',
+  //     });
+  //   } catch (error) {
+  //     toast.show({
+  //       title: 'Erro ao deletar foto',
+  //       placement: 'top',
+  //       bgColor: 'red.500',
+  //     });
+  //   }
+  // }
 
   useEffect(() => {
     async function fetchLocationDetails() {
@@ -188,389 +147,252 @@ export function LocationDetails() {
   }, [locationId]);
 
   return (
-    <VStack>
+    <SafeAreaView>
       <VStack>
-        <AppHeader title="Detalhes" />
+        <AppHeader
+          title="Detalhes"
+          navigation={navigation}
+          screen="locations"
+        />
       </VStack>
 
-      <VStack px={5} py={5}>
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{
-            paddingBottom: 120,
-          }}
-        >
-          {isLoading && (
-            <LoadingModal
-              showModal={isLoading}
-              setShowModal={setIsLoading}
-              message={loadingMessage}
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{
+          paddingBottom: 50,
+        }}
+      >
+        {isLoading && (
+          <LoadingModal
+            showModal={isLoading}
+            setShowModal={setIsLoading}
+            message={loadingMessage}
+          />
+        )}
+
+        <FlatList
+          horizontal
+          data={location.LocationsPhotos}
+          pagingEnabled
+          indicatorStyle="white"
+          snapToAlignment="start"
+          decelerationRate={'fast'}
+          keyExtractor={(item) => item.id!}
+          renderItem={({ item }) => (
+            <HStack>
+              <Image
+                w={500}
+                maxW={500}
+                h={300}
+                maxH={300}
+                source={{
+                  uri: `${api.defaults.baseURL}/locations/photo/${location.id}/${item.photo}`,
+                }}
+                alt="Location photo"
+              />
+            </HStack>
+          )}
+          ListEmptyComponent={() => (
+            <HStack>
+              <VStack
+                w={500}
+                maxW={500}
+                h={300}
+                maxH={300}
+                backgroundColor={'purple.100'}
+              >
+                <VStack alignSelf={'center'} mr={70} mt={50}>
+                  <Text textAlign={'center'} bold>
+                    Nenhuma foto adicionada
+                  </Text>
+                  <Text textAlign={'center'}>
+                    Adicione fotos para atrair mais clientes
+                  </Text>
+                </VStack>
+              </VStack>
+            </HStack>
+          )}
+        />
+
+        <HStack px={5} py={5}>
+          <HStack>
+            <UserPhoto
+              source={{
+                uri: user.avatar
+                  ? `${api.defaults.baseURL}/user/avatar/${user.id}/${user.avatar}`
+                  : `https://ui-avatars.com/api/?format=png&name=${user.name}+${profile.last_name}&size=512`,
+              }}
+              alt="Foto de perfil"
+              size={10}
+            />
+          </HStack>
+          <HStack ml={3}>
+            <VStack>
+              <Text bold fontSize={'xs'}>
+                {user.name}
+              </Text>
+              <Text fontSize={'xs'}>{location.business_name}</Text>
+            </VStack>
+          </HStack>
+
+          {user.isPartner && (
+            <HStack position={'absolute'} right={5} bottom={5}>
+              <VStack>
+                <Button
+                  h={50}
+                  variant={'dark'}
+                  title="Adicionar Foto"
+                  onPress={handleLocationPhotos}
+                />
+                {isPhotoLoading && (
+                  <Progress
+                    position={'relative'}
+                    top={3}
+                    w={100}
+                    colorScheme={'purple'}
+                    value={progressValue}
+                  />
+                )}
+              </VStack>
+            </HStack>
+          )}
+
+          {!user.isPartner && (
+            <HStack position={'absolute'} right={5} bottom={5}>
+              <Button
+                h={50}
+                variant={'dark'}
+                title="Abrir no Mapa"
+                onPress={() => null}
+              />
+            </HStack>
+          )}
+        </HStack>
+
+        <VStack px={5}>
+          <Text textAlign={'justify'}>{location.business_description}</Text>
+        </VStack>
+
+        <VStack px={5} py={3}>
+          <Text bold fontSize={'xs'} color={'gray.600'} pb={1}>
+            Local
+          </Text>
+          <VStack>
+            <Text>
+              {location.address_line}, {location.number}
+            </Text>
+            <Text>
+              {location.city} - {location.state}
+            </Text>
+          </VStack>
+        </VStack>
+
+        <VStack px={5} py={3}>
+          <Text bold fontSize={'xs'} color={'gray.600'} pb={1}>
+            Contato
+          </Text>
+          <VStack>
+            <Text>{location.business_phone}</Text>
+            <Text>{location.business_email}</Text>
+          </VStack>
+        </VStack>
+
+        <VStack px={5} py={3}>
+          <Text bold fontSize={'xs'} color={'gray.600'} pb={1}>
+            Meios de Pagamento
+          </Text>
+          {location.payment_methods?.map((payment) => {
+            return (
+              <HStack key={payment}>
+                <Icon
+                  as={FontAwesome5}
+                  name={
+                    PAYMENT_TYPES.find((method) =>
+                      method.id === payment ? method.name : ''
+                    )?.icon
+                  }
+                  size={5}
+                  mr={2}
+                />
+                <Text>
+                  {
+                    PAYMENT_TYPES.find((method) =>
+                      method.id === payment ? method.name : ''
+                    )?.name
+                  }
+                </Text>
+              </HStack>
+            );
+          })}
+        </VStack>
+
+        <VStack px={5} py={3}>
+          <Text bold fontSize={'xs'} color={'gray.600'} pb={1}>
+            Servicos oferecidos
+          </Text>
+          <VStack>
+            {location.business_categories?.map((category) => {
+              return (
+                <VStack key={category}>
+                  <Text>
+                    {
+                      SERVICES_TYPES.find((service) =>
+                        service.id === category ? service.name : ''
+                      )?.name
+                    }
+                  </Text>
+                </VStack>
+              );
+            })}
+          </VStack>
+        </VStack>
+
+        <VStack px={5} py={3}>
+          <Text bold fontSize={'xs'} color={'gray.600'} pb={1}>
+            Horario de funcionamento
+          </Text>
+          <VStack>
+            <Text>
+              {location.open_hours_weekend?.length === 5 && 'Segunda a Sexta'}
+              {location.open_hours_weekend?.length === 6 && 'Segunda a Sabado'}
+              {location.open_hours_weekend?.length === 7 && 'Domingo a Domingo'}
+            </Text>
+            <Text>{location.open_hours}</Text>
+          </VStack>
+        </VStack>
+
+        <VStack px={5} py={5}>
+          {user.isPartner && (
+            <Button
+              title={'Editar Local'}
+              onPress={() =>
+                navigation.navigate('editLocation', {
+                  locationId: location.id,
+                })
+              }
+              h={50}
             />
           )}
 
-          <VStack backgroundColor="white" borderRadius={10} p={5}>
-            <HStack>
-              <VStack>
-                <UserPhoto
-                  source={{
-                    uri: user.avatar
-                      ? `${api.defaults.baseURL}/user/avatar/${user.id}/${user.avatar}`
-                      : `https://ui-avatars.com/api/?format=png&name=${user.name}+${profile.last_name}&size=512`,
-                  }}
-                  alt="Foto de perfil"
-                  size={20}
-                />
-              </VStack>
-              <VStack>
-                <VStack position={'absolute'} left={220} bottom={60}>
-                  <Icon
-                    as={Feather}
-                    name="message-square"
-                    size={5}
-                    ml={3}
-                    mt={5}
-                    color="amber.600"
-                  />
-                </VStack>
-                <VStack ml={3} mt={2}>
-                  <Text bold>{user.name}</Text>
-                  <Text>0 avaliacoes</Text>
-                  <Text>{location.business_name}</Text>
-                  <Text>{location.business_phone}</Text>
-                </VStack>
-              </VStack>
-            </HStack>
-          </VStack>
+          {!user.isPartner && (
+            <VStack>
+              <Button
+                title="Agendar Servico"
+                onPress={() => null}
+                h={50}
+                variant={'dark'}
+              />
 
-          <Button
-            title="Editar Local"
-            onPress={() =>
-              navigation.navigate('editLocation', {
-                locationId: location.id,
-              })
-            }
-            h={50}
-            mt={5}
-          />
-
-          <VStack p={5} mt={5} backgroundColor="white" borderRadius={10}>
-            <VStack mb={3}>
-              <Text bold>Local</Text>
+              <Button
+                title="Solicitar orcamento"
+                onPress={() => null}
+                h={50}
+                variant={'dark'}
+              />
             </VStack>
-            <HStack>
-              <HStack>
-                <Icon
-                  as={Feather}
-                  name="briefcase"
-                  size={5}
-                  ml={3}
-                  color="amber.600"
-                />
-                <VStack ml={2}>
-                  <Text>CNPJ/CPF: {location.cnpj}</Text>
-                </VStack>
-              </HStack>
-            </HStack>
-
-            <VStack mt={5}>
-              <HStack>
-                <HStack>
-                  <Icon
-                    as={Feather}
-                    name="map-pin"
-                    size={5}
-                    ml={3}
-                    mt={5}
-                    color="amber.600"
-                  />
-                  <VStack ml={2}>
-                    <Text>
-                      {location.address_line},{location.number}-
-                      {location.district}
-                    </Text>
-                    <Text>
-                      {location.city}-{location.state}
-                    </Text>
-                    <Text>{location.zipcode}</Text>
-                  </VStack>
-                </HStack>
-              </HStack>
-            </VStack>
-
-            <VStack mt={5}>
-              <HStack>
-                <HStack>
-                  <Icon
-                    as={Feather}
-                    name="mail"
-                    size={5}
-                    ml={3}
-                    color="amber.600"
-                  />
-                  <VStack ml={2}>
-                    <Text>{location.business_email}</Text>
-                  </VStack>
-                </HStack>
-              </HStack>
-            </VStack>
-
-            <VStack mt={5}>
-              <HStack>
-                <HStack>
-                  <Icon
-                    as={Feather}
-                    name="info"
-                    size={5}
-                    ml={3}
-                    color="amber.600"
-                  />
-                  <VStack ml={2} w={300}>
-                    <Text textAlign="justify">
-                      {location.business_description}
-                    </Text>
-                  </VStack>
-                </HStack>
-              </HStack>
-            </VStack>
-          </VStack>
-
-          <VStack p={5} mt={5} backgroundColor="white" borderRadius={10}>
-            <VStack mb={3}>
-              <Text bold>Meios de Pagamento</Text>
-            </VStack>
-            <HStack>
-              <HStack>
-                <Icon
-                  as={Feather}
-                  name="dollar-sign"
-                  size={5}
-                  ml={3}
-                  color="amber.600"
-                />
-                <HStack ml={2} w={300}>
-                  {location.payment_methods?.map((payment) => {
-                    return (
-                      <VStack key={payment} ml={3}>
-                        <Text>
-                          {
-                            paymentMethods.find((method) =>
-                              method.id === payment ? method.name : ''
-                            )?.name
-                          }
-                        </Text>
-                      </VStack>
-                    );
-                  })}
-                </HStack>
-              </HStack>
-            </HStack>
-          </VStack>
-
-          <VStack p={5} mt={5} backgroundColor="white" borderRadius={10}>
-            <VStack mb={3}>
-              <Text bold>Servicos oferecidos</Text>
-            </VStack>
-            <HStack>
-              <HStack>
-                <Icon
-                  as={Feather}
-                  name="tool"
-                  size={5}
-                  ml={3}
-                  color="amber.600"
-                />
-                <HStack ml={2} w={300} flexWrap={'wrap'}>
-                  {location.business_categories?.map((category) => {
-                    return (
-                      <VStack key={category} ml={3}>
-                        <Text>
-                          {
-                            servicesCategories.find((service) =>
-                              service.id === category ? service.name : ''
-                            )?.name
-                          }
-                        </Text>
-                      </VStack>
-                    );
-                  })}
-                </HStack>
-              </HStack>
-            </HStack>
-          </VStack>
-
-          <VStack p={5} mt={5} backgroundColor="white" borderRadius={10}>
-            <VStack mb={3}>
-              <Text bold>Dias da semana</Text>
-            </VStack>
-            <HStack>
-              <HStack>
-                <Icon
-                  as={Feather}
-                  name="calendar"
-                  size={5}
-                  ml={3}
-                  color="amber.600"
-                />
-                <HStack ml={2} w={300} flexWrap={'wrap'}>
-                  {location.open_hours_weekend?.map((category) => {
-                    return (
-                      <VStack key={category} ml={3}>
-                        <Text>{category.toLocaleLowerCase()}</Text>
-                      </VStack>
-                    );
-                  })}
-                </HStack>
-              </HStack>
-            </HStack>
-          </VStack>
-
-          <VStack p={5} mt={5} backgroundColor="white" borderRadius={10}>
-            <VStack mb={3}>
-              <Text bold>Horario</Text>
-            </VStack>
-            <HStack>
-              <HStack>
-                <Icon
-                  as={Feather}
-                  name="clock"
-                  size={5}
-                  ml={3}
-                  color="amber.600"
-                />
-                <VStack ml={4} w={300}>
-                  {location.open_hours?.length > 1 ? (
-                    <Text>{location.open_hours}</Text>
-                  ) : (
-                    <Text color="red.500">
-                      Voce deve adicionar seus horarios para poder receber
-                      clientes!
-                    </Text>
-                  )}
-                </VStack>
-              </HStack>
-            </HStack>
-          </VStack>
-
-          <VStack p={5} mt={5} backgroundColor="white" borderRadius={10}>
-            <VStack mb={3}>
-              <Text bold>Data de criacao</Text>
-            </VStack>
-            <HStack>
-              <HStack>
-                <Icon
-                  as={Feather}
-                  name="clock"
-                  size={5}
-                  ml={3}
-                  color="amber.600"
-                />
-                <VStack ml={2}>
-                  <Text>
-                    Criado em:{' '}
-                    {new Date(location.created_at!).toLocaleDateString('pt-br')}
-                  </Text>
-                </VStack>
-              </HStack>
-            </HStack>
-          </VStack>
-
-          <VStack p={5} mt={5} backgroundColor="white" borderRadius={10}>
-            <VStack mb={3}>
-              <Text bold>Fotos e videos do local</Text>
-            </VStack>
-            <HStack>
-              <HStack>
-                <Icon
-                  as={Feather}
-                  name="image"
-                  size={5}
-                  ml={3}
-                  color="amber.600"
-                />
-                <VStack ml={2} w={300}>
-                  {location.photos &&
-                    location.photos.map((photo) => {
-                      return (
-                        <HStack key={photo}>
-                          <HStack>
-                            <VStack ml={2}>
-                              <Text>{photo}</Text>
-                            </VStack>
-                          </HStack>
-                        </HStack>
-                      );
-                    })}
-
-                  {location.LocationsPhotos?.length === 0 ? (
-                    <VStack mb={5}>
-                      <Text>
-                        Adicione fotos ao seu local e atraia mais clientes
-                      </Text>
-                    </VStack>
-                  ) : (
-                    <VStack mb={5}>
-                      {location.LocationsPhotos?.map((photo) => (
-                        <VStack
-                          mb={5}
-                          borderWidth={2}
-                          borderColor={'purple.700'}
-                        >
-                          <Image
-                            key={photo.id}
-                            source={{
-                              uri: `${api.defaults.baseURL}/locations/photo/${location.id}/${photo.photo}`,
-                            }}
-                            alt="local"
-                            w={400}
-                            h={400}
-                          />
-                          <VStack
-                            w={60}
-                            h={8}
-                            position={'absolute'}
-                            bottom={0}
-                            left={0}
-                            borderTopRightRadius={10}
-                            borderTopLeftRadius={0}
-                            bg={'purple.900'}
-                            alignItems={'center'}
-                            justifyItems={'center'}
-                          >
-                            <TouchableOpacity
-                              onPress={() => deletePhoto(photo.id!)}
-                            >
-                              <Icon
-                                as={Feather}
-                                name="trash-2"
-                                size={7}
-                                color="white"
-                              />
-                            </TouchableOpacity>
-                          </VStack>
-                        </VStack>
-                      ))}
-                    </VStack>
-                  )}
-                  <Button
-                    title={
-                      location.LocationsPhotos?.length === 0
-                        ? '+ Adicionar photo'
-                        : '+ Adicionar mais fotos'
-                    }
-                    onPress={handleLocationPhotos}
-                    h={50}
-                    variant={'outline'}
-                  />
-                </VStack>
-              </HStack>
-            </HStack>
-          </VStack>
-
-          <VStack p={5} mt={5} backgroundColor="white" borderRadius={10}>
-            <Text bold>Avaliacoes</Text>
-          </VStack>
-        </ScrollView>
-      </VStack>
-    </VStack>
+          )}
+        </VStack>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
