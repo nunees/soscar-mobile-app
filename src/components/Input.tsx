@@ -8,6 +8,7 @@ import {
 type Props = IInputProps & {
   errorMessage?: string | null;
   helperText?: string;
+  isInvalid?: boolean;
 };
 
 export function Input({

@@ -1,10 +1,14 @@
+import NewLocationSVG from '@assets/newlocation.svg';
 import { AppHeader } from '@components/AppHeader';
 import { Button } from '@components/Button';
-import ButtonSelection from '@components/ButtonSelection';
 import { Input } from '@components/Input';
-import { LoadingModal } from '@components/LoadingModal';
+import RegisterLocationButtonSelect from '@components/RegisterLocationButtonSelect';
 import { TextArea } from '@components/TextArea';
-import { ILocation } from '@dtos/ILocation';
+import { PAYMENT_TYPES } from '@data/PaymentTypes';
+import { SERVICES_TYPES } from '@data/ServicesTypes';
+import { WEEK_DAYS } from '@data/WeekDays';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { useAddressToCoords } from '@hooks/useAddressToCoords';
 import { useAuth } from '@hooks/useAuth';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
@@ -12,106 +16,85 @@ import { PartnerNavigatorRoutesProps } from '@routes/partner.routes';
 import { api } from '@services/api';
 import { AppError } from '@utils/AppError';
 import { GetAddressByCEP } from '@utils/GetAddressByCEP';
-import * as Location from 'expo-location';
 import { ScrollView, VStack, Text, HStack, useToast } from 'native-base';
 import { useCallback, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import * as yup from 'yup';
 
-const payment_types = [
-  { id: 1, name: 'Dinheiro' },
-  { id: 2, name: 'Crédito' },
-  { id: 3, name: 'Débito' },
-  { id: 4, name: 'PIX' },
-  { id: 5, name: 'Transferencia' },
-  { id: 6, name: 'Outros' },
-];
+type FormDataProps = {
+  cnpj: string;
+  business_name: string;
+  business_phone: string;
+  business_email: string;
+  address_line: string;
+  number: string;
+  district: string;
+  city: string;
+  state: string;
+  zipcode: string;
+  business_description: string;
+  latitude: string;
+  longitude: string;
+  openAt: string;
+  closeAt: string;
+};
 
-const services_types = [
-  { id: 1, name: 'Acessorios' },
-  { id: 2, name: 'Cambio' },
-  { id: 3, name: 'Eletrica' },
-  { id: 4, name: 'Fluidos' },
-  { id: 5, name: 'Funilaria e Pintura' },
-  { id: 6, name: 'Lavagem' },
-  { id: 7, name: 'Mecanica' },
-  { id: 8, name: 'Pneus' },
-  { id: 9, name: 'Suspensão' },
-  { id: 10, name: 'Vidros' },
-  { id: 11, name: 'Outros' },
-];
-
-function handleMultipleSelection(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  changeFunction: React.Dispatch<React.SetStateAction<any[]>>,
-  state: unknown[],
-  value: unknown
-) {
-  const alreadySelected = state.includes(value);
-
-  if (alreadySelected === undefined) {
-    changeFunction([value]);
-    return;
-  }
-  if (!alreadySelected) {
-    changeFunction([...state!, value]);
-    return;
-  }
-  if (alreadySelected) {
-    changeFunction(state?.filter((item) => item !== value));
-  }
-}
-
-async function ConvertAddressToLatLong(address: string) {
-  try {
-    const { status } = await Location.requestForegroundPermissionsAsync();
-
-    if (status !== 'granted') {
-      console.error('Permissão de localização negada');
-      return null;
-    }
-
-    const location = await Location.geocodeAsync(address);
-
-    if (location && location.length > 0) {
-      const primeiraCoordenada = location[0];
-      return {
-        latitude: primeiraCoordenada.latitude,
-        longitude: primeiraCoordenada.longitude,
-      };
-    }
-  } catch (error) {
-    throw new AppError('Não foi possível obter as coordenadas do endereço');
-  }
-}
+const addLocationSchema = yup.object().shape({
+  cnpj: yup.string().required('Informe um CPF ou CNPJ'),
+  business_name: yup.string().required('Informe um nome fantasia'),
+  business_phone: yup.string().required('Informe um telefone'),
+  business_email: yup.string().required('Informe um email'),
+  address_line: yup.string().required('Informe um endereço'),
+  number: yup.string().required('Informe um número'),
+  district: yup.string().required('Informe um bairro'),
+  city: yup.string().required('Informe uma cidade'),
+  state: yup.string().required('Informe um estado'),
+  zipcode: yup.string().required('Informe um CEP'),
+  business_description: yup.string().required('Informe uma descrição'),
+  latitude: yup.string().required('Localização não encontrada'),
+  longitude: yup.string().required('Localização não encontrada'),
+  openAt: yup.string().required('Informe um horário de abertura'),
+  closeAt: yup.string().required('Informe um horário de fechamento'),
+});
 
 export function AddLocation() {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<string>('');
 
-  const [location, setLocation] = useState<ILocation>({} as ILocation);
-
-  const [zipcode, setZipCode] = useState<string>('');
-
   const [payment_methods, setPaymentMethods] = useState<number[]>([]);
   const [openHoursWeekend, setOpenHoursWeekend] = useState<string[]>([]);
   const [business_categories, setBusinessCategories] = useState<number[]>([]);
 
-  const [openHour, setOpenHour] = useState<string>('');
-  const [closeHour, setCloseHour] = useState<string>('');
-
-  const { user } = useAuth();
   const toast = useToast();
   const navigation = useNavigation<PartnerNavigatorRoutesProps>();
 
-  // eslint-disable-next-line consistent-return
-  async function handleCepInput(cep: string) {
+  const { ConvertAddressToLatLong } = useAddressToCoords();
+
+  const { user } = useAuth();
+
+  const {
+    control,
+    handleSubmit,
+    getValues,
+    setValue,
+    formState: { errors },
+  } = useForm<FormDataProps>({
+    resolver: yupResolver(addLocationSchema),
+  });
+
+  const handleCepInput = useCallback(async () => {
     try {
+      const fields = getValues();
+
       setIsLoading(true);
       setMessage('Buscando endereço...');
 
-      if (zipcode.length === 8) {
-        const address = await GetAddressByCEP(cep);
+      if (fields.zipcode.length === 8) {
+        const address = await GetAddressByCEP(fields.zipcode);
+
         if (address.data.erro || !address.data.logradouro) {
-          return null;
+          throw new AppError('CEP não encontrado');
         }
 
         const position = await ConvertAddressToLatLong(
@@ -119,65 +102,86 @@ export function AddLocation() {
         );
 
         if (position) {
-          setLocation({
-            ...location,
-            address_line: address.data.logradouro,
-            district: address.data.bairro,
-            city: address.data.localidade,
-            state: address.data.uf,
-            zipcode: address.data.cep,
-            latitude: String(position.latitude),
-            longitude: String(position.longitude),
-          });
+          setValue('address_line', address.data.logradouro);
+          setValue('district', address.data.bairro);
+          setValue('city', address.data.localidade);
+          setValue('state', address.data.uf);
+          setValue('zipcode', address.data.cep);
+          setValue('latitude', String(position.latitude));
+          setValue('longitude', String(position.longitude));
         }
       }
     } catch (error) {
-      console.log(error);
+      const isAppError = error instanceof AppError;
+      const title = isAppError ? error.message : 'Erro ao buscar endereço';
+      toast.show({
+        title,
+        placement: 'top',
+        bgColor: 'red.500',
+      });
     } finally {
       setIsLoading(false);
     }
-  }
+  }, []);
 
-  function handleHour(date: Date | undefined, state: string) {
+  const handleHour = useCallback((date: Date | undefined, state: string) => {
     if (date) {
       const tempDate = date
         .toLocaleTimeString()
         .split(':')
         .slice(0, 2)
         .join(':');
+      console.log(tempDate);
       if (state === 'open') {
-        setOpenHour(tempDate);
+        setValue('openAt', tempDate);
       } else if (state === 'close') {
-        setCloseHour(tempDate);
+        setValue('closeAt', tempDate);
       }
     }
-  }
+  }, []);
 
-  const handleSubmitBusiness = useCallback(async () => {
+  async function handleSubmitBusiness() {
     try {
-      setMessage('Salvando local...');
       setIsLoading(true);
+
+      const {
+        cnpj,
+        business_name,
+        business_phone,
+        business_email,
+        address_line,
+        number,
+        district,
+        city,
+        state,
+        zipcode,
+        latitude,
+        longitude,
+        business_description,
+        openAt,
+        closeAt,
+      } = getValues();
 
       await api.post(
         '/locations',
         {
-          cnpj: location.cnpj,
-          business_name: location.business_name,
-          business_phone: location.business_phone,
-          business_email: location.business_email,
-          address_line: location.address_line,
-          number: Number(location.number),
-          district: location.district,
-          city: location.city,
-          state: location.state,
-          zipcode: location.zipcode,
-          latitude: location.latitude,
-          longitude: location.longitude,
+          cnpj,
+          business_name,
+          business_phone,
+          business_email,
+          address_line,
+          number: Number(number),
+          district,
+          city,
+          state,
+          zipcode,
+          latitude,
+          longitude,
           payment_methods,
           business_categories,
-          open_hours: `${openHour} - ${closeHour}`,
+          open_hours: `${openAt} - ${closeAt}`,
           open_hours_weekend: openHoursWeekend,
-          business_description: location.business_description,
+          business_description,
         },
         {
           headers: {
@@ -205,332 +209,424 @@ export function AddLocation() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }
 
   return (
-    <VStack flex={1}>
+    <SafeAreaView>
       <VStack>
-        <AppHeader title="Adicionar Local" />
-      </VStack>
-
-      {setIsLoading && (
-        <LoadingModal
-          showModal={isLoading}
-          setShowModal={setIsLoading}
-          message={message}
+        <AppHeader
+          title="Adicionar Local"
+          navigation={navigation}
+          screen="locations"
         />
-      )}
+      </VStack>
 
       <VStack>
         <ScrollView
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 100 }}
+          contentContainerStyle={{ paddingBottom: 150 }}
         >
-          <VStack py={10} px={19}>
-            <VStack p={5} mb={5} borderRadius={10} backgroundColor="white">
-              <Text fontSize="md" fontFamily="heading" bold mb={3}>
-                Informacoes pessoais
+          <VStack px={5}>
+            <NewLocationSVG width={400} height={200} />
+            <VStack backgroundColor={'white'} borderRadius={10} p={3}>
+              <Text fontSize={'sm'} color="gray.600">
+                Preencha as informações abaixo para salvar o seu local de
+                trabalho.
               </Text>
-              <Input
-                placeholder="CNPJ ou CPF"
-                value={location.cnpj}
-                keyboardType="numeric"
-                onChangeText={(value) =>
-                  setLocation({ ...location, cnpj: value })
-                }
+              <Text fontSize={'sm'} bold>
+                Essas informações podem ser alteradas mais tarde
+              </Text>
+            </VStack>
+          </VStack>
+
+          <VStack px={5} mt={10}>
+            <Text fontSize="md" fontFamily="heading" bold mb={3}>
+              Informações pessoais
+            </Text>
+            <VStack p={5} mb={5} borderRadius={10} backgroundColor="white">
+              <Controller
+                control={control}
+                name="cnpj"
+                rules={{ required: 'Informe um numero de CPF ou CNPJ' }}
+                render={({ field: { onChange, value } }) => (
+                  <Input
+                    placeholder="CNPJ ou CPF"
+                    fontSize={'md'}
+                    keyboardType="numeric"
+                    onChangeText={onChange}
+                    value={value}
+                    errorMessage={errors.cnpj?.message}
+                  />
+                )}
               />
-              <Input
-                placeholder="Nome Fantasia"
-                value={location.business_name}
-                onChangeText={(value) =>
-                  setLocation({ ...location, business_name: value })
-                }
+
+              <Controller
+                control={control}
+                name="business_name"
+                rules={{ required: 'Informe o nome do local' }}
+                render={({ field: { onChange, value } }) => (
+                  <Input
+                    placeholder="Nome Fantasia"
+                    fontSize={'md'}
+                    keyboardType="default"
+                    onChangeText={onChange}
+                    value={value}
+                    errorMessage={errors.cnpj?.message}
+                  />
+                )}
               />
-              <Input
-                placeholder="Telefone"
-                value={location.business_phone}
-                onChangeText={(value) =>
-                  setLocation({ ...location, business_phone: value })
-                }
-                keyboardType="numeric"
+
+              <Controller
+                control={control}
+                name="business_phone"
+                rules={{ required: 'Informe o numero de telefone' }}
+                render={({ field: { onChange, value } }) => (
+                  <Input
+                    placeholder="Telefone"
+                    fontSize={'md'}
+                    keyboardType="numeric"
+                    onChangeText={onChange}
+                    value={value}
+                    errorMessage={errors.cnpj?.message}
+                  />
+                )}
               />
-              <Input
-                placeholder="Email"
-                value={location.business_email}
-                onChangeText={(value) =>
-                  setLocation({ ...location, business_email: value })
-                }
+
+              <Controller
+                control={control}
+                name="business_email"
+                rules={{ required: 'Informe o endereco de email valido' }}
+                render={({ field: { onChange, value } }) => (
+                  <Input
+                    placeholder="Email"
+                    fontSize={'md'}
+                    keyboardType="numeric"
+                    onChangeText={onChange}
+                    value={value}
+                    errorMessage={errors.cnpj?.message}
+                  />
+                )}
               />
             </VStack>
+          </VStack>
 
+          <VStack px={5}>
+            <Text fontSize="md" fontFamily={'heading'} bold mb={3}>
+              Localização
+            </Text>
             <VStack mb={5} p={5} backgroundColor="white" borderRadius={10}>
-              <Text fontSize="md" fontFamily={'heading'} bold mb={3}>
-                Localizaçao
-              </Text>
-
               <VStack>
                 <HStack>
                   <VStack mr={2}>
-                    <Input
-                      w={200}
-                      placeholder="CEP"
-                      value={zipcode}
-                      onChangeText={setZipCode}
-                      keyboardType="numeric"
+                    <Controller
+                      control={control}
+                      name="zipcode"
+                      rules={{ required: 'Informe um cep valido' }}
+                      render={({ field: { onChange, value } }) => (
+                        <Input
+                          w={200}
+                          placeholder="CEP"
+                          fontSize={'md'}
+                          keyboardType="numeric"
+                          onChangeText={onChange}
+                          value={value}
+                          errorMessage={errors.cnpj?.message}
+                        />
+                      )}
                     />
                   </VStack>
                   <VStack>
                     <Button
                       title="Procurar"
-                      w={120}
-                      onPress={() => handleCepInput(zipcode)}
+                      w={100}
+                      onPress={() => handleCepInput()}
                       isLoading={isLoading}
                     />
                   </VStack>
                 </HStack>
               </VStack>
 
-              <Input
-                placeholder="Endereço"
-                value={location.address_line}
-                editable={false}
-                isDisabled={true}
-                caretHidden={true}
-                showSoftInputOnFocus={false}
-              />
-              <Input
-                placeholder="Número"
-                onChangeText={(value) =>
-                  setLocation({ ...location, number: value })
-                }
-                value={location.number}
-                keyboardType="numeric"
-              />
-              <Input
-                placeholder="Bairro"
-                value={location.district}
-                editable={false}
-                isDisabled={true}
-                caretHidden={true}
-                showSoftInputOnFocus={false}
-              />
-              <Input
-                placeholder="Cidade"
-                value={location.city}
-                editable={false}
-                isDisabled={true}
-                caretHidden={true}
-                showSoftInputOnFocus={false}
-              />
-              <Input
-                placeholder="Estado"
-                value={location.state}
-                editable={false}
-                isDisabled={true}
-                caretHidden={true}
-                showSoftInputOnFocus={false}
-              />
-            </VStack>
-
-            <VStack backgroundColor="white" p={5} borderRadius={10} mb={5}>
-              <Text fontSize="md" mb={3} bold>
-                Meios de pagamentos oferecidos
-              </Text>
-              <HStack flexWrap={'wrap'}>
-                {payment_types.map((item) => (
-                  <ButtonSelection
-                    key={item.id}
-                    data={item.name}
-                    isToggled={payment_methods?.includes(item.id)}
-                    handleOpenDays={() =>
-                      handleMultipleSelection(
-                        setPaymentMethods,
-                        payment_methods,
-                        item.id
-                      )
-                    }
-                  />
-                ))}
-              </HStack>
-            </VStack>
-
-            <VStack backgroundColor="white" p={5} borderRadius={10} mb={5}>
-              <Text fontSize="md" mb={3} bold>
-                Tipos de serviços oferecidos
-              </Text>
-              <HStack flexWrap={'wrap'}>
-                {services_types.map((item) => (
-                  <ButtonSelection
-                    key={item.id}
-                    data={item.name}
-                    isToggled={business_categories?.includes(item.id)}
-                    handleOpenDays={() =>
-                      handleMultipleSelection(
-                        setBusinessCategories,
-                        business_categories,
-                        item.id
-                      )
-                    }
-                  />
-                ))}
-              </HStack>
-            </VStack>
-
-            <VStack backgroundColor="white" p={5} borderRadius={10} mb={5}>
-              <Text fontSize="md" bold pb={5}>
-                Dias de funcionamento
-              </Text>
-              <HStack flexWrap={'wrap'}>
-                <ButtonSelection
-                  data={'segunda'}
-                  isToggled={openHoursWeekend?.includes('segunda')}
-                  handleOpenDays={() =>
-                    handleMultipleSelection(
-                      setOpenHoursWeekend,
-                      openHoursWeekend,
-                      'segunda'
-                    )
-                  }
-                />
-
-                <ButtonSelection
-                  data={'terca'}
-                  isToggled={openHoursWeekend?.includes('terca')}
-                  handleOpenDays={() =>
-                    handleMultipleSelection(
-                      setOpenHoursWeekend,
-                      openHoursWeekend,
-                      'terca'
-                    )
-                  }
-                />
-                <ButtonSelection
-                  data={'quarta'}
-                  isToggled={openHoursWeekend?.includes('quarta')}
-                  handleOpenDays={() =>
-                    handleMultipleSelection(
-                      setOpenHoursWeekend,
-                      openHoursWeekend,
-                      'quarta'
-                    )
-                  }
-                />
-                <ButtonSelection
-                  data={'quinta'}
-                  isToggled={openHoursWeekend?.includes('quinta')}
-                  handleOpenDays={() =>
-                    handleMultipleSelection(
-                      setOpenHoursWeekend,
-                      openHoursWeekend,
-                      'quinta'
-                    )
-                  }
-                />
-                <ButtonSelection
-                  data={'sexta'}
-                  isToggled={openHoursWeekend?.includes('sexta')}
-                  handleOpenDays={() =>
-                    handleMultipleSelection(
-                      setOpenHoursWeekend,
-                      openHoursWeekend,
-                      'sexta'
-                    )
-                  }
-                />
-                <ButtonSelection
-                  data={'sabado'}
-                  isToggled={openHoursWeekend?.includes('sabado')}
-                  handleOpenDays={() =>
-                    handleMultipleSelection(
-                      setOpenHoursWeekend,
-                      openHoursWeekend,
-                      'sabado'
-                    )
-                  }
-                />
-                <ButtonSelection
-                  data={'domingo'}
-                  isToggled={openHoursWeekend?.includes('domingo')}
-                  handleOpenDays={() =>
-                    handleMultipleSelection(
-                      setOpenHoursWeekend,
-                      openHoursWeekend,
-                      'domingo'
-                    )
-                  }
-                />
-              </HStack>
-            </VStack>
-
-            <VStack backgroundColor="white" p={5} borderRadius={10} mb={5}>
-              <Text fontSize="md" bold pb={5}>
-                Horário de funcionamento
-              </Text>
-              <HStack>
-                <VStack w={100}>
+              <Controller
+                control={control}
+                name="address_line"
+                rules={{ required: 'Informe um endereco valido' }}
+                render={({ field: { onChange, value } }) => (
                   <Input
-                    placeholder={'Abre'}
+                    placeholder="Endereço"
+                    fontSize={'md'}
                     editable={false}
-                    value={openHour}
-                    caretHidden
-                    textAlign="center"
-                    onPressIn={() => {
-                      DateTimePickerAndroid.open({
-                        mode: 'time',
-                        is24Hour: true,
-                        value: new Date(),
-                        onChange: (event, date) => handleHour(date, 'open'),
-                      });
-                    }}
+                    isDisabled={true}
+                    caretHidden={true}
+                    showSoftInputOnFocus={false}
+                    onChangeText={onChange}
+                    value={value}
+                    errorMessage={errors.cnpj?.message}
+                  />
+                )}
+              />
+
+              <Controller
+                control={control}
+                name="number"
+                rules={{ required: 'Informe um numero' }}
+                render={({ field: { onChange, value } }) => (
+                  <Input
+                    placeholder="Numero"
+                    fontSize={'md'}
+                    keyboardType="numeric"
+                    onChangeText={onChange}
+                    value={value}
+                    errorMessage={errors.cnpj?.message}
+                  />
+                )}
+              />
+
+              <Controller
+                control={control}
+                name="district"
+                rules={{ required: 'Informe um bairro' }}
+                render={({ field: { onChange, value } }) => (
+                  <Input
+                    placeholder="Endereço"
+                    fontSize={'md'}
+                    editable={false}
+                    isDisabled={true}
+                    caretHidden={true}
+                    showSoftInputOnFocus={false}
+                    onChangeText={onChange}
+                    value={value}
+                    errorMessage={errors.cnpj?.message}
+                  />
+                )}
+              />
+
+              <Controller
+                control={control}
+                name="city"
+                rules={{ required: 'Informe uma cidade' }}
+                render={({ field: { onChange, value } }) => (
+                  <Input
+                    placeholder="Cidade"
+                    fontSize={'md'}
+                    editable={false}
+                    isDisabled={true}
+                    caretHidden={true}
+                    showSoftInputOnFocus={false}
+                    onChangeText={onChange}
+                    value={value}
+                    errorMessage={errors.cnpj?.message}
+                  />
+                )}
+              />
+
+              <Controller
+                control={control}
+                name="state"
+                rules={{ required: 'Informe um estado' }}
+                render={({ field: { onChange, value } }) => (
+                  <Input
+                    placeholder="Estado"
+                    fontSize={'md'}
+                    editable={false}
+                    isDisabled={true}
+                    caretHidden={true}
+                    showSoftInputOnFocus={false}
+                    onChangeText={onChange}
+                    value={value}
+                    errorMessage={errors.cnpj?.message}
+                  />
+                )}
+              />
+
+              <Text pb={1} color="gray.400">
+                Coordenadas
+              </Text>
+              <Controller
+                control={control}
+                name="latitude"
+                rules={{ required: 'Informe uma latitude' }}
+                render={({ field: { onChange, value } }) => (
+                  <Input
+                    placeholder="Latitude"
+                    fontSize={'md'}
+                    editable={false}
+                    isDisabled={true}
+                    caretHidden={true}
+                    showSoftInputOnFocus={false}
+                    onChangeText={onChange}
+                    value={value}
+                    errorMessage={errors.cnpj?.message}
+                  />
+                )}
+              />
+
+              <Controller
+                control={control}
+                name="longitude"
+                rules={{ required: 'Informe uma longitude' }}
+                render={({ field: { onChange, value } }) => (
+                  <Input
+                    placeholder="Longitude"
+                    fontSize={'md'}
+                    editable={false}
+                    isDisabled={true}
+                    caretHidden={true}
+                    showSoftInputOnFocus={false}
+                    onChangeText={onChange}
+                    value={value}
+                    errorMessage={errors.cnpj?.message}
+                  />
+                )}
+              />
+            </VStack>
+          </VStack>
+
+          <VStack px={5}>
+            <Text fontSize="md" mb={3} bold>
+              Meios de pagamentos oferecidos
+            </Text>
+            <VStack backgroundColor="white" p={5} borderRadius={10} mb={5}>
+              <HStack flexWrap={'wrap'}>
+                <RegisterLocationButtonSelect
+                  items={PAYMENT_TYPES}
+                  state={payment_methods}
+                  setState={setPaymentMethods}
+                />
+              </HStack>
+            </VStack>
+          </VStack>
+
+          <VStack px={5}>
+            <Text fontSize="md" mb={3} bold>
+              Tipos de serviços oferecidos
+            </Text>
+            <VStack backgroundColor="white" p={5} borderRadius={10} mb={5}>
+              <HStack flexWrap={'wrap'}>
+                <RegisterLocationButtonSelect
+                  items={SERVICES_TYPES}
+                  state={business_categories}
+                  setState={setBusinessCategories}
+                />
+              </HStack>
+            </VStack>
+          </VStack>
+
+          <VStack p={5}>
+            <Text fontSize="md" bold pb={5}>
+              Dias de funcionamento
+            </Text>
+            <VStack backgroundColor="white" p={5} borderRadius={10} mb={5}>
+              <HStack flexWrap={'wrap'}>
+                <RegisterLocationButtonSelect
+                  items={WEEK_DAYS}
+                  state={openHoursWeekend}
+                  setState={setOpenHoursWeekend}
+                  saveText={true}
+                />
+              </HStack>
+            </VStack>
+          </VStack>
+
+          <VStack p={5}>
+            <Text fontSize="md" bold pb={5}>
+              Horário de funcionamento
+            </Text>
+            <VStack backgroundColor="white" p={5} borderRadius={10} mb={5}>
+              <HStack justifyContent={'space-around'}>
+                <VStack>
+                  <Controller
+                    control={control}
+                    name="openAt"
+                    rules={{ required: 'Informe um horario de abertura' }}
+                    render={({ field: { value } }) => (
+                      <Input
+                        w={120}
+                        placeholder="Abre as"
+                        fontSize={'md'}
+                        editable={false}
+                        isDisabled={true}
+                        caretHidden={true}
+                        showSoftInputOnFocus={false}
+                        onPressIn={() =>
+                          DateTimePickerAndroid.open({
+                            mode: 'time',
+                            is24Hour: true,
+                            value: new Date(),
+                            onChange: (event, date) => handleHour(date, 'open'),
+                          })
+                        }
+                        value={value}
+                        errorMessage={errors.cnpj?.message}
+                      />
+                    )}
                   />
                 </VStack>
-                <VStack px={5} py={5}>
-                  <Text>-</Text>
-                </VStack>
-                <VStack w={100}>
-                  <Input
-                    placeholder={'Fecha'}
-                    editable={false}
-                    value={closeHour}
-                    caretHidden
-                    textAlign="center"
-                    onPressIn={() => {
-                      DateTimePickerAndroid.open({
-                        mode: 'time',
-                        is24Hour: true,
-                        value: new Date(),
-                        onChange: (event, date) => handleHour(date, 'close'),
-                      });
-                    }}
+
+                <VStack>
+                  <Controller
+                    control={control}
+                    name="closeAt"
+                    rules={{ required: 'Informe um horario de fechamento' }}
+                    render={({ field: { value } }) => (
+                      <Input
+                        w={120}
+                        placeholder="Fecha as"
+                        fontSize={'md'}
+                        editable={false}
+                        isDisabled={true}
+                        caretHidden={true}
+                        showSoftInputOnFocus={false}
+                        onPressIn={() =>
+                          DateTimePickerAndroid.open({
+                            mode: 'time',
+                            is24Hour: true,
+                            value: new Date(),
+                            onChange: (event, date) =>
+                              handleHour(date, 'close'),
+                          })
+                        }
+                        value={value}
+                        errorMessage={errors.cnpj?.message}
+                      />
+                    )}
                   />
                 </VStack>
               </HStack>
             </VStack>
+          </VStack>
 
+          <VStack px={5}>
+            <Text fontSize={'md'} bold pb={5}>
+              Conte nos um pouco sobre o seu negócio
+            </Text>
             <VStack backgroundColor="white" p={5} borderRadius={10} mb={5}>
-              <Text bold pb={5}>
-                Conte nos um pouco sobre o seu negócio
-              </Text>
-              <TextArea
-                placeholder="Ele pode ser o diferencial para o cliente escolher o seu estabelecimento."
-                h={150}
-                value={location.business_description}
-                onChangeText={(value) =>
-                  setLocation({ ...location, business_description: value })
-                }
-                fontSize="md"
-                borderRadius={5}
+              <Controller
+                control={control}
+                name="business_description"
+                rules={{ required: 'Informe uma descricao de seu local' }}
+                render={({ field: { onChange, value } }) => (
+                  <TextArea
+                    h={150}
+                    fontSize="md"
+                    borderRadius={5}
+                    onChangeText={onChange}
+                    value={value}
+                    errorMessage={errors.cnpj?.message}
+                  />
+                )}
               />
             </VStack>
+          </VStack>
 
+          <VStack px={5}>
             <Button
               title="Criar local"
-              onPress={handleSubmitBusiness}
+              onPress={handleSubmit(handleSubmitBusiness)}
               isLoading={isLoading}
             />
           </VStack>
         </ScrollView>
       </VStack>
-    </VStack>
+    </SafeAreaView>
   );
 }

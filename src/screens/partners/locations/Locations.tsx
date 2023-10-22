@@ -1,3 +1,4 @@
+import NoLocationSVG from '@assets/nolocation.svg';
 import { AppHeader } from '@components/AppHeader';
 import { LoadingModal } from '@components/LoadingModal';
 import { ILocation } from '@dtos/ILocation';
@@ -16,8 +17,9 @@ import {
   HStack,
   useToast,
   Badge,
+  Center,
 } from 'native-base';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { TouchableOpacity, Alert } from 'react-native';
 
 export function Locations() {
@@ -56,7 +58,6 @@ export function Locations() {
                   placement: 'top',
                   bgColor: 'green.500',
                 });
-                loadData();
               } catch (error) {
                 toast.show({
                   title: 'Erro ao deletar local',
@@ -106,7 +107,7 @@ export function Locations() {
   return (
     <VStack flex={1}>
       <VStack>
-        <AppHeader title="Meus Locais" />
+        <AppHeader title="Meus Locais" navigation={navigation} screen="home" />
       </VStack>
 
       <VStack>
@@ -118,7 +119,7 @@ export function Locations() {
             <LoadingModal
               showModal={isLoading}
               setShowModal={setIsLoading}
-              message="Aguarde..."
+              message="Buscando..."
             />
           )}
           <VStack flex={1}>
@@ -228,9 +229,21 @@ export function Locations() {
                 ))
               ) : (
                 <VStack mt={100} alignItems={'center'}>
-                  <Text textAlign={'center'} color="gray.500">
-                    Não há locais cadastrados.
-                  </Text>
+                  <NoLocationSVG width={200} height={200} />
+                  <Center>
+                    <Text fontSize={'xl'} bold>
+                      Não há locais cadastrados 🙁
+                    </Text>
+
+                    <Text fontSize={'md'} bold pb={5}>
+                      Que tal cadastrar seu primeiro local?
+                    </Text>
+
+                    <Text>Ao cadastrar um local você poderá</Text>
+                    <Text>- Gerenciar os agendamentos de seus clientes</Text>
+                    <Text>- Gerenciar os serviços de seu local</Text>
+                    <Text>- Entre muitas outras vantagens</Text>
+                  </Center>
                 </VStack>
               )}
             </VStack>

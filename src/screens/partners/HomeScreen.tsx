@@ -1,26 +1,26 @@
+import { SearchBar } from '@components/SearchBar';
+import { SmallSchedulleCard } from '@components/SmallSchedulleCard';
 import UserPhoto from '@components/UserPhoto';
 import { ISchedules } from '@dtos/ISchedules';
-import { Feather } from '@expo/vector-icons';
 import { useAuth } from '@hooks/useAuth';
 import { useProfile } from '@hooks/useProfile';
 import { useNavigation } from '@react-navigation/native';
 import { PartnerNavigatorRoutesProps } from '@routes/partner.routes';
 import { api } from '@services/api';
 import { AppError } from '@utils/AppError';
-import { DateToString } from '@utils/DateToString';
 import {
   Text,
   ScrollView,
   VStack,
   HStack,
-  Icon,
-  Heading,
   useToast,
   Center,
   Pressable,
   Badge,
+  FlatList,
 } from 'native-base';
 import { useEffect, useState } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 /**
  * 0 - Cancelado
@@ -33,7 +33,7 @@ export function HomeScreen() {
   const [schedules, setSchedules] = useState<ISchedules[]>({} as ISchedules[]);
 
   const { user } = useAuth();
-  const { profile, updateProfile } = useProfile();
+  const { updateProfile } = useProfile();
 
   const toast = useToast();
 
@@ -84,148 +84,99 @@ export function HomeScreen() {
   }, [schedules.length]);
 
   return (
-    <ScrollView showsVerticalScrollIndicator={false}>
-      <VStack
-        backgroundColor="purple.900"
-        borderBottomLeftRadius={10}
-        borderBottomRightRadius={10}
-      >
-        <HStack justifyContent="space-between">
-          <VStack justifyContent={'space-between'} px={3}>
-            <HStack justifyItems={'baseline'} mb={2}>
-              <HStack ml={2} pt={5}>
-                <VStack>
-                  <Text bold color="white" fontSize={20}>
-                    Ola, {user.name}
-                  </Text>
-                  <Text color="white">
-                    {profile.genderId === 1 && 'Bem vindo'}
-                    {profile.genderId === 2 && 'Bem vinda'}
-                    {profile.genderId === 3 && 'Bem vindx'}
-                    {profile.genderId === 4 && 'Bem vindes'}
-                  </Text>
-                </VStack>
-              </HStack>
+    <SafeAreaView>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <VStack>
+          <VStack backgroundColor="white" p={5} borderRadius={10} shadow={1}>
+            <HStack justifyContent={'space-between'} alignItems={'center'}>
+              <VStack>
+                <Text fontSize={'md'} color="gray.700">
+                  Boas vindas,
+                </Text>
+                <Text fontSize={'md'} bold color="gray.700">
+                  {user.name}!
+                </Text>
+              </VStack>
+              <Pressable onPress={() => navigation.navigate('profile')}>
+                <UserPhoto
+                  source={{
+                    uri: user.avatar
+                      ? `${api.defaults.baseURL}/user/avatar/${user.id}/${user.avatar}`
+                      : `https://ui-avatars.com/api/?format=png&name=${user.name}W&size=512`,
+                  }}
+                  alt="Foto de perfil"
+                  size={10}
+                  borderWidth={3}
+                  borderColor="purple.700"
+                />
+              </Pressable>
+            </HStack>
+            <HStack mt={3}>
+              <SearchBar />
             </HStack>
           </VStack>
 
-          <VStack alignItems="center" justifyContent="center" mt={5} mr={5}>
-            <UserPhoto
-              source={{
-                uri: user.avatar
-                  ? `${api.defaults.baseURL}/user/avatar/${user.id}/${user.avatar}`
-                  : `https://ui-avatars.com/api/?format=png&name=${user.name}W&size=512`,
-              }}
-              alt="Foto de perfil"
-              size={10}
-            />
-          </VStack>
-        </HStack>
+          <VStack px={5} mt={5}>
+            <VStack>
+              <Text fontSize={'md'} bold pb={3}>
+                Agendamentos marcados
+              </Text>
 
-        <VStack px={5} py={5}>
-          <VStack p={5} borderRadius={10} backgroundColor="white">
-            <Heading fontFamily={'heading'}>Resumo</Heading>
-            <HStack justifyContent="space-between">
-              <Text>Agendamentos em aberto: </Text>
-              <Text>0</Text>
-            </HStack>
-            <HStack justifyContent="space-between">
-              <Text>Agendamentos em andamento: </Text>
-              <Text>0</Text>
-            </HStack>
-            <HStack justifyContent="space-between">
-              <Text>Agendamentos finalizados: </Text>
-              <Text>0</Text>
-            </HStack>
-            <HStack justifyContent="space-between">
-              <Text>Agendamentos cancelados: </Text>
-              <Text>0</Text>
-            </HStack>
-          </VStack>
-        </VStack>
-      </VStack>
-
-      <VStack px={3} py={5}>
-        <VStack backgroundColor={'white'} p={3} borderRadius={10}>
-          <Text bold pb={5}>
-            Agendamentos pendentes
-          </Text>
-
-          {schedules &&
-            schedules.length > 0 &&
-            schedules?.map(
-              (schedule: ISchedules) =>
-                schedule.status === 1 && (
-                  <Pressable
+              <FlatList
+                data={schedules}
+                horizontal={true}
+                renderItem={({ item }) => {
+                  return (
+                    <VStack
+                      borderWidth={1}
+                      borderColor="gray.700"
+                      mb={3}
+                      borderRadius={5}
+                      shadow={0.8}
+                      key={item.id}
+                    >
+                      <Badge colorScheme={'purple'} borderRadius={10}>
+                        <HStack>
+                          <SmallSchedulleCard data={item} key={item.id} />
+                        </HStack>
+                      </Badge>
+                    </VStack>
+                  );
+                }}
+                ListEmptyComponent={() => (
+                  <HStack
+                    backgroundColor="white"
+                    w={350}
+                    borderRadius={10}
                     p={3}
-                    key={schedule.id}
-                    borderColor="gray.200"
-                    borderBottomWidth={1}
-                    mb={2}
-                    onPress={() =>
-                      navigation.navigate('scheduleDetail', {
-                        scheduleId: schedule.id,
-                      })
-                    }
+                    justifyContent={'space-around'}
                   >
-                    <HStack justifyContent={'space-between'}>
-                      <Text bold>{schedule.location?.business_name}</Text>
-                      <HStack alignItems={'baseline'}>
-                        <Icon
-                          name="clock"
-                          as={Feather}
-                          size={4}
-                          color="purple.900"
-                        />
-                        <Text pl={1}>{DateToString(schedule.date)}</Text>
-                      </HStack>
-                      <HStack alignItems={'baseline'}>
-                        <Icon
-                          name="calendar"
-                          as={Feather}
-                          size={4}
-                          color="purple.900"
-                        />
-                        <Text pl={1}>{schedule.time}</Text>
-                      </HStack>
-                    </HStack>
-                    <HStack justifyContent={'space-between'}>
-                      <HStack alignItems={'baseline'} pt={1}>
-                        {schedule.status === 1 && (
-                          <Badge colorScheme="warning" variant="solid" mr={1}>
-                            <Text color="white">Aguardando confirmacao</Text>
-                          </Badge>
-                        )}
-                      </HStack>
-                      <HStack alignItems={'baseline'}></HStack>
-                    </HStack>
-                  </Pressable>
-                )
-            )}
-
-          {!schedules.length && (
-            <Center>
-              <Text color="gray.300">Nenhum agendamento pendente</Text>
-            </Center>
-          )}
+                    <VStack w={20} h={20}>
+                      <VStack
+                        backgroundColor={'purple.700'}
+                        borderRadius={10}
+                        alignItems={'center'}
+                      >
+                        <Text bold fontSize={'4xl'} p={3} color="white">
+                          {new Date().getDate().toString()}
+                        </Text>
+                      </VStack>
+                    </VStack>
+                    <VStack pt={5}>
+                      <Center>
+                        <Text color="green.600">Tudo certo! 👍</Text>
+                        <Text color="green.600" bold>
+                          Você não possui agendamentos
+                        </Text>
+                      </Center>
+                    </VStack>
+                  </HStack>
+                )}
+              />
+            </VStack>
+          </VStack>
         </VStack>
-      </VStack>
-
-      <VStack px={3} py={5}>
-        <VStack backgroundColor={'white'} px={5} borderRadius={10}>
-          <Text bold pb={5}>
-            Publicidade
-          </Text>
-        </VStack>
-      </VStack>
-
-      <VStack px={3} py={5}>
-        <VStack backgroundColor={'white'} px={5} borderRadius={10}>
-          <Text bold pb={5}>
-            Informacoes
-          </Text>
-        </VStack>
-      </VStack>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
