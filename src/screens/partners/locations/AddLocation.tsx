@@ -60,7 +60,6 @@ const addLocationSchema = yup.object().shape({
 
 export function AddLocation() {
   const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState<string>('');
 
   const [payment_methods, setPaymentMethods] = useState<number[]>([]);
   const [openHoursWeekend, setOpenHoursWeekend] = useState<string[]>([]);
@@ -85,10 +84,8 @@ export function AddLocation() {
 
   const handleCepInput = useCallback(async () => {
     try {
-      const fields = getValues();
-
       setIsLoading(true);
-      setMessage('Buscando endereço...');
+      const fields = getValues();
 
       if (fields.zipcode.length === 8) {
         const address = await GetAddressByCEP(fields.zipcode);
