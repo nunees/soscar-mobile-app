@@ -1,6 +1,6 @@
 import { AppHeader } from '@components/AppHeader';
 import { Button } from '@components/Button';
-import ButtonSelection from '@components/ButtonSelection';
+import ButtonSelection from '@components/RegisterLocationButtonSelect';
 import { Input } from '@components/Input';
 import { LoadingModal } from '@components/LoadingModal';
 import { TextArea } from '@components/TextArea';
