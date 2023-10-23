@@ -13,6 +13,7 @@ type ButtonProps = IButtonProps & {
   hasIcon?: boolean;
   iconName?: string;
   iconSize?: number;
+  fontSize?: string;
 };
 
 export function Button({
@@ -21,6 +22,7 @@ export function Button({
   hasIcon,
   iconName,
   iconSize = 8,
+  fontSize = 'md',
   ...rest
 }: ButtonProps) {
   return (
@@ -31,7 +33,7 @@ export function Button({
         variant === 'dark'
           ? 'purple.800'
           : variant === 'light'
-          ? 'white'
+          ? 'purple.400'
           : variant === 'outline'
           ? 'transparent'
           : 'purple.800'
@@ -44,15 +46,14 @@ export function Button({
     >
       {!hasIcon && (
         <Text
-          bold
           color={
             variant === 'dark'
               ? 'white'
               : variant === 'light'
-              ? 'black'
-              : 'white'
+              ? 'white'
+              : 'purple.400'
           }
-          fontSize={'md'}
+          fontSize={fontSize}
         >
           {title}
         </Text>

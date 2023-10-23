@@ -88,8 +88,7 @@ export function SelectBusinessCategories({
       h={14}
       px={4}
       borderRadius={10}
-      fontSize="md"
-      fontFamily={'body'}
+      fontSize="sm"
       borderWidth={1}
       color="gray.400"
       _selectedItem={{

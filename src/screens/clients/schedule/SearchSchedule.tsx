@@ -69,7 +69,11 @@ export function SearchSchedule() {
   return (
     <VStack pb={10}>
       <VStack mb={5}>
-        <AppHeader title="Parceiros disponiveis" />
+        <AppHeader
+          title="Parceiros disponiveis"
+          navigation={navigation}
+          screen="schedules"
+        />
       </VStack>
 
       {isLoading && (

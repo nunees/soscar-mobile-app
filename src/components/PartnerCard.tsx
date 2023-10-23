@@ -1,7 +1,6 @@
 import UserPhoto from '@components/UserPhoto';
 import { ILocation } from '@dtos/ILocation';
-import { Feather } from '@expo/vector-icons';
-import { useProfile } from '@hooks/useProfile';
+import { useGPS } from '@hooks/useGPS';
 import { api } from '@services/api';
 import { CalculatePositionDistance } from '@utils/CalculatePositionDistance';
 import {
@@ -10,12 +9,9 @@ import {
   Text,
   IImageProps,
   IIconProps,
-  Icon,
   Badge,
-  Button,
-  Divider,
 } from 'native-base';
-import { Linking, Platform, TouchableOpacity } from 'react-native';
+import { TouchableOpacity } from 'react-native';
 
 type Props = IImageProps &
   IIconProps & {
@@ -23,21 +19,21 @@ type Props = IImageProps &
   };
 
 export function PartnerCard({ location, ...rest }: Props) {
-  const { profile } = useProfile();
+  // function functionMapsNavigate() {
+  //   const scheme = Platform.select({
+  //     ios: 'maps:0,0?q=',
+  //     android: 'geo:0,0?q=',
+  //   });
+  //   const latLng = `${location?.latitude},${location?.longitude}`;
+  //   const label = location?.business_name;
+  //   const url = Platform.select({
+  //     ios: `${scheme}${label}@${latLng}`,
+  //     android: `${scheme}${latLng}(${label})`,
+  //   });
+  //   return url;
+  // }
 
-  function functionMapsNavigate() {
-    const scheme = Platform.select({
-      ios: 'maps:0,0?q=',
-      android: 'geo:0,0?q=',
-    });
-    const latLng = `${location?.latitude},${location?.longitude}`;
-    const label = location?.business_name;
-    const url = Platform.select({
-      ios: `${scheme}${label}@${latLng}`,
-      android: `${scheme}${latLng}(${label})`,
-    });
-    return url;
-  }
+  const { coords } = useGPS();
 
   function getDistanceFromLatLonInKm(
     [lat1, lon1]: number[],
@@ -55,7 +51,7 @@ export function PartnerCard({ location, ...rest }: Props) {
 
   const distance = Number(
     getDistanceFromLatLonInKm(
-      [Number(profile.latitude), Number(profile.longitude)],
+      [Number(coords.latitude), Number(coords.longitude)],
       [Number(location?.latitude), Number(location?.longitude)]
     ).toPrecision(3)
   );
@@ -65,62 +61,55 @@ export function PartnerCard({ location, ...rest }: Props) {
       w={380}
       p={5}
       alignSelf="center"
-      mb={5}
+      mb={3}
       background="white"
       borderRadius={10}
       shadow={1}
     >
       <TouchableOpacity {...rest}>
-        <HStack>
-          <UserPhoto
-            source={{
-              uri: location.users?.avatar
-                ? `${api.defaults.baseURL}/user/avatar/${location.user_id}/${location.users.avatar}`
-                : `https://ui-avatars.com/api/?format=png&name=${location.users?.name}+${location.users?.email}&size=512`,
-            }}
-            alt="Foto de perfil"
-            size={100}
-          />
-          <VStack ml={2} mb={3}>
-            <HStack justifyContent="space-between" mb={1}>
-              <Text bold fontSize="md">
-                {location?.business_name}{' '}
-              </Text>
-            </HStack>
-
-            <VStack>
-              <HStack mb={1}>
-                <Icon name="map-pin" as={Feather} size={4} color="purple.400" />
-                <Text>
-                  {' '}
-                  {distance < 1
-                    ? 'bem proximo a voce'
-                    : ` ${distance} km de voce`}
-                </Text>
-              </HStack>
-              <HStack mb={1}>
-                <Icon name="clock" as={Feather} size={4} color="purple.400" />
-                <Text> {location?.open_hours}</Text>
-              </HStack>
-              <HStack mb={1}>
-                <Icon name="phone" as={Feather} size={4} color="purple.400" />
-                <Text> {location?.business_phone}</Text>
-              </HStack>
-            </VStack>
-          </VStack>
-        </HStack>
-        <Divider my={2} />
         <HStack justifyContent={'space-between'}>
           <HStack>
-            <Badge
-              colorScheme={isPartnerOpen() ? 'success' : 'danger'}
-              variant="solid"
-              rounded={5}
-            >
-              {isPartnerOpen() ? 'aberto' : 'fechado'}
-            </Badge>
+            <UserPhoto
+              source={{
+                uri: location.users?.avatar
+                  ? `${api.defaults.baseURL}/user/avatar/${location.user_id}/${location.users.avatar}`
+                  : `https://ui-avatars.com/api/?format=png&name=${location.users?.name}+${location.users?.email}&size=512`,
+              }}
+              alt="Foto de perfil"
+              size={50}
+              borderWidth={2}
+              borderColor={'purple.300'}
+            />
           </HStack>
+
+          <HStack justifyContent="space-between" mb={1}>
+            <VStack>
+              <Text bold fontSize="sm">
+                {location?.business_name}
+              </Text>
+              <Text>
+                {distance && distance < 1
+                  ? 'bem proximo a voce'
+                  : ` ${distance} km de voce`}
+              </Text>
+            </VStack>
+          </HStack>
+
           <HStack>
+            <VStack>
+              <Badge
+                colorScheme={isPartnerOpen() ? 'success' : 'danger'}
+                variant="subtle"
+                h={8}
+                borderRadius={6}
+              >
+                {isPartnerOpen() ? 'Aberto' : 'Fechado'}
+              </Badge>
+            </VStack>
+          </HStack>
+        </HStack>
+
+        {/* <HStack>
             <Button
               width={70}
               height={8}
@@ -129,8 +118,7 @@ export function PartnerCard({ location, ...rest }: Props) {
             >
               <Icon name="navigation" as={Feather} size={5} color="white" />
             </Button>
-          </HStack>
-        </HStack>
+          </HStack> */}
       </TouchableOpacity>
     </VStack>
   );

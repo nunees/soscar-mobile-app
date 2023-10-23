@@ -1,13 +1,50 @@
-import { ISchedules } from '@dtos/ISchedules';
-import { Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
-import { Icon, VStack, Text, HStack } from 'native-base';
+import { VStack, Text, HStack } from 'native-base';
 import { TouchableOpacity } from 'react-native';
 
-type Props = {
-  data: ISchedules;
+type SchedulesType = {
+  date: string | undefined | null;
+  id: string | undefined | null;
+  business_name: string | undefined | null;
+  time: string | undefined | null;
+  service: string | undefined | null;
 };
+
+type Props = {
+  data: SchedulesType;
+};
+
+function numberToMonth(month: string) {
+  switch (month) {
+    case '01':
+      return 'Janeiro';
+    case '02':
+      return 'Fevereiro';
+    case '03':
+      return 'Março';
+    case '04':
+      return 'Abril';
+    case '05':
+      return 'Maio';
+    case '06':
+      return 'Junho';
+    case '07':
+      return 'Julho';
+    case '08':
+      return 'Agosto';
+    case '09':
+      return 'Setembro';
+    case '10':
+      return 'Outubro';
+    case '11':
+      return 'Novembro';
+    case '12':
+      return 'Dezembro';
+    default:
+      return 'Mês';
+  }
+}
 
 /**
  * 4 - Cancelado
@@ -16,79 +53,63 @@ type Props = {
  * 3 - Finalizado
  */
 
-export function SmallSchedulleCard({ data }: Props) {
-  const date = data.date
-    ? data.date.toString().split('T')[0].split('-').reverse().join('/')
-    : '';
+const todayDate = new Date().toISOString().slice(0, 10).split('-')[2];
+const todayMonth = new Date().toISOString().slice(0, 10).split('-')[1];
 
+export function SmallSchedulleCard({ data }: Props) {
   const navigation = useNavigation<AppNavigatorRoutesProps>();
 
   return (
-    <TouchableOpacity
-      onPress={() =>
-        navigation.navigate('schedulesDetails', {
-          scheduleId: String(data!.id),
-        })
-      }
-    >
-      <HStack
-        w={370}
-        p={5}
-        justifyContent="space-between"
-        backgroundColor="white"
-        borderRadius={5}
-      >
-        <VStack>
-          <HStack>
-            <HStack>
-              <Icon
-                as={Feather}
-                name="calendar"
-                size={6}
-                color={'purple.800'}
-              />
+    <>
+      {data?.date!.toString().split('-')[1] >= todayMonth &&
+        data?.date!.toString().split('-')[2] > todayDate && (
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('schedulesDetails', {
+                scheduleId: String(data!.id),
+              })
+            }
+          >
+            <HStack
+              w={400}
+              h={100}
+              backgroundColor={'purple.100'}
+              variant="subtle"
+              borderRadius={6}
+              justifyContent={'flex-start'}
+            >
+              <HStack>
+                <VStack
+                  w={100}
+                  backgroundColor={'purple.700'}
+                  p={1}
+                  borderRadius={6}
+                >
+                  <VStack alignItems={'center'}>
+                    <Text color={'white'} fontSize={'4xl'} bold>
+                      {data.date?.split('T')[0].split('-')[2]}
+                    </Text>
+                    <Text color="white">
+                      {numberToMonth(data?.date!.split('T')[0].split('-')[1])}
+                    </Text>
+                  </VStack>
+                </VStack>
+              </HStack>
 
-              <Text pl={2} pt={1}>
-                {date}
-              </Text>
+              <HStack ml={5} py={2}>
+                <VStack>
+                  <Text color={'gray.700'} fontSize={'lg'} bold>
+                    {data.business_name}
+                  </Text>
+                  <Text color={'gray.700'} fontSize={'lg'}>
+                    {data.time}h
+                  </Text>
+                  <Text>Tipo de servico: {data.service}</Text>
+                </VStack>
+              </HStack>
             </HStack>
-            <HStack ml={5}>
-              <Icon as={Feather} name="clock" size={6} color={'purple.800'} />
-              <Text pl={2} pt={1}>
-                {data.time}
-              </Text>
-            </HStack>
-            <HStack ml={5}>
-              <Icon
-                as={Feather}
-                name="briefcase"
-                size={6}
-                color={'purple.800'}
-              />
-              <Text pl={2} pt={1}>
-                {data.location!.business_name.length > 6
-                  ? `${data.location?.business_name.substring(0, 6)}...`
-                  : data.location?.business_name}
-              </Text>
-            </HStack>
-          </HStack>
-        </VStack>
-
-        <VStack>
-          {data.status === 4 && (
-            <Icon as={Feather} name="x" color="red.500" size={7} />
-          )}
-          {data.status === 1 && (
-            <Icon as={Feather} name="file-text" color="blue.500" size={7} />
-          )}
-          {data.status === 2 && (
-            <Icon as={Feather} name="tool" color="purple.500" size={7} />
-          )}
-          {data.status === 3 && (
-            <Icon as={Feather} name="check" color="green.500" size={7} />
-          )}
-        </VStack>
-      </HStack>
-    </TouchableOpacity>
+          </TouchableOpacity>
+        )}
+    </>
   );
 }

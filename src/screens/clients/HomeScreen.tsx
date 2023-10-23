@@ -17,17 +17,28 @@ import {
   ScrollView,
   VStack,
   Text,
-  Badge,
   FlatList,
   Center,
   Pressable,
 } from 'native-base';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
+type SchedulesType = {
+  id: string | undefined | null;
+  date: string | undefined | null;
+  business_name: string | undefined | null;
+  time: string | undefined | null;
+  service: string | undefined | null;
+};
 
 export function HomeScreen() {
   const { user } = useAuth();
   const { updateProfile } = useProfile();
+
+  const [schedulesByDate, setSchedulesByDate] = useState<SchedulesType[]>(
+    {} as SchedulesType[]
+  );
 
   const [schedules, setSchedules] = useState<ISchedules[]>([]);
 
@@ -44,13 +55,28 @@ export function HomeScreen() {
   }, []);
 
   const fetchSchedules = useCallback(async (user_id: string) => {
-    const response = await api.get('/schedules/', {
+    const response = await api.get('/schedules/client', {
       headers: {
         id: user_id,
       },
     });
     return response;
   }, []);
+
+  useEffect(() => {
+    const schedulesByDate = schedules.map((schedule) => {
+      return {
+        id: schedule.id,
+        business_name: schedule.location?.business_name,
+        date: String(schedule.created_at),
+        time: schedule.time,
+        service: schedule.service_type?.name,
+      };
+    });
+
+    setSchedulesByDate(schedulesByDate);
+    console.log(schedulesByDate);
+  }, [schedules]);
 
   useFocusEffect(
     useCallback(() => {
@@ -64,6 +90,7 @@ export function HomeScreen() {
           phone: response.data.mobile_phone,
         });
       });
+
       fetchSchedules(user.id).then((response) => {
         setSchedules(response.data);
       });
@@ -106,27 +133,19 @@ export function HomeScreen() {
           <VStack mt={5}>
             <VStack>
               <Text fontSize={'md'} bold pb={3}>
-                Seus agendamentos
+                Proximos agendamentos
               </Text>
 
               <FlatList
-                data={schedules}
+                data={schedulesByDate}
                 horizontal={true}
+                snapToAlignment="start"
+                pagingEnabled
+                keyExtractor={(item) => item.id!}
                 renderItem={({ item }) => {
                   return (
-                    <VStack
-                      borderWidth={1}
-                      borderColor="gray.700"
-                      mb={3}
-                      borderRadius={5}
-                      shadow={0.8}
-                      key={item.id}
-                    >
-                      <Badge colorScheme={'purple'} borderRadius={10}>
-                        <HStack>
-                          <SmallSchedulleCard data={item} key={item.id} />
-                        </HStack>
-                      </Badge>
+                    <VStack mb={3} borderRadius={5} shadow={0.8}>
+                      <SmallSchedulleCard data={item} />
                     </VStack>
                   );
                 }}

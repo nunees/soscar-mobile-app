@@ -13,7 +13,7 @@ export function Select({ label, data, ...rest }: Props) {
       h={14}
       px={4}
       borderRadius={10}
-      fontSize="md"
+      fontSize="sm"
       fontFamily={'body'}
       borderWidth={1}
       color="gray.400"

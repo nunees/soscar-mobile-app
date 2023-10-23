@@ -27,6 +27,7 @@ import { Vechicles } from '@screens/clients/vehicles/Vehicles';
 import EditProfileInformation from '@screens/EditProfileInformation';
 import MyAccountInformation from '@screens/MyAccountInformation';
 import { Profile } from '@screens/Profile';
+import { TaskDone } from '@screens/TeaskDone';
 import { Icon, useTheme } from 'native-base';
 
 type AppRotes = {
@@ -54,6 +55,9 @@ type AppRotes = {
   legalQuotes: undefined;
   newLegalQuote: { serviceId: string };
   searchLegalQuote: { serviceId: string };
+
+  // Other routes
+  taskDone: { date: string };
 };
 
 export type AppNavigatorRoutesProps = BottomTabNavigationProp<AppRotes>;
@@ -320,6 +324,15 @@ export function AppRoutes() {
       <Screen
         name="searchLegalQuote"
         component={SearchLegalQuote}
+        options={{
+          tabBarButton: () => null,
+          tabBarStyle: { display: 'none' },
+        }}
+      />
+
+      <Screen
+        name="taskDone"
+        component={TaskDone}
         options={{
           tabBarButton: () => null,
           tabBarStyle: { display: 'none' },

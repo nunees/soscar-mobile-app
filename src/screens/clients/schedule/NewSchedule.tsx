@@ -3,13 +3,14 @@ import { Button } from '@components/Button';
 import { Input } from '@components/Input';
 import { LoadingModal } from '@components/LoadingModal';
 import { PartnerCard } from '@components/PartnerCard';
+import { ScheduleCalendar } from '@components/ScheduleCalendar';
 import { Select } from '@components/Select';
 import { SelectBusinessCategories } from '@components/SelectBusinessCategories';
 import { TextArea } from '@components/TextArea';
 import { ILocation } from '@dtos/ILocation';
 import { IVehicleDTO } from '@dtos/IVechicleDTO';
-import { Feather } from '@expo/vector-icons';
 import { useAuth } from '@hooks/useAuth';
+import { useUploadImage } from '@hooks/useUploadImage';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import {
   useFocusEffect,
@@ -19,18 +20,16 @@ import {
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
 import { api } from '@services/api';
 import { AppError } from '@utils/AppError';
-import { handleDate, handleTime } from '@utils/DateTime';
-import { IFileInfo } from 'expo-file-system';
-import * as FileSystem from 'expo-file-system';
-import * as ImagePicker from 'expo-image-picker';
+import { handleTime } from '@utils/DateTime';
 import {
   VStack,
   ScrollView,
   HStack,
   Text,
   useToast,
-  Icon,
   Image,
+  Progress,
+  FlatList,
 } from 'native-base';
 import { useCallback, useState } from 'react';
 import { Alert, TouchableOpacity } from 'react-native';
@@ -49,6 +48,9 @@ export function NewSchedule() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [message, setMessage] = useState<string>('');
 
+  const [isPhotoLoading, setIsPhotoLoading] = useState<boolean>(false);
+  const [progressValue, setProgressValue] = useState<number>(0);
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [files, setfiles] = useState<any[]>([]);
 
@@ -56,14 +58,15 @@ export function NewSchedule() {
 
   const [userVehicles, setUserVehicles] = useState<IVehicleDTO[]>();
   const [vehicle_id, setVehicle_id] = useState<string>();
-  // const [services, setServices] = useState<number[]>();
 
-  const [date, setDate] = useState<string>('');
+  const [selectedDate, setSelectedDate] = useState<string>('');
   const [time, setTime] = useState<string>('');
 
   const [requiredServices, setRequiredServices] = useState<number>();
 
   const [notes, setNotes] = useState<string>('');
+
+  const [uploadForms, setUploadForms] = useState<FormData[]>([]);
 
   const routes = useRoute();
   const { user } = useAuth();
@@ -71,69 +74,31 @@ export function NewSchedule() {
 
   const toast = useToast();
   const navigation = useNavigation<AppNavigatorRoutesProps>();
+  const { handleUserProfilePictureSelect } = useUploadImage();
 
-  const userPhotoUploadForm = new FormData();
-
-  async function handleUserProfilePictureSelect() {
+  async function uploadImage() {
     try {
-      setIsLoading(true);
-      setMessage('Anexando imagem...');
-      const media = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.All,
-        quality: 1,
-        aspect: [4, 4],
+      setIsPhotoLoading(true);
+      setProgressValue(15);
+
+      setProgressValue(30);
+      const file = await handleUserProfilePictureSelect(user.id, 'document');
+      if (!file!.userPhotoUploadForm) {
+        throw new AppError('Erro ao anexar arquivo');
+      }
+
+      setProgressValue(60);
+      setfiles([...files, file?.photoFile]);
+
+      setProgressValue(80);
+      setUploadForms([...uploadForms, file!.userPhotoUploadForm]);
+
+      setProgressValue(100);
+      toast.show({
+        title: 'Arquivo anexado',
+        placement: 'top',
+        bgColor: 'green.500',
       });
-
-      if (media.canceled) {
-        return;
-      }
-
-      if (media.assets[0].uri) {
-        const mediaInfo = (await FileSystem.getInfoAsync(
-          media.assets[0].uri
-        )) as IFileInfo;
-
-        if (mediaInfo?.size && mediaInfo.size / 1021 / 1024 > 30) {
-          toast.show({
-            title: 'O arquivo deve ter no máximo 30MB',
-            placement: 'top',
-            bgColor: 'red.500',
-          });
-        }
-
-        const fileExtension = media.assets[0].uri.split('.').pop();
-        if (
-          fileExtension !== 'jpg' &&
-          fileExtension !== 'jpeg' &&
-          fileExtension !== 'png' &&
-          fileExtension !== 'mp4' &&
-          fileExtension !== 'pdf'
-        ) {
-          toast.show({
-            title: 'Formato de arquivo não suportado',
-            placement: 'top',
-            bgColor: 'red.500',
-          });
-          return;
-        }
-
-        const file = {
-          name: `${user.username}.${fileExtension}`.toLowerCase(),
-          uri: media.assets[0].uri,
-          type: `${media.assets[0].type}/${fileExtension}`,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } as any;
-
-        // userPhotoUploadForm.append('document', file);
-
-        setfiles([...files, file]);
-
-        toast.show({
-          title: 'Arquivo anexado',
-          placement: 'top',
-          bgColor: 'green.500',
-        });
-      }
     } catch (error) {
       const isAppError = error instanceof AppError;
       const title = isAppError ? error.message : 'Erro na atualização';
@@ -143,59 +108,46 @@ export function NewSchedule() {
         bgColor: 'red.500',
       });
     } finally {
-      setIsLoading(false);
+      setProgressValue(0);
+      setIsPhotoLoading(false);
     }
   }
 
   async function handleSubmit() {
     try {
       setIsLoading(true);
-      setMessage('Agendando...');
+
       const response = await api.post(
         '/schedules',
         {
           vehicle_id,
           location_id: locationId,
           service_type: Number(requiredServices),
-          date,
+          date: selectedDate,
           time,
           notes,
         },
         {
           headers: {
             id: user.id,
+            'Content-Type': 'application/json',
           },
         }
       );
 
-      try {
-        files.map(async (file) => {
-          userPhotoUploadForm.append('document', file);
-          await api.post(
-            `/schedules/documents/${response.data.id}`,
-            userPhotoUploadForm,
-            {
-              headers: {
-                id: user.id,
-                'Content-Type': 'multipart/form-data',
-              },
-            }
-          );
+      console.log(response.data);
+
+      uploadForms.map(async (form) => {
+        console.log(form);
+        await api.post(`/schedules/documents/${response.data.id}`, form, {
+          headers: {
+            id: user.id,
+            'Content-Type': 'multipart/form-data',
+          },
         });
-        navigation.navigate('home');
-        toast.show({
-          title: 'Agendamento realizado com sucesso!',
-          placement: 'top',
-          bgColor: 'green.500',
-        });
-      } catch (error) {
-        const isAppError = error instanceof AppError;
-        toast.show({
-          title: isAppError ? error.message : 'Erro ao anexar arquivos',
-          placement: 'top',
-          bgColor: 'red.500',
-        });
-      }
+      });
+
+      navigation.navigate('taskDone', { date: selectedDate });
     } catch (error) {
       const isAppError = error instanceof AppError;
       toast.show({
@@ -270,7 +222,11 @@ export function NewSchedule() {
   return (
     <VStack>
       <VStack>
-        <AppHeader title="Novo agendamento" />
+        <AppHeader
+          title="Novo agendamento"
+          navigation={navigation}
+          screen="searchSchedule"
+        />
       </VStack>
 
       {isLoading && (
@@ -289,6 +245,10 @@ export function NewSchedule() {
           }}
         >
           {location && <PartnerCard location={location} />}
+          <VStack>
+            <Button title="Mais informacoes" fontSize={'xs'} h={10} mb={1} />
+            <Button title="Mostrar no mapa" fontSize={'xs'} h={10} mb={3} />
+          </VStack>
 
           <VStack p={5} mb={5} backgroundColor="white" borderRadius={10}>
             <VStack>
@@ -327,76 +287,53 @@ export function NewSchedule() {
             </VStack>
           </VStack>
 
-          <HStack
+          <VStack
             p={5}
             mb={5}
             backgroundColor="white"
             borderRadius={10}
             justifyContent="space-between"
           >
-            <HStack alignItems="center">
-              <VStack>
-                <Text bold pb={1}>
-                  Data
-                </Text>
-                <Input
-                  placeholder={'Data'}
-                  w={150}
-                  editable={false}
-                  value={date}
-                  caretHidden
-                  onPressIn={() => {
-                    DateTimePickerAndroid.open({
-                      mode: 'date',
-                      value: new Date(),
-                      onChange: (event, date) =>
-                        setDate(handleDate(date as Date)),
-                    });
-                  }}
-                />
-              </VStack>
-            </HStack>
-            <HStack>
-              <VStack>
-                <Text bold pb={1}>
-                  Hora
-                </Text>
-                <Input
-                  placeholder={'Horario'}
-                  w={120}
-                  editable={false}
-                  value={time}
-                  caretHidden
-                  onPressIn={() => {
-                    DateTimePickerAndroid.open({
-                      mode: 'time',
-                      is24Hour: true,
-                      value: new Date(),
-                      onChange: (event, date) =>
-                        setTime(handleTime(date as Date)),
-                    });
-                  }}
-                />
-              </VStack>
-            </HStack>
-          </HStack>
+            <Text bold pb={1}>
+              Data
+            </Text>
 
-          <VStack p={5} mb={5} backgroundColor="white" borderRadius={10}>
-            <HStack>
-              <Icon
-                as={Feather}
-                name="info"
-                size={38}
-                color="purple.400"
-                mr={1}
-                mt={1}
-              />
-              <Text fontSize="xs" bold color="gray.600" textAlign="justify">
-                O tempo medio de reparo e de 1 hora, no entanto pode ser
-                necessario mais tempo. Nao se preocupe, seu mecanico ira
-                informa-lo se necessario.
-              </Text>
-            </HStack>
+            <ScheduleCalendar
+              selectedDate={selectedDate}
+              setSelectedDate={setSelectedDate}
+            />
+          </VStack>
+
+          <VStack
+            p={5}
+            mb={5}
+            backgroundColor="white"
+            borderRadius={10}
+            justifyContent="space-between"
+          >
+            <Text bold pb={1}>
+              Horario
+            </Text>
+
+            <Input
+              placeholder={'Selecione um horario'}
+              editable={false}
+              value={time}
+              caretHidden
+              onPressIn={() => {
+                DateTimePickerAndroid.open({
+                  mode: 'time',
+                  is24Hour: true,
+                  value: new Date(),
+                  onChange: (event, date) => setTime(handleTime(date as Date)),
+                });
+              }}
+            />
+            <Text fontSize="xs" color="gray.600" textAlign="justify" w={320}>
+              O tempo medio de reparo e de 1 hora, no entanto pode ser
+              necessario mais tempo. Nao se preocupe, seu mecanico ira
+              informa-lo se necessario.
+            </Text>
           </VStack>
 
           <VStack p={5} mb={5} backgroundColor="white" borderRadius={10}>
@@ -418,39 +355,57 @@ export function NewSchedule() {
 
           <VStack p={5} mb={5} backgroundColor="white" borderRadius={10}>
             <HStack mb={5}>
-              <Text fontSize="xs" bold color="gray.500" textAlign="justify">
-                Você pode adicionar fotos ou videos adicionais que demonstram os
-                problemas relatados e ajudam o prestador de serviço a ter o
-                melhor entendimento do problema. Você pode adicionar imagens,
-                videos ou documentos.
+              <Text fontSize="xs" color="gray.500" textAlign="justify">
+                Você pode adicionar fotos adicionais que demonstram os problemas
+                relatados e ajudam o prestador de serviço a ter o melhor
+                entendimento do problema.
               </Text>
             </HStack>
-            <VStack maxW={400} flexWrap="wrap">
-              {files.map((item) => (
-                <HStack key={item.id}>
+            <VStack>
+              <FlatList
+                horizontal
+                data={files}
+                pagingEnabled
+                indicatorStyle="white"
+                snapToAlignment="start"
+                decelerationRate={'fast'}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
                   <TouchableOpacity>
-                    <HStack mb={5}>
-                      <Image
-                        w={'full'}
-                        height={200}
-                        source={item}
-                        alt="Some thing in the way"
-                        resizeMode="cover"
-                      />
-                    </HStack>
+                    <Image
+                      w={350}
+                      height={200}
+                      source={item}
+                      alt="User image"
+                    />
                   </TouchableOpacity>
-                </HStack>
-              ))}
+                )}
+              />
 
               <Button
                 title="Carregar foto"
-                variant="outline"
-                onPress={handleUserProfilePictureSelect}
+                variant="light"
+                fontSize={'sm'}
+                fontWeight={'normal'}
+                onPress={uploadImage}
+                mt={5}
               />
+              {isPhotoLoading && (
+                <Progress
+                  mt={3}
+                  value={progressValue}
+                  w={'full'}
+                  colorScheme={'purple'}
+                />
+              )}
             </VStack>
           </VStack>
 
-          <Button title="Agendar" onPress={handleSubmit} />
+          <Button
+            title="Agendar"
+            onPress={handleSubmit}
+            isLoading={isLoading}
+          />
         </ScrollView>
       </VStack>
     </VStack>
