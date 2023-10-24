@@ -3,22 +3,13 @@ import KeyHelp from '@assets/services/key-car.png';
 import EletricService from '@assets/services/spark-plug.png';
 import TowService from '@assets/services/tow.png';
 import WhellService from '@assets/services/wheel.png';
-import { GOOGLE_MAPS_APIKEY } from '@env';
 import { useProfile } from '@hooks/useProfile';
 import axios from 'axios';
 import {
   getCurrentPositionAsync,
   requestForegroundPermissionsAsync,
 } from 'expo-location';
-import {
-  CircleIcon,
-  Icon,
-  Image,
-  Input,
-  ScrollView,
-  Text,
-  VStack,
-} from 'native-base';
+import { ScrollView, Text, VStack } from 'native-base';
 import { useEffect, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
@@ -46,6 +37,8 @@ type coords = {
   latitude: number;
   longitude: number;
 };
+
+const GOOGLE_MAPS_APIKEY = 'AIzaSyB-7jJXvH9qH6w8Z8Z2W0qQ2Y5QZ6YQY5o';
 
 export function Map({ latitude, longitude }: coords) {
   const { profile } = useProfile();

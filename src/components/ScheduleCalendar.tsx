@@ -93,6 +93,8 @@ export function ScheduleCalendar({ selectedDate, setSelectedDate }: Props) {
   //   return <Text>{day.name}</Text>;
   // };
 
+  console.log(selectedDate);
+
   return (
     <VStack>
       <Calendar

@@ -19,7 +19,8 @@
     "@react-navigation/native": "^6.1.7",
     "@react-navigation/native-stack": "^6.9.13",
     "axios": "^1.4.0",
-    "dayjs": "^1.11.9",
+    "data-fns": "^1.1.0",
+    "dayjs": "^1.11.10",
     "eslint-config-airbnb-base": "^15.0.0",
     "expo": "~48.0.18",
     "expo-av": "~13.2.1",
@@ -43,6 +44,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
+    "@types/date-fns": "^2.6.0",
     "@types/react": "~18.0.14",
     "@types/uuid": "^9.0.6",
     "@typescript-eslint/eslint-plugin": "^6.4.1",

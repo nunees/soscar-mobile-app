@@ -219,6 +219,8 @@ export function NewSchedule() {
     }, [])
   );
 
+  console.log('Render');
+
   return (
     <VStack>
       <VStack>

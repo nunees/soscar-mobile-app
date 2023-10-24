@@ -144,7 +144,7 @@ export function Locations() {
                       {location.active ? (
                         <Badge
                           w={50}
-                          variant="solid"
+                          variant="subtle"
                           colorScheme="green"
                           px={2}
                           borderRadius={5}

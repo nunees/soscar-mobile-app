@@ -16,7 +16,6 @@ import {
   useToast,
   Center,
   Pressable,
-  Badge,
   FlatList,
 } from 'native-base';
 import { useEffect, useState } from 'react';
@@ -29,7 +28,19 @@ import { SafeAreaView } from 'react-native-safe-area-context';
  * 3 - Finalizado
  */
 
+type SchedulesType = {
+  id: string | undefined | null;
+  date: Date;
+  business_name: string | undefined | null;
+  time: string | undefined | null;
+  service: string | undefined | null;
+};
+
 export function HomeScreen() {
+  const [schedulesByDate, setSchedulesByDate] = useState<SchedulesType[]>(
+    {} as SchedulesType[]
+  );
+
   const [schedules, setSchedules] = useState<ISchedules[]>({} as ISchedules[]);
 
   const { user } = useAuth();
@@ -38,6 +49,42 @@ export function HomeScreen() {
   const toast = useToast();
 
   const navigation = useNavigation<PartnerNavigatorRoutesProps>();
+
+  useEffect(() => {
+    async function fetchSchedules() {
+      try {
+        const response = await api.get('/schedules/partner', {
+          headers: {
+            id: user.id,
+          },
+        });
+
+        setSchedules(response.data);
+
+        const schedulesByDate = schedules.map((schedule) => {
+          return {
+            id: schedule.id,
+            business_name: schedule.location?.business_name,
+            date: schedule.date,
+            time: schedule.time,
+            service: schedule.service_type?.name,
+          };
+        });
+
+        setSchedulesByDate(schedulesByDate);
+      } catch (error) {
+        if (error instanceof AppError) {
+          toast.show({
+            title: 'Erro ao carregar agendamentos',
+            placement: 'top',
+            bgColor: 'red.500',
+          });
+        }
+      }
+    }
+
+    fetchSchedules();
+  }, [schedules.length]);
 
   useEffect(() => {
     async function fetchUserData() {
@@ -58,30 +105,6 @@ export function HomeScreen() {
 
     fetchUserData();
   }, []);
-
-  useEffect(() => {
-    async function fetchSchedules() {
-      try {
-        const response = await api.get('/schedules/partner', {
-          headers: {
-            id: user.id,
-          },
-        });
-
-        setSchedules(response.data);
-      } catch (error) {
-        if (error instanceof AppError) {
-          toast.show({
-            title: 'Erro ao carregar agendamentos',
-            placement: 'top',
-            bgColor: 'red.500',
-          });
-        }
-      }
-    }
-
-    fetchSchedules();
-  }, [schedules.length]);
 
   return (
     <SafeAreaView>
@@ -119,27 +142,20 @@ export function HomeScreen() {
           <VStack px={5} mt={5}>
             <VStack>
               <Text fontSize={'md'} bold pb={3}>
-                Agendamentos marcados
+                Seus proximos clientes
               </Text>
 
               <FlatList
-                data={schedules}
+                data={schedulesByDate}
                 horizontal={true}
+                showsHorizontalScrollIndicator={false}
+                snapToAlignment="start"
+                pagingEnabled
+                keyExtractor={(item) => item.id!}
                 renderItem={({ item }) => {
                   return (
-                    <VStack
-                      borderWidth={1}
-                      borderColor="gray.700"
-                      mb={3}
-                      borderRadius={5}
-                      shadow={0.8}
-                      key={item.id}
-                    >
-                      <Badge colorScheme={'purple'} borderRadius={10}>
-                        <HStack>
-                          <SmallSchedulleCard data={item} key={item.id} />
-                        </HStack>
-                      </Badge>
+                    <VStack mb={3} borderRadius={5} shadow={0.8}>
+                      <SmallSchedulleCard data={item} />
                     </VStack>
                   );
                 }}

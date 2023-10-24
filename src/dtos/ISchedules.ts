@@ -44,6 +44,7 @@ export interface ISchedules {
     email: string;
     cpf: string;
     mobile_phone: string;
+    avatar: string;
     UsersAddresses?: {
       address_line: string;
       number: number;

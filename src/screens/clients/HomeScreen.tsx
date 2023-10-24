@@ -26,7 +26,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 type SchedulesType = {
   id: string | undefined | null;
-  date: string | undefined | null;
+  date: Date;
   business_name: string | undefined | null;
   time: string | undefined | null;
   service: string | undefined | null;
@@ -68,14 +68,13 @@ export function HomeScreen() {
       return {
         id: schedule.id,
         business_name: schedule.location?.business_name,
-        date: String(schedule.created_at),
+        date: schedule.date,
         time: schedule.time,
         service: schedule.service_type?.name,
       };
     });
 
     setSchedulesByDate(schedulesByDate);
-    console.log(schedulesByDate);
   }, [schedules]);
 
   useFocusEffect(
@@ -139,6 +138,7 @@ export function HomeScreen() {
               <FlatList
                 data={schedulesByDate}
                 horizontal={true}
+                showsHorizontalScrollIndicator={false}
                 snapToAlignment="start"
                 pagingEnabled
                 keyExtractor={(item) => item.id!}
