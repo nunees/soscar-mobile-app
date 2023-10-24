@@ -21,9 +21,16 @@ import { api } from '@services/api';
 import { AppError } from '@utils/AppError';
 import { ConvertAddressToLatLong } from '@utils/CalculatePositionDistance';
 import { GetAddressByCEP } from '@utils/GetAddressByCEP';
-import { VStack, Text, useToast, ScrollView, HStack } from 'native-base';
+import {
+  VStack,
+  Text,
+  useToast,
+  ScrollView,
+  HStack,
+  Switch,
+} from 'native-base';
 import { useState, useCallback } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, set, useForm } from 'react-hook-form';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as yup from 'yup';
 
@@ -70,6 +77,8 @@ const addLocationSchema = yup.object().shape({
 export function EditLocation() {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingData, setIsLoadingData] = useState(false);
+
+  const [isPlaceActive, setIsPlaceActive] = useState(true);
 
   const [payment_methods, setPaymentMethods] = useState<number[]>([]);
   const [openHoursWeekend, setOpenHoursWeekend] = useState<string[]>([]);
@@ -146,6 +155,25 @@ export function EditLocation() {
       setIsLoading(false);
     }
   }, []);
+
+  async function handleSetInative(status: boolean) {
+    try {
+      await api.patch(
+        `/locations/${locationId}`,
+        {
+          active: status,
+        },
+        {
+          headers: {
+            id: user.id,
+          },
+        }
+      );
+      setIsPlaceActive(status);
+    } catch (error) {
+      throw new AppError('Erro ao inativar local');
+    }
+  }
 
   async function handleSubmitBusiness() {
     try {
@@ -244,6 +272,7 @@ export function EditLocation() {
       setValue('business_description', response.data.business_description);
       setValue('openAt', response.data.open_hours.split('-')[0].trim());
       setValue('closeAt', response.data.open_hours.split('-')[1].trim());
+      setIsPlaceActive(response.data.active);
 
       setPaymentMethods(response.data.payment_methods);
       setBusinessCategories(response.data.business_categories);
@@ -294,6 +323,19 @@ export function EditLocation() {
         >
           <VStack>
             <NewLocationSVG width={400} height={200} />
+          </VStack>
+
+          <VStack px={5}>
+            <HStack justifyContent={'space-between'} alignItems={'center'}>
+              <Text bold>Ativo?</Text>
+              <Switch
+                ml={2}
+                onTrackColor="purple.500"
+                size={'sm'}
+                onChange={() => handleSetInative(!isPlaceActive)}
+                isChecked={isPlaceActive}
+              />
+            </HStack>
           </VStack>
 
           <VStack px={5}>
