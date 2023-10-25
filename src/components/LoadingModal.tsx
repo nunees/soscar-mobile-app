@@ -3,7 +3,7 @@ import { IModalProps, Modal, Spinner, VStack, Text } from 'native-base';
 type Props = IModalProps & {
   message?: string | undefined;
   showModal: boolean;
-  setShowModal: (value: boolean) => void;
+  setShowModal?: (value: boolean) => void;
 };
 
 export function LoadingModal({
@@ -13,7 +13,11 @@ export function LoadingModal({
   ...rest
 }: Props) {
   return (
-    <Modal isOpen={showModal} onClose={() => setShowModal(false)} {...rest}>
+    <Modal
+      isOpen={showModal}
+      onClose={setShowModal ? () => setShowModal(false) : false}
+      {...rest}
+    >
       <Modal.Content maxWidth="400px">
         <Modal.Body>
           <VStack alignItems="center">

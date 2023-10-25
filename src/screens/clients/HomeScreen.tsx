@@ -1,104 +1,81 @@
 import CalendarImage from '@assets/services/calendar.png';
 import CompliantImage from '@assets/services/compliant.png';
 import PaperImage from '@assets/services/paper.png';
+import { LoadingModal } from '@components/LoadingModal';
 import { SearchBar } from '@components/SearchBar';
 import { ServiceCardTypes } from '@components/ServiceCardTypes';
 import { SmallSchedulleCard } from '@components/SmallSchedulleCard';
 import UserPhoto from '@components/UserPhoto';
-import { ISchedules } from '@dtos/ISchedules';
+import { useAxiosFetch } from '@hooks/axios/useAxiosFetch';
 import { useAuth } from '@hooks/useAuth';
-// import { useGPS } from '@hooks/useGPS';
-import { useProfile } from '@hooks/useProfile';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
 import { api } from '@services/api';
-import {
-  HStack,
-  ScrollView,
-  VStack,
-  Text,
-  FlatList,
-  Center,
-  Pressable,
-} from 'native-base';
-import { useCallback, useEffect, useState } from 'react';
+import { HStack, ScrollView, VStack, Text, Pressable } from 'native-base';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-type SchedulesType = {
-  id: string | undefined | null;
-  date: Date;
-  business_name: string | undefined | null;
-  time: string | undefined | null;
-  service: string | undefined | null;
-};
 
 export function HomeScreen() {
   const { user } = useAuth();
-  const { updateProfile } = useProfile();
-
-  const [schedulesByDate, setSchedulesByDate] = useState<SchedulesType[]>(
-    {} as SchedulesType[]
-  );
-
-  const [schedules, setSchedules] = useState<ISchedules[]>([]);
 
   const navigation = useNavigation<AppNavigatorRoutesProps>();
+
+  const { state } = useAxiosFetch({
+    method: 'GET',
+    url: '/schedules/client',
+    headers: {
+      id: user.id,
+    },
+  });
+
   // const { coords } = useGPS();
 
-  const fetchUserData = useCallback(async (user_id: string) => {
-    const response = await api.get(`/user/profile/${user_id}`, {
-      headers: {
-        id: user_id,
-      },
-    });
-    return response;
-  }, []);
+  // const fetchUserData = useCallback(async (user_id: string) => {
+  //   const response = await api.get(`/user/profile/${user_id}`, {
+  //     headers: {
+  //       id: user_id,
+  //     },
+  //   });
+  //   return response;
+  // }, []);
 
-  const fetchSchedules = useCallback(async (user_id: string) => {
-    const response = await api.get('/schedules/client', {
-      headers: {
-        id: user_id,
-      },
-    });
-    return response;
-  }, []);
+  // const fetchSchedules = useCallback(async (user_id: string) => {
+  //   const response = await api.get('/schedules/client', {
+  //     headers: {
+  //       id: user_id,
+  //     },
+  //   });
+  //   return response;
+  // }, []);
 
-  useEffect(() => {
-    const schedulesByDate = schedules.map((schedule) => {
-      return {
-        id: schedule.id,
-        business_name: schedule.location?.business_name,
-        date: schedule.date,
-        time: schedule.time,
-        service: schedule.service_type?.name,
-      };
-    });
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     fetchUserData(user.id).then((response) => {
+  //       updateProfile({
+  //         birth_date: response.data.birth_date,
+  //         cpf: response.data.cpf,
+  //         genderId: response.data.genderId,
+  //         last_name: response.data.last_name,
+  //         name: response.data.name,
+  //         phone: response.data.mobile_phone,
+  //       });
+  //     });
 
-    setSchedulesByDate(schedulesByDate);
-  }, [schedules]);
-
-  useFocusEffect(
-    useCallback(() => {
-      fetchUserData(user.id).then((response) => {
-        updateProfile({
-          birth_date: response.data.birth_date,
-          cpf: response.data.cpf,
-          genderId: response.data.genderId,
-          last_name: response.data.last_name,
-          name: response.data.name,
-          phone: response.data.mobile_phone,
-        });
-      });
-
-      fetchSchedules(user.id).then((response) => {
-        setSchedules(response.data);
-      });
-    }, [])
-  );
+  //     fetchSchedules(user.id).then((response) => {
+  //       setSchedules(response.data);
+  //     });
+  //   }, [])
+  // );
 
   return (
     <SafeAreaView>
       <ScrollView showsVerticalScrollIndicator={false}>
+        {state.isLoading && (
+          <LoadingModal
+            showModal={state.isLoading}
+            message="Carregando dados.."
+          />
+        )}
+
         <VStack px={5} py={2}>
           <VStack backgroundColor="white" p={5} borderRadius={10} shadow={1}>
             <HStack justifyContent={'space-between'} alignItems={'center'}>
@@ -135,52 +112,10 @@ export function HomeScreen() {
                 Proximos agendamentos
               </Text>
 
-              {schedulesByDate.length > 0 && (
-                <FlatList
-                  data={schedulesByDate}
-                  horizontal={true}
-                  showsHorizontalScrollIndicator={false}
-                  snapToAlignment="start"
-                  pagingEnabled
-                  keyExtractor={(item) => item.id!}
-                  renderItem={({ item }) => {
-                    return (
-                      <VStack mb={3} borderRadius={5} shadow={0.8}>
-                        <SmallSchedulleCard data={item} />
-                      </VStack>
-                    );
-                  }}
-                  ListEmptyComponent={() => (
-                    <HStack
-                      backgroundColor="white"
-                      w={350}
-                      borderRadius={10}
-                      p={3}
-                      justifyContent={'space-around'}
-                    >
-                      <VStack w={20} h={20}>
-                        <VStack
-                          backgroundColor={'purple.700'}
-                          borderRadius={10}
-                          alignItems={'center'}
-                        >
-                          <Text bold fontSize={'4xl'} p={3} color="white">
-                            {new Date().getDate().toString()}
-                          </Text>
-                        </VStack>
-                      </VStack>
-                      <VStack pt={5}>
-                        <Center>
-                          <Text color="green.600">Tudo certo! 👍</Text>
-                          <Text color="green.600" bold>
-                            Você não possui agendamentos
-                          </Text>
-                        </Center>
-                      </VStack>
-                    </HStack>
-                  )}
-                />
-              )}
+              {/* {schedulesByDate.length > 0 && (
+
+              )} */}
+              {state.data && <SmallSchedulleCard data={state.data} />}
             </VStack>
           </VStack>
 
