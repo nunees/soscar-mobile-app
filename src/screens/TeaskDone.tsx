@@ -2,7 +2,7 @@ import TaskDoneSVG from '@assets/taskdone.svg';
 import { Button } from '@components/Button';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
-import { Center, Heading, VStack, Text, Image } from 'native-base';
+import { Center, Heading, VStack, Text } from 'native-base';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 type RouteParamsProps = {

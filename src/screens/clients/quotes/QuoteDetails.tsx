@@ -1,14 +1,13 @@
+/* eslint-disable import/no-extraneous-dependencies */
 import { AppHeader } from '@components/AppHeader';
 import { Button } from '@components/Button';
 import getLogoImage from '@components/LogosImages';
 import { TextArea } from '@components/TextArea';
 import { VechiclesBrands } from '@data/VechiclesBrands';
 import { ILocation } from '@dtos/ILocation';
-import { IQuotesDocumentDTO } from '@dtos/IQuoteDocumentDTO';
 import { IQuoteList } from '@dtos/IQuoteList';
 import { IVehicleDTO } from '@dtos/IVechicleDTO';
 import { useAuth } from '@hooks/useAuth';
-import { useMapsLinking } from '@hooks/useMapsLinking';
 import {
   useFocusEffect,
   useNavigation,
@@ -17,7 +16,6 @@ import {
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
 import { api } from '@services/api';
 import { AppError } from '@utils/AppError';
-import { ResizeMode, Video } from 'expo-av';
 import {
   VStack,
   Text,
@@ -26,9 +24,11 @@ import {
   Image,
   HStack,
   Avatar,
+  FlatList,
 } from 'native-base';
 import { useCallback, useState } from 'react';
 import { Alert } from 'react-native';
+import QRCode from 'react-native-qrcode-svg';
 
 type RouteParamsProps = {
   quoteId: string;
@@ -42,16 +42,12 @@ export function QuoteDetails() {
   const [quote, setQuote] = useState<IQuoteList>({} as IQuoteList);
   const [location, setLocation] = useState<ILocation>({} as ILocation);
   const [vehicle, setVehicle] = useState<IVehicleDTO>({} as IVehicleDTO);
-  const [userFiles, setUserFiles] = useState<IQuotesDocumentDTO[]>(
-    {} as IQuotesDocumentDTO[]
-  );
 
   const { user } = useAuth();
   const navigation = useNavigation<AppNavigatorRoutesProps>();
   const route = useRoute();
   const toast = useToast();
   const { quoteId, locationId, vehicleId } = route.params as RouteParamsProps;
-  const { deviceMapNavigation } = useMapsLinking();
 
   async function handleCancelQuote() {
     Alert.alert(
@@ -175,10 +171,16 @@ export function QuoteDetails() {
     }, [vehicleId])
   );
 
+  console.log(quote?.UserQuotesDocuments);
+
   return (
     <VStack pb={10}>
       <VStack mb={5}>
-        <AppHeader title="Detalhes do orçamento" />
+        <AppHeader
+          title="Detalhes do orçamento"
+          navigation={navigation}
+          screen="quotesList"
+        />
       </VStack>
 
       <VStack px={5}>
@@ -188,7 +190,7 @@ export function QuoteDetails() {
             paddingBottom: 200,
           }}
         >
-          <VStack px={3} py={3}>
+          <VStack>
             <VStack backgroundColor="white" borderRadius={10} p={5}>
               <HStack>
                 <VStack>
@@ -198,7 +200,7 @@ export function QuoteDetails() {
                         ? `${api.defaults.baseURL}/user/avatar/${location.users?.id}/${location.users?.avatar}`
                         : `https://ui-avatars.com/api/?format=png&name=${location.business_name}+${location.business_email}&size=512`,
                     }}
-                    size={'xl'}
+                    size={'lg'}
                     mr={2}
                   />
                 </VStack>
@@ -211,8 +213,6 @@ export function QuoteDetails() {
                       {location.address_line},{location.number} -{' '}
                       {location.city} - {location.state}
                     </Text>
-                    <Text fontSize={'sm'}>{location.business_email}</Text>
-                    <Text fontSize={'sm'}>{location.business_phone}</Text>
                   </VStack>
                 </VStack>
               </HStack>
@@ -234,7 +234,12 @@ export function QuoteDetails() {
           <VStack backgroundColor="white" borderRadius={10} mt={5}>
             <VStack px={5} py={5}>
               <Text bold>Chave de verificacao</Text>
-              <Text>{quote?.hashId}</Text>
+              <HStack justifyContent={'space-between'} alignItems={'center'}>
+                <VStack w={160}>
+                  <Text fontSize={'2xs'}>{quote?.hashId}</Text>
+                </VStack>
+                <QRCode value={quote?.hashId} size={100} />
+              </HStack>
             </VStack>
           </VStack>
 
@@ -274,88 +279,73 @@ export function QuoteDetails() {
                 Arquivos enviados pelo usuario
               </Text>
               <VStack>
-                {quote?.UserQuotesDocuments?.map((file) => {
-                  if (file.document_type_id === 1) {
-                    return (
-                      <Image
-                        borderRadius={5}
-                        key={file.id}
-                        source={{
-                          uri: `${api.defaults.baseURL}/quotes/document/${file.id}/${file.hashId}`,
-                        }}
-                        alt="Imagem do usuario"
-                        resizeMode="cover"
-                        size={350}
-                        mb={5}
-                      />
-                    );
-                  }
-
-                  if (file.document_type_id === 3) {
-                    return (
-                      <Video
-                        source={{
-                          uri: `${api.defaults.baseURL}/quotes/document/${file.id}/${file.hashId}`,
-                        }}
-                        resizeMode={ResizeMode.COVER}
-                        style={{
-                          width: 330,
-                          height: 330,
-                        }}
-                        key={file.id}
-                        useNativeControls
-                        isLooping
-                        isMuted
-                      />
-                    );
-                  }
-                  return <Text>Nao ha arquivos anexados</Text>;
-                })}
+                <FlatList
+                  data={quote?.UserQuotesDocuments}
+                  keyExtractor={(item) => item.id}
+                  pagingEnabled
+                  snapToAlignment="start"
+                  renderItem={({ item }) => (
+                    <Image
+                      borderRadius={5}
+                      source={{
+                        uri: `${api.defaults.baseURL}/quotes/document/${item.id}/${item.hashId}`,
+                      }}
+                      alt="Imagem do usuario"
+                      resizeMode="cover"
+                      size={350}
+                      mb={5}
+                    />
+                  )}
+                />
               </VStack>
             </VStack>
           </VStack>
 
-          <VStack backgroundColor="white" borderRadius={10} mt={5}>
-            <VStack px={5} py={5}>
-              <Text bold>Observacoes do profissional</Text>
-              <Text>{quote.partner_notes}</Text>
-            </VStack>
-          </VStack>
+          {quote.status === 2 && (
+            <>
+              <VStack backgroundColor="white" borderRadius={10} mt={5}>
+                <VStack px={5} py={5}>
+                  <Text bold>Observacoes do profissional</Text>
+                  <Text>{quote.partner_notes}</Text>
+                </VStack>
+              </VStack>
 
-          <VStack backgroundColor="white" borderRadius={10} mt={5}>
-            <VStack px={5} py={5}>
-              <Text bold>Descricao do servico</Text>
-              <Text>{quote.service_decription}</Text>
-            </VStack>
-          </VStack>
+              <VStack backgroundColor="white" borderRadius={10} mt={5}>
+                <VStack px={5} py={5}>
+                  <Text bold>Descricao do servico</Text>
+                  <Text>{quote.service_decription}</Text>
+                </VStack>
+              </VStack>
 
-          <VStack backgroundColor="white" borderRadius={10} mt={5}>
-            <VStack px={5} py={5}>
-              <Text bold>Valor do orcamento</Text>
-              <Text>{quote.service_price}</Text>
-            </VStack>
-          </VStack>
+              <VStack backgroundColor="white" borderRadius={10} mt={5}>
+                <VStack px={5} py={5}>
+                  <Text bold>Valor do orcamento</Text>
+                  <Text>{quote.service_price}</Text>
+                </VStack>
+              </VStack>
 
-          <VStack backgroundColor="white" borderRadius={10} mt={5}>
-            <VStack px={5} py={5}>
-              <Text bold>Valor aceito pela franquia</Text>
-              <Text>{quote.franchise_price}</Text>
-            </VStack>
-          </VStack>
+              <VStack backgroundColor="white" borderRadius={10} mt={5}>
+                <VStack px={5} py={5}>
+                  <Text bold>Valor aceito pela franquia</Text>
+                  <Text>{quote.franchise_price}</Text>
+                </VStack>
+              </VStack>
 
-          <VStack backgroundColor="white" borderRadius={10} mt={5}>
-            <VStack px={5} py={5}>
-              <Text bold>Valor total do documento</Text>
-              <Text>{quote.franchise_price}</Text>
-            </VStack>
-          </VStack>
+              <VStack backgroundColor="white" borderRadius={10} mt={5}>
+                <VStack px={5} py={5}>
+                  <Text bold>Valor total do documento</Text>
+                  <Text>{quote.franchise_price}</Text>
+                </VStack>
+              </VStack>
 
-          <VStack backgroundColor="white" borderRadius={10} mt={5}>
-            <VStack px={5} py={5}>
-              <Text bold>Documento de orcamento</Text>
-              {}
-            </VStack>
-          </VStack>
+              <VStack backgroundColor="white" borderRadius={10} mt={5}>
+                <VStack px={5} py={5}>
+                  <Text bold>Documento de orcamento</Text>
+                  {}
+                </VStack>
+              </VStack>
+            </>
+          )}
 
           {quote.status !== 3 && (
             <VStack mt={5}>

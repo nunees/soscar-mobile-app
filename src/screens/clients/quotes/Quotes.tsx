@@ -14,7 +14,11 @@ export function Quotes() {
   return (
     <VStack>
       <VStack>
-        <AppHeader title="Tipos de orçamentos" />
+        <AppHeader
+          title="Tipos de orçamentos"
+          navigation={navigation}
+          screen="services"
+        />
       </VStack>
 
       <ScrollView

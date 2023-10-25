@@ -15,7 +15,7 @@ export function Services() {
   return (
     <VStack>
       <VStack>
-        <AppHeader title="Serviços" />
+        <AppHeader title="Serviços" navigation={navigation} screen="home" />
       </VStack>
 
       <ScrollView

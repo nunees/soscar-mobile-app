@@ -431,7 +431,7 @@ export function ScheduleDetail() {
             {schedule?.status !== 4 && schedule?.status !== 3 && (
               <VStack>
                 <Button
-                  title="Enviar orcamento"
+                  title="Confirmar Agendamento"
                   onPress={handleSubmit}
                   mb={3}
                   isLoading={isLoading}

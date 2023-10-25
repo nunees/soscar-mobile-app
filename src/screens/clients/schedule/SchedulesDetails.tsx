@@ -1,15 +1,21 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { AppHeader } from '@components/AppHeader';
 import { Button } from '@components/Button';
-import { FavoriteCars } from '@components/FavoriteCars';
 import getLogoImage from '@components/LogosImages';
 import { StatusIcon } from '@components/StatusIcon';
 import { ISchedules } from '@dtos/ISchedules';
-import { Entypo, Feather } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
 import { useAuth } from '@hooks/useAuth';
 import { useMapsLinking } from '@hooks/useMapsLinking';
-import { useFocusEffect, useRoute } from '@react-navigation/native';
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
+import { AppNavigatorRoutesProps } from '@routes/app.routes';
 import { api } from '@services/api';
 import {
+  FlatList,
   HStack,
   Heading,
   Icon,
@@ -45,6 +51,8 @@ export function SchedulesDetails() {
 
   const routes = useRoute();
   const { scheduleId } = routes.params as RouteParams;
+
+  const navigation = useNavigation<AppNavigatorRoutesProps>();
 
   const { user } = useAuth();
   const { deviceMapNavigation } = useMapsLinking();
@@ -99,19 +107,24 @@ export function SchedulesDetails() {
     );
   }
 
-  useEffect(() => {
-    fetchScheduleDetails();
-    return () => {
-      setSchedule({} as ISchedules);
-      setLoadedImages([]);
-      setCarLogo('');
-    };
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchScheduleDetails();
+      return () => {
+        setSchedule(undefined);
+        setLoadedImages([]);
+      };
+    }, [scheduleId])
+  );
 
   return (
     <VStack flex={1}>
       <VStack>
-        <AppHeader title="Detalhes do agendamento" />
+        <AppHeader
+          title="Detalhes do agendamento"
+          navigation={navigation}
+          screen="schedulesList"
+        />
       </VStack>
 
       <ScrollView
@@ -190,25 +203,20 @@ export function SchedulesDetails() {
             </Text>
           </VStack>
 
-          <VStack mt={5} backgroundColor="white" p={5} borderRadius={10}>
-            {/* <Text bold>Veiculo</Text>
-            <VStack>
-              <Text>{schedule?.vehicles?.brand.name}</Text>
-              <Text>
-                {schedule?.vehicles?.name.name}-{schedule?.vehicles?.year}
-              </Text>
-            </VStack> */}
+          <VStack mt={5} backgroundColor="white" p={3} borderRadius={10}>
             <HStack
               justifyContent="space-between"
               backgroundColor="white"
               borderRadius={10}
             >
               <VStack>
-                <Text bold fontSize={'lg'}>
+                <Text bold>Veiculo</Text>
+                <Text bold fontSize={'md'}>
                   {schedule?.vehicles?.brand.name}
                 </Text>
-                <Text fontSize={'md'}>{schedule?.vehicles?.name.name}</Text>
-                <Text fontSize={'xs'}>{schedule?.vehicles?.year}</Text>
+                <Text fontSize={'md'}>
+                  {schedule?.vehicles?.name.name} / {schedule?.vehicles?.year}
+                </Text>
               </VStack>
               <VStack>
                 {schedule?.vehicles?.brand.icon && (
@@ -222,22 +230,15 @@ export function SchedulesDetails() {
             </HStack>
           </VStack>
 
-          <VStack mt={5} backgroundColor="white" p={5} borderRadius={10}>
+          <VStack mt={5} backgroundColor="white" p={3} borderRadius={10}>
             <Text bold>Seguradora</Text>
             <VStack>
               <Text>{schedule?.vehicles?.InsuranceCompanies.name}</Text>
             </VStack>
           </VStack>
 
-          <VStack mt={5} backgroundColor="white" p={5} borderRadius={10}>
-            <VStack ml={3}>
-              <Text bold>Usuario</Text>
-              <Text>{user.username}</Text>
-            </VStack>
-          </VStack>
-
-          <VStack mt={5} backgroundColor="white" p={5} borderRadius={10}>
-            <Text bold>Informacoes do usuario</Text>
+          <VStack mt={5} backgroundColor="white" p={3} borderRadius={10}>
+            <Text bold>Tipo de servico</Text>
             <Text>{schedule?.notes ? schedule?.notes : 'Sem observações'}</Text>
           </VStack>
         </VStack>
@@ -245,12 +246,12 @@ export function SchedulesDetails() {
         <VStack flex={1} px={5}>
           <Text bold>Dados do prestador</Text>
 
-          <VStack mt={5} backgroundColor="white" p={5} borderRadius={10}>
+          <VStack mt={5} backgroundColor="white" p={3} borderRadius={10}>
             <Text>Local</Text>
             <Text bold>{schedule?.location?.business_name}</Text>
           </VStack>
 
-          <VStack mt={5} backgroundColor="white" p={5} borderRadius={10}>
+          <VStack mt={5} backgroundColor="white" p={3} borderRadius={10}>
             <Text bold>Endereco</Text>
             <Text>
               {schedule?.location?.address_line}, {schedule?.location?.number}
@@ -277,7 +278,7 @@ export function SchedulesDetails() {
           </VStack>
 
           <VStack mt={5} backgroundColor="white" p={5} borderRadius={10}>
-            <Text bold>Data</Text>
+            <Text bold>Data do pedido de agendamento</Text>
             <Text>
               {schedule?.date
                 ?.toString()
@@ -295,7 +296,7 @@ export function SchedulesDetails() {
           </VStack>
 
           <VStack mt={5} backgroundColor="white" p={5} borderRadius={10}>
-            <Text bold>Servico</Text>
+            <Text bold>Categoria de servico</Text>
             <Text>{schedule?.service_type?.name}</Text>
           </VStack>
 
@@ -303,36 +304,43 @@ export function SchedulesDetails() {
             <Text bold>Imagens e Videos</Text>
             <HStack pt={2}>
               <VStack>
-                {loadedImages.map((image) => (
-                  <Image
-                    borderRadius={10}
-                    key={image.id}
-                    source={{
-                      uri: `${api.defaults.baseURL}/schedules/documents/${schedule?.id}/${image.file_url}`,
-                    }}
-                    alt="Imagem do agendamento"
-                    size={350}
-                  />
-                ))}
+                <FlatList
+                  data={loadedImages}
+                  horizontal
+                  pagingEnabled
+                  snapToAlignment="start"
+                  renderItem={({ item }) => (
+                    <Image
+                      borderRadius={10}
+                      key={item}
+                      source={{
+                        uri: `${api.defaults.baseURL}/schedules/documents/${schedule?.id}/${item.file_url}`,
+                      }}
+                      alt="Imagem do agendamento"
+                      size={350}
+                    />
+                  )}
+                  ListEmptyComponent={() => (
+                    <Text color="gray.400">Sem imagens</Text>
+                  )}
+                />
               </VStack>
             </HStack>
           </VStack>
 
-          <VStack mt={5} backgroundColor="white" p={5} borderRadius={10}>
-            <HStack>
-              <VStack>
-                <Icon as={Feather} name="info" size={8} color="purple.500" />
-              </VStack>
-              <VStack ml={3}>
-                <Text bold>Informacoes finais</Text>
-                <Text>
-                  {schedule?.partner_notes
-                    ? schedule?.partner_notes
-                    : 'Sem observações ainda'}
-                </Text>
-              </VStack>
-            </HStack>
-          </VStack>
+          {schedule?.status === 4 && (
+            <VStack mt={5} backgroundColor="white" p={5} borderRadius={10}>
+              <HStack>
+                <VStack>
+                  <Icon as={Feather} name="info" size={8} color="purple.500" />
+                </VStack>
+                <VStack ml={3}>
+                  <Text bold>Informacoes finais</Text>
+                  <Text>{schedule.partner_notes}</Text>
+                </VStack>
+              </HStack>
+            </VStack>
+          )}
 
           <VStack mt={20}>
             {schedule?.status !== 4 && (

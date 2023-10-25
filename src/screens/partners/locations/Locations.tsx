@@ -134,6 +134,7 @@ export function Locations() {
                     p={5}
                     mb={5}
                     key={location.id}
+                    opacity={location.active ? 1 : 0.5}
                   >
                     <HStack
                       justifyContent="center"
@@ -162,7 +163,7 @@ export function Locations() {
                         </Badge>
                       )}
                     </HStack>
-                    <Text fontSize="lg" pb={3} bold>
+                    <Text fontSize="lg" bold>
                       {location.business_name.length > 20
                         ? `${location.business_name.slice(
                             0,
@@ -170,16 +171,16 @@ export function Locations() {
                           )}...`.toUpperCase()
                         : location.business_name.toUpperCase()}
                     </Text>
-                    <Text pb={2}>
-                      <Text bold>CNPJ/CPF:</Text> {location.business_phone}
+                    <Text>
+                      Criado em:{' '}
+                      {location.created_at
+                        ?.toString()
+                        .split('T')[0]
+                        .split('-')
+                        .reverse()
+                        .join('/')}
                     </Text>
-                    <Text pb={2}>
-                      <Text bold>Endereco:</Text> {location.address_line}
-                    </Text>
-                    <Text pb={2}>
-                      <Text bold>Telefone: </Text>
-                      {location.business_phone}
-                    </Text>
+
                     <HStack mt={2}>
                       <TouchableOpacity
                         onPress={() =>

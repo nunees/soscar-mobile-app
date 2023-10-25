@@ -108,8 +108,8 @@ export function NewSchedule() {
         bgColor: 'red.500',
       });
     } finally {
-      setProgressValue(0);
       setIsPhotoLoading(false);
+      setProgressValue(0);
     }
   }
 

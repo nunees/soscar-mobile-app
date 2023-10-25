@@ -21,7 +21,6 @@ type RouteParamsProps = {
 
 export function SearchSchedule() {
   const [isLoading, setIsLoading] = useState(false);
-
   const [locations, setLocations] = useState<ILocation[]>({} as ILocation[]);
 
   const navigation = useNavigation<AppNavigatorRoutesProps>();

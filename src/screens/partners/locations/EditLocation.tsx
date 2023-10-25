@@ -30,7 +30,7 @@ import {
   Switch,
 } from 'native-base';
 import { useState, useCallback } from 'react';
-import { Controller, set, useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as yup from 'yup';
 

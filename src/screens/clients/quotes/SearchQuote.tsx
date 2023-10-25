@@ -62,7 +62,11 @@ export function SearchQuote() {
   return (
     <VStack>
       <VStack mb={5}>
-        <AppHeader title="Parceiros disponiveis" />
+        <AppHeader
+          title="Parceiros disponiveis"
+          navigation={navigation}
+          screen="quotes"
+        />
       </VStack>
 
       {isLoading && (
@@ -87,6 +91,7 @@ export function SearchQuote() {
                   })
                 }
                 location={item}
+                key={item.id}
               />
             );
           }}

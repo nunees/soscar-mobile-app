@@ -135,50 +135,52 @@ export function HomeScreen() {
                 Proximos agendamentos
               </Text>
 
-              <FlatList
-                data={schedulesByDate}
-                horizontal={true}
-                showsHorizontalScrollIndicator={false}
-                snapToAlignment="start"
-                pagingEnabled
-                keyExtractor={(item) => item.id!}
-                renderItem={({ item }) => {
-                  return (
-                    <VStack mb={3} borderRadius={5} shadow={0.8}>
-                      <SmallSchedulleCard data={item} />
-                    </VStack>
-                  );
-                }}
-                ListEmptyComponent={() => (
-                  <HStack
-                    backgroundColor="white"
-                    w={350}
-                    borderRadius={10}
-                    p={3}
-                    justifyContent={'space-around'}
-                  >
-                    <VStack w={20} h={20}>
-                      <VStack
-                        backgroundColor={'purple.700'}
-                        borderRadius={10}
-                        alignItems={'center'}
-                      >
-                        <Text bold fontSize={'4xl'} p={3} color="white">
-                          {new Date().getDate().toString()}
-                        </Text>
+              {schedulesByDate.length > 0 && (
+                <FlatList
+                  data={schedulesByDate}
+                  horizontal={true}
+                  showsHorizontalScrollIndicator={false}
+                  snapToAlignment="start"
+                  pagingEnabled
+                  keyExtractor={(item) => item.id!}
+                  renderItem={({ item }) => {
+                    return (
+                      <VStack mb={3} borderRadius={5} shadow={0.8}>
+                        <SmallSchedulleCard data={item} />
                       </VStack>
-                    </VStack>
-                    <VStack pt={5}>
-                      <Center>
-                        <Text color="green.600">Tudo certo! 👍</Text>
-                        <Text color="green.600" bold>
-                          Você não possui agendamentos
-                        </Text>
-                      </Center>
-                    </VStack>
-                  </HStack>
-                )}
-              />
+                    );
+                  }}
+                  ListEmptyComponent={() => (
+                    <HStack
+                      backgroundColor="white"
+                      w={350}
+                      borderRadius={10}
+                      p={3}
+                      justifyContent={'space-around'}
+                    >
+                      <VStack w={20} h={20}>
+                        <VStack
+                          backgroundColor={'purple.700'}
+                          borderRadius={10}
+                          alignItems={'center'}
+                        >
+                          <Text bold fontSize={'4xl'} p={3} color="white">
+                            {new Date().getDate().toString()}
+                          </Text>
+                        </VStack>
+                      </VStack>
+                      <VStack pt={5}>
+                        <Center>
+                          <Text color="green.600">Tudo certo! 👍</Text>
+                          <Text color="green.600" bold>
+                            Você não possui agendamentos
+                          </Text>
+                        </Center>
+                      </VStack>
+                    </HStack>
+                  )}
+                />
+              )}
             </VStack>
           </VStack>
 

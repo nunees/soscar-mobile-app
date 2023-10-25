@@ -27,6 +27,7 @@ import { Vechicles } from '@screens/clients/vehicles/Vehicles';
 import EditProfileInformation from '@screens/EditProfileInformation';
 import MyAccountInformation from '@screens/MyAccountInformation';
 import { Profile } from '@screens/Profile';
+import { QuoteDone } from '@screens/QuoteDone';
 import { TaskDone } from '@screens/TeaskDone';
 import { Icon, useTheme } from 'native-base';
 
@@ -55,6 +56,7 @@ type AppRotes = {
   legalQuotes: undefined;
   newLegalQuote: { serviceId: string };
   searchLegalQuote: { serviceId: string };
+  quoteDone: undefined;
 
   // Other routes
   taskDone: { date: string };
@@ -333,6 +335,15 @@ export function AppRoutes() {
       <Screen
         name="taskDone"
         component={TaskDone}
+        options={{
+          tabBarButton: () => null,
+          tabBarStyle: { display: 'none' },
+        }}
+      />
+
+      <Screen
+        name="quoteDone"
+        component={QuoteDone}
         options={{
           tabBarButton: () => null,
           tabBarStyle: { display: 'none' },
