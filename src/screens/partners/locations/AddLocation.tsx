@@ -2,6 +2,7 @@ import NewLocationSVG from '@assets/newlocation.svg';
 import { AppHeader } from '@components/AppHeader';
 import { Button } from '@components/Button';
 import { Input } from '@components/Input';
+import { MultiSelection } from '@components/MultiSelection';
 import RegisterLocationButtonSelect from '@components/RegisterLocationButtonSelect';
 import { TextArea } from '@components/TextArea';
 import { PAYMENT_TYPES } from '@data/PaymentTypes';
@@ -10,7 +11,6 @@ import { WEEK_DAYS } from '@data/WeekDays';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useAddressToCoords } from '@hooks/useAddressToCoords';
 import { useAuth } from '@hooks/useAuth';
-import { useHandleCEP } from '@hooks/useHandleCEP';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
 import { PartnerNavigatorRoutesProps } from '@routes/partner.routes';
@@ -18,7 +18,7 @@ import { api } from '@services/api';
 import { AppError } from '@utils/AppError';
 import { GetAddressByCEP } from '@utils/GetAddressByCEP';
 import { ScrollView, VStack, Text, HStack, useToast } from 'native-base';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as yup from 'yup';
@@ -235,6 +235,10 @@ export function AddLocation() {
                 Essas informações podem ser alteradas mais tarde
               </Text>
             </VStack>
+          </VStack>
+
+          <VStack px={5} mt={10}>
+            <MultiSelection />
           </VStack>
 
           <VStack px={5} mt={10}>
