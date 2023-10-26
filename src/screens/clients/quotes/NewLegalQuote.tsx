@@ -5,17 +5,15 @@ import { LoadingModal } from '@components/LoadingModal';
 import { Select } from '@components/Select';
 import { SelectBusinessCategories } from '@components/SelectBusinessCategories';
 import { TextArea } from '@components/TextArea';
+import { UploadFileField } from '@components/UploadFileField';
 import { ILocation } from '@dtos/ILocation';
 import { IVehicleDTO } from '@dtos/IVechicleDTO';
+import { useAxiosFetch } from '@hooks/axios/useAxiosFetch';
 import { useAuth } from '@hooks/useAuth';
 import { useGPS } from '@hooks/useGPS';
 import { useIdGenerator } from '@hooks/useIdGenerator';
-import { useUploadImage } from '@hooks/useUploadImage';
-import {
-  useFocusEffect,
-  useNavigation,
-  useRoute,
-} from '@react-navigation/native';
+import { useUploadFormData } from '@hooks/useUploadFormData';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
 import { api } from '@services/api';
 import { AppError } from '@utils/AppError';
@@ -26,12 +24,11 @@ import {
   Text,
   VStack,
   useToast,
-  Image,
   FlatList,
   Avatar,
   Badge,
 } from 'native-base';
-import React, { useCallback, useState } from 'react';
+import React, { useState } from 'react';
 import { TouchableOpacity } from 'react-native';
 
 type RouteParamsProps = {
@@ -42,19 +39,11 @@ export function NewLegalQuote() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  const [isPhotoUploading, setIsPhotoUploading] = useState(false);
-  const [progressValue, setProgressValue] = useState(0);
-
-  const [uploadFormData, setUploadFormData] = useState<FormData[]>([]);
-
   const [locationsSelected, setLocationsSelected] = useState<string[]>([]);
 
-  const [locations, setLocations] = useState<ILocation[]>();
-
-  const [vehicles, setVehicles] = useState<IVehicleDTO[]>();
   const [vehicleId, setVehicleId] = useState<string>();
   const [vehicleDetails, setVehicleDetails] = useState<IVehicleDTO>();
-  const [files, setFiles] = useState<any[]>([]);
+
   const [requiredServices, setRequiredServices] = useState<number>();
   const [userNotes, setUserNotes] = useState<string>('');
 
@@ -64,65 +53,27 @@ export function NewLegalQuote() {
 
   const { user } = useAuth();
 
-  const { coords } = useGPS();
+  const { position } = useGPS();
   const toast = useToast();
 
   const { generateId } = useIdGenerator();
-  const { handleUserProfilePictureSelect } = useUploadImage();
+  const { upload, GetUploadImage } = useUploadFormData('document');
 
-  async function handleMediaSelect() {
-    try {
-      setIsPhotoUploading(true);
-      setProgressValue(15);
+  const locations = useAxiosFetch<ILocation[]>({
+    url: `/locations/services/${serviceId}`,
+    method: 'get',
+    headers: {
+      id: user.id,
+    },
+  });
 
-      setProgressValue(30);
-      const file = await handleUserProfilePictureSelect(user.id, 'document');
-
-      setProgressValue(50);
-      if (!file?.userPhotoUploadForm) {
-        return;
-      }
-
-      setUploadFormData([...uploadFormData, file.userPhotoUploadForm]);
-
-      setFiles([...files, file.photoFile]);
-      setProgressValue(100);
-      toast.show({
-        title: 'Arquivo anexado',
-        placement: 'top',
-        bgColor: 'green.500',
-      });
-    } catch (error) {
-      const isAppError = error instanceof AppError;
-      const title = isAppError ? error.message : 'Erro na atualização';
-      toast.show({
-        title,
-        placement: 'top',
-        bgColor: 'red.500',
-      });
-    } finally {
-      setIsPhotoUploading(false);
-      setProgressValue(0);
-    }
-  }
-
-  async function handleFetchLocation() {
-    try {
-      setIsLoading(true);
-      const response = await api.get(`/locations/services/${serviceId}`, {
-        headers: {
-          id: user.id,
-        },
-      });
-      setLocations(response.data);
-
-      setIsLoading(false);
-    } catch (error) {
-      throw new AppError('Erro ao buscar localizacao');
-    } finally {
-      setIsLoading(false);
-    }
-  }
+  const vehicles = useAxiosFetch<IVehicleDTO[]>({
+    url: '/vehicles',
+    method: 'get',
+    headers: {
+      id: user.id,
+    },
+  });
 
   async function handleFindVehicleDetails(vehicleId: string) {
     try {
@@ -140,23 +91,6 @@ export function NewLegalQuote() {
         placement: 'top',
         bgColor: 'red.500',
       });
-    } finally {
-      setIsLoading(false);
-    }
-  }
-
-  async function handleFetchVechicles() {
-    try {
-      setIsLoading(true);
-      const response = await api.get(`/vehicles/`, {
-        headers: {
-          id: user.id,
-        },
-      });
-      setVehicles(response.data);
-      setIsLoading(false);
-    } catch (error) {
-      throw new AppError('Erro ao buscar veiculos');
     } finally {
       setIsLoading(false);
     }
@@ -183,16 +117,6 @@ export function NewLegalQuote() {
       setIsSaving(true);
       const generatedHash = generateId(128);
 
-      console.log({
-        user_id: user.id,
-        hashId: generatedHash,
-        vehicle_id: vehicleId,
-        insurance_company_id: vehicleDetails?.InsuranceCompanies?.id,
-        service_type_id: requiredServices,
-        user_notes: String(userNotes),
-        locations: locationsSelected,
-      });
-
       const response = await api.post(
         '/quotes/legal',
         {
@@ -212,7 +136,7 @@ export function NewLegalQuote() {
         }
       );
 
-      uploadFormData.map(async (file) => {
+      upload.data?.forEach(async (file) => {
         await api.post(
           `/quotes/legal/document/${response.data.id}/${generatedHash}`,
           file,
@@ -245,13 +169,6 @@ export function NewLegalQuote() {
       });
     }
   }
-
-  useFocusEffect(
-    useCallback(() => {
-      handleFetchLocation();
-      handleFetchVechicles();
-    }, [])
-  );
 
   return (
     <VStack pb={10}>
@@ -286,8 +203,8 @@ export function NewLegalQuote() {
               height={10}
               label={'Selecione um veículo'}
               data={
-                vehicles
-                  ? vehicles.map((item) => {
+                vehicles.state?.data
+                  ? vehicles.state.data.map((item) => {
                       return {
                         label: `${item.brand.name} - ${item.name.name}`,
                         value: String(item.id),
@@ -340,37 +257,12 @@ export function NewLegalQuote() {
         </VStack>
 
         <VStack px={5} py={1}>
-          <VStack backgroundColor="white" borderRadius={10} p={5}>
-            <HStack justifyContent="space-between">
-              <Text fontSize="md" bold mb={2}>
-                Arquivos de midia
-              </Text>
-            </HStack>
-            <VStack>
-              <Text fontSize="xs" pt={1} color="gray.400">
-                Fotos e videos podem agilizar o processo de analise e reduzir o
-                tempo de espera.
-              </Text>
-            </VStack>
-            <FlatList
-              data={files}
-              horizontal
-              pagingEnabled
-              snapToAlignment="start"
-              renderItem={({ item }) => (
-                <Image source={item} alt={item.name} w={320} h={200} />
-              )}
-            />
-
-            <VStack py={5}>
-              <Button
-                onPress={handleMediaSelect}
-                title="Adicionar fotos"
-                isLoading={isPhotoUploading}
-                isLoadingText={`Carregando... ${progressValue}%`}
-              />
-            </VStack>
-          </VStack>
+          <UploadFileField
+            upload={upload}
+            GetUploadImage={GetUploadImage}
+            text=" Fotos e videos podem agilizar o processo de analise e reduzir o
+            tempo de espera."
+          />
         </VStack>
 
         <VStack px={5} py={1}>
@@ -387,7 +279,7 @@ export function NewLegalQuote() {
               </VStack>
             </HStack>
             <FlatList
-              data={locations}
+              data={locations.state.data}
               horizontal
               pagingEnabled
               snapToAlignment="start"
@@ -427,7 +319,10 @@ export function NewLegalQuote() {
                         <Text fontSize={'sm'}>{item.city}</Text>
                         <Text>
                           {CalculatePositionDistance(
-                            [Number(coords.latitude), Number(coords.longitude)],
+                            [
+                              Number(position.coords.latitude),
+                              Number(position.coords.longitude),
+                            ],
                             [Number(item.latitude), Number(item.longitude)]
                           ).toPrecision(2)}
                           km de voce

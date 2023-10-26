@@ -2,48 +2,32 @@
 import { AppHeader } from '@components/AppHeader';
 import { LoadingModal } from '@components/LoadingModal';
 import { ISchedules } from '@dtos/ISchedules';
+import { useAxiosFetch } from '@hooks/axios/useAxiosFetch';
 import { useAuth } from '@hooks/useAuth';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
-import { api } from '@services/api';
-import { AppError } from '@utils/AppError';
 import { numberToMonth } from '@utils/DayjsDateProvider';
-import { VStack, Text, FlatList, HStack, Pressable, Badge } from 'native-base';
-import { useCallback, useState } from 'react';
-
-async function fetchData(user_id: string) {
-  try {
-    const response = await api.get('/schedules/client', {
-      headers: {
-        id: user_id,
-      },
-    });
-
-    return response.data;
-  } catch (error) {
-    throw new AppError('Não foi possível carregar os agendamentos');
-  }
-}
+import {
+  VStack,
+  Text,
+  FlatList,
+  HStack,
+  Pressable,
+  Badge,
+  Center,
+} from 'native-base';
 
 export function SchedulesList() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [isLoadingMessage, setIsLoadingMessage] = useState('');
-  const [quotes, setQuotes] = useState<ISchedules[]>([]);
-
   const { user } = useAuth();
   const navigation = useNavigation<AppNavigatorRoutesProps>();
 
-  useFocusEffect(
-    useCallback(() => {
-      setIsLoading(true);
-      setIsLoadingMessage('Carregando agendamentos');
-      fetchData(user.id).then((response) => setQuotes(response));
-      setIsLoading(false);
-      return () => {
-        setQuotes([]);
-      };
-    }, [])
-  );
+  const { state } = useAxiosFetch<ISchedules[]>({
+    method: 'GET',
+    url: '/schedules/client',
+    headers: {
+      id: user.id,
+    },
+  });
 
   return (
     <VStack pb={10}>
@@ -55,18 +39,17 @@ export function SchedulesList() {
         />
       </VStack>
 
-      {isLoading && (
+      {state.isLoading && (
         <LoadingModal
-          showModal={isLoading}
-          setShowModal={setIsLoading}
-          message={isLoadingMessage}
+          showModal={state.isLoading}
+          message={'Carregando agendamentos...'}
         />
       )}
 
       <VStack px={5} paddingBottom={100}>
         <FlatList
           showsVerticalScrollIndicator={false}
-          data={quotes}
+          data={state.data}
           renderItem={({ item }) => (
             <Pressable
               onPress={() =>
@@ -106,11 +89,11 @@ export function SchedulesList() {
                         bold
                         textAlign={'center'}
                       >
-                        {item.date.toString().split('T')[0].split('-')[2]}
+                        {item.date?.toString().split('T')[0].split('-')[2]}
                       </Text>
                       <Text fontSize={'xs'} color="white">
                         {numberToMonth(
-                          item.date.toString().split('T')[0].split('-')[1]
+                          item.date?.toString().split('T')[0].split('-')[1]
                         )}
                       </Text>
                     </VStack>
@@ -133,17 +116,6 @@ export function SchedulesList() {
                     </VStack>
                   </HStack>
                   <HStack>
-                    {/* <UserPhoto
-                      source={{
-                        uri:
-                          item.users?.avatar &&
-                          `${api.defaults.baseURL}/user/avatar/${item.users?.id}/${item.users?.avatar}`,
-                      }}
-                      alt="Foto de perfil"
-                      size={60}
-                      borderRadius={100}
-                    /> */}
-
                     {item.status === 1 && (
                       <Badge
                         colorScheme={'blue'}
@@ -201,7 +173,11 @@ export function SchedulesList() {
           )}
           keyExtractor={({ id }) => String(id)}
           ListEmptyComponent={() => (
-            <Text>Nao exitem orcamentos registrados</Text>
+            <Center>
+              <Text bold color="gray.600">
+                Nao exitem orcamentos registrados
+              </Text>
+            </Center>
           )}
         />
       </VStack>

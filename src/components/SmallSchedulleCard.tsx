@@ -1,48 +1,17 @@
 import { ISchedules } from '@dtos/ISchedules';
 import { useNavigation } from '@react-navigation/native';
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
-import {
-  compareDateIsAfter,
-  compareDateIsBefore,
-  countDaysBetweenDates,
-  numberToMonth,
-} from '@utils/DayjsDateProvider';
+import { countDaysBetweenDates, numberToMonth } from '@utils/DayjsDateProvider';
 import { VStack, Text, HStack, Badge, Center } from 'native-base';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback } from 'react';
 import { FlatList, TouchableOpacity } from 'react-native';
-
-// type Props = {
-//   data: {
-//     date: Date;
-//     id: string | undefined | null;
-//     business_name: string | undefined | null;
-//     time: string | undefined | null;
-//     service: string | undefined | null;
-//   };
-// };
 
 type Props = {
   data: ISchedules[];
 };
 
 export function SmallSchedulleCard({ data }: Props) {
-  const [date, setDate] = useState<string>('');
-  const [isDateAfter, setIsDateAfter] = useState(false);
-  const [isDateBefore, setIsDateBefore] = useState(false);
-
   const navigation = useNavigation<AppNavigatorRoutesProps>();
-
-  // useEffect(() => {
-  //   if (compareDateIsAfter(data.date, new Date())) {
-  //     setIsDateAfter(true);
-  //     setDate(data.date.toString().split('T')[0]);
-  //   }
-
-  //   if (compareDateIsBefore(data.date, new Date())) {
-  //     setIsDateBefore(true);
-  //     setDate(data.date.toString().split('T')[0]);
-  //   }
-  // }, [data]);
 
   const remainingDays = useCallback((item: ISchedules) => {
     const todayDate = new Date();
@@ -105,7 +74,7 @@ export function SmallSchedulleCard({ data }: Props) {
                   </VStack>
                 </HStack>
 
-                <VStack position={'relative'} right={-40} top={2}>
+                <VStack position={'relative'} right={-20} top={2}>
                   {remainingDays(item) > 0 && (
                     <Badge colorScheme="purple" variant="subtle">
                       <Text color="gray.500" bold>

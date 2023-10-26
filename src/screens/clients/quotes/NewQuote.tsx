@@ -5,6 +5,7 @@ import { LoadingModal } from '@components/LoadingModal';
 import { Select } from '@components/Select';
 import { SelectBusinessCategories } from '@components/SelectBusinessCategories';
 import { TextArea } from '@components/TextArea';
+import { UploadFileField } from '@components/UploadFileField';
 import UserPhoto from '@components/UserPhoto';
 import { ILocation } from '@dtos/ILocation';
 import { IVehicleDTO } from '@dtos/IVechicleDTO';
@@ -13,24 +14,14 @@ import { useAuth } from '@hooks/useAuth';
 import { useGPS } from '@hooks/useGPS';
 import { useIdGenerator } from '@hooks/useIdGenerator';
 import { useProfile } from '@hooks/useProfile';
-import { useUploadImage } from '@hooks/useUploadImage';
+import { useUploadFormData } from '@hooks/useUploadFormData';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
 import { api } from '@services/api';
 import { AppError } from '@utils/AppError';
 import { CalculatePositionDistance } from '@utils/CalculatePositionDistance';
-import {
-  HStack,
-  ScrollView,
-  Text,
-  VStack,
-  useToast,
-  Image,
-  Icon,
-  FlatList,
-} from 'native-base';
+import { HStack, ScrollView, Text, VStack, useToast, Icon } from 'native-base';
 import React, { useEffect, useState } from 'react';
-import { TouchableOpacity } from 'react-native';
 
 type RouteParamsProps = {
   serviceId: string;
@@ -40,9 +31,6 @@ type RouteParamsProps = {
 export function NewQuote() {
   const [isLoading, setIsLoading] = useState(false);
 
-  const [isPhotoLoading, setIsPhotoLoading] = useState(false);
-  const [progressValue, setProgressValue] = useState(0);
-
   const [isSaving, setIsSaving] = useState(false);
 
   const [location, setLocation] = useState<ILocation>();
@@ -50,13 +38,9 @@ export function NewQuote() {
   const [vehicleId, setVehicleId] = useState<string>();
 
   const [vehicleDetails, setVehicleDetails] = useState<IVehicleDTO>();
-  const [files, setFiles] = useState<any[]>([]);
 
   const [requiredServices, setRequiredServices] = useState<number>();
   const [userNotes, setUserNotes] = useState<string>('');
-
-  const [uploadForms, setUploadForms] = useState<FormData[]>([]);
-  const { handleUserProfilePictureSelect } = useUploadImage();
 
   const routes = useRoute();
   const { serviceId, locationId } = routes.params as RouteParamsProps;
@@ -67,46 +51,9 @@ export function NewQuote() {
   const toast = useToast();
   const { generateId } = useIdGenerator();
 
-  const { coords } = useGPS();
+  const { position } = useGPS();
 
-  async function handleMediaSelect() {
-    try {
-      setIsPhotoLoading(true);
-      setProgressValue(15);
-
-      setProgressValue(30);
-      const file = await handleUserProfilePictureSelect(user.id, 'document');
-      if (!file!.userPhotoUploadForm) {
-        throw new AppError('Erro ao anexar arquivo');
-      }
-
-      setProgressValue(60);
-      setFiles([...files, file?.photoFile]);
-
-      setProgressValue(80);
-      setUploadForms([...uploadForms, file!.userPhotoUploadForm]);
-
-      setFiles([...files, file?.photoFile]);
-
-      setProgressValue(100);
-      toast.show({
-        title: 'Arquivo anexado',
-        placement: 'top',
-        bgColor: 'green.500',
-      });
-    } catch (error) {
-      const isAppError = error instanceof AppError;
-      const title = isAppError ? error.message : 'Erro na atualização';
-      toast.show({
-        title,
-        placement: 'top',
-        bgColor: 'red.500',
-      });
-    } finally {
-      setIsPhotoLoading(false);
-      setProgressValue(0);
-    }
-  }
+  const { upload, GetUploadImage } = useUploadFormData('file');
 
   async function handleFetchLocation() {
     try {
@@ -191,19 +138,13 @@ export function NewQuote() {
         }
       );
 
-      files.map(async (file) => {
-        const formData = new FormData();
-        formData.append('file', file);
-        await api.post(
-          `/quotes/documents/${response.data.id}/${hash}`,
-          formData,
-          {
-            headers: {
-              id: user.id,
-              'Content-Type': 'multipart/form-data',
-            },
-          }
-        );
+      upload.data?.forEach(async (file) => {
+        await api.post(`/quotes/documents/${response.data.id}/${hash}`, file, {
+          headers: {
+            id: user.id,
+            'Content-Type': 'multipart/form-data',
+          },
+        });
       });
 
       setIsSaving(false);
@@ -292,7 +233,10 @@ export function NewQuote() {
                   />
                   <Text fontSize="xs">
                     {CalculatePositionDistance(
-                      [Number(coords.latitude), Number(coords.longitude)],
+                      [
+                        Number(position.coords.latitude),
+                        Number(position.coords.longitude),
+                      ],
                       [Number(location?.latitude), Number(location?.longitude)]
                     ).toFixed(2)}
                     {' km de distancia'}
@@ -366,47 +310,11 @@ export function NewQuote() {
         </VStack>
 
         <VStack px={5} py={1}>
-          <VStack p={5} mb={5} backgroundColor="white" borderRadius={10}>
-            <HStack mb={5}>
-              <Text fontSize="xs" color="gray.500" textAlign="justify">
-                Você pode adicionar fotos adicionais que demonstram os problemas
-                relatados e ajudam o prestador de serviço a ter o melhor
-                entendimento do problema.
-              </Text>
-            </HStack>
-            <VStack>
-              <FlatList
-                horizontal
-                data={files}
-                pagingEnabled
-                indicatorStyle="white"
-                snapToAlignment="start"
-                decelerationRate={'fast'}
-                keyExtractor={(item) => item.id}
-                renderItem={({ item }) => (
-                  <TouchableOpacity>
-                    <Image
-                      width={350}
-                      height={200}
-                      source={{ uri: item.uri }}
-                      alt="User image"
-                    />
-                  </TouchableOpacity>
-                )}
-              />
-
-              <Button
-                title="Carregar foto"
-                variant="light"
-                fontSize={'sm'}
-                fontWeight={'normal'}
-                onPress={handleMediaSelect}
-                mt={5}
-                isLoading={isPhotoLoading}
-                isLoadingText={`Carregando ${progressValue}%`}
-              />
-            </VStack>
-          </VStack>
+          <UploadFileField
+            upload={upload}
+            GetUploadImage={GetUploadImage}
+            text="Imagens"
+          />
         </VStack>
 
         <VStack px={5} py={1}>

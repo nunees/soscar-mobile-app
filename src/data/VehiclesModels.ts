@@ -1,4 +1,4 @@
-export const VehiclesModels = [
+export const VEHICLE_MODELS = [
   { id: 1, brand_id: 1, name: 'A1' },
   { id: 2, brand_id: 1, name: 'A3' },
   { id: 3, brand_id: 1, name: 'A4' },

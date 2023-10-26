@@ -1,4 +1,3 @@
-import { useProfile } from '@hooks/useProfile';
 import {
   LocationObjectCoords,
   getCurrentPositionAsync,
@@ -7,29 +6,51 @@ import {
 import { useEffect, useState } from 'react';
 
 export function useGPS() {
-  const [coords, setCoords] = useState<LocationObjectCoords>(
-    {} as LocationObjectCoords
-  );
-
-  const { profile, updateProfile } = useProfile();
+  const [position, setPosition] = useState({
+    coords: {} as LocationObjectCoords,
+    isLoading: true,
+    isError: false,
+    isSucess: false,
+    error: '',
+  });
 
   useEffect(() => {
-    async function handleGPS() {
-      const { granted } = await requestForegroundPermissionsAsync();
-      if (granted) {
-        const currentPosition = await getCurrentPositionAsync({
-          accuracy: 6,
+    requestForegroundPermissionsAsync()
+      .then((response) => {
+        if (response.granted) {
+          getCurrentPositionAsync({
+            accuracy: 6,
+          })
+            .then((response) => {
+              setPosition({
+                coords: response.coords,
+                isLoading: false,
+                isError: false,
+                isSucess: true,
+                error: '',
+              });
+            })
+            .catch((error) => {
+              setPosition({
+                coords: {} as LocationObjectCoords,
+                isLoading: false,
+                isError: true,
+                isSucess: false,
+                error,
+              });
+            });
+        }
+      })
+      .catch((error) => {
+        setPosition({
+          coords: {} as LocationObjectCoords,
+          isLoading: false,
+          isError: true,
+          isSucess: false,
+          error,
         });
-
-        setCoords(currentPosition.coords);
-        profile.latitude = currentPosition.coords.latitude;
-        profile.longitude = currentPosition.coords.longitude;
-        await updateProfile(profile);
-      }
-    }
-
-    handleGPS();
+      });
   }, []);
 
-  return { coords };
+  return { position };
 }

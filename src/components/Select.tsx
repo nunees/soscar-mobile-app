@@ -1,5 +1,4 @@
-import { Feather } from '@expo/vector-icons';
-import { Select as SelectNative, ISelectProps, Icon } from 'native-base';
+import { Select as SelectNative, ISelectProps } from 'native-base';
 
 type Props = ISelectProps & {
   label: string | undefined;
@@ -23,7 +22,6 @@ export function Select({ label, data, ...rest }: Props) {
       placeholderTextColor="gray.400"
       accessibilityLabel={label}
       placeholder={label}
-      dropdownIcon={<Icon as={Feather} name="chevron-down" size={5} mr={5} />}
       {...rest}
     >
       {

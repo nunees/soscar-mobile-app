@@ -39,7 +39,11 @@ export function Vechicles() {
   return (
     <VStack flex={1}>
       <VStack>
-        <AppHeader title="Meus Veículos" />
+        <AppHeader
+          title="Meus Veículos"
+          navigation={navigation}
+          screen="home"
+        />
       </VStack>
 
       {/* Content */}
