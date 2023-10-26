@@ -1,22 +1,24 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { api } from '@services/api';
 import { AxiosRequestConfig } from 'axios';
 import { useCallback, useState } from 'react';
 
-export function useAxiosPost(params: AxiosRequestConfig) {
-  const [state, setState] = useState({
-    data: null,
+export function useAxiosPost<Type>() {
+  const [postState, setPostState] = useState({
+    data: [] as Type,
     isLoading: false,
     isSucess: false,
     isError: false,
     error: '',
   });
 
-  const post = useCallback(() => {
-    setState((prevState) => ({ ...prevState, isLoading: true }));
+  async function postData(params: AxiosRequestConfig) {
+    setPostState((prevState) => ({ ...prevState, isLoading: true }));
     api
       .request(params)
       .then((response) => {
-        setState((prevState) => ({
+        console.log();
+        setPostState((prevState) => ({
           ...prevState,
           isLoading: false,
           isSucess: true,
@@ -25,16 +27,41 @@ export function useAxiosPost(params: AxiosRequestConfig) {
         }));
       })
       .catch((error) => {
-        setState((prevState) => ({
+        setPostState((prevState) => ({
           ...prevState,
           isLoading: false,
           isSucess: false,
-          data: null,
+          data: [] as Type,
           isError: true,
           error: error.message,
         }));
       });
-  }, [params]);
+  }
 
-  return { post, state };
+  const postMultipleData = useCallback(async (params: AxiosRequestConfig) => {
+    setPostState((prevState) => ({ ...prevState, isLoading: true }));
+    api
+      .request({ ...params })
+      .then((response) => {
+        setPostState((prevState) => ({
+          ...prevState,
+          isLoading: false,
+          isSucess: true,
+          data: response.data,
+          error: '',
+        }));
+      })
+      .catch((error) => {
+        setPostState((prevState) => ({
+          ...prevState,
+          isLoading: false,
+          isSucess: false,
+          data: [] as Type,
+          isError: true,
+          error: error.message,
+        }));
+      });
+  }, []);
+
+  return { postState, postData, postMultipleData };
 }

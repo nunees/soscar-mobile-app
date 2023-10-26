@@ -121,7 +121,7 @@ export function AddVehicle() {
       );
 
       setShowModal(false);
-      navigation.navigate('vehicles');
+      navigation.navigate('home');
     } catch (error) {
       setShowModal(false);
       const isApperror = error instanceof AppError;
@@ -146,7 +146,11 @@ export function AddVehicle() {
   return (
     <VStack>
       <VStack>
-        <AppHeader title="Adicionar Veículo" />
+        <AppHeader
+          title="Adicionar Veículo"
+          navigation={navigation}
+          screen="home"
+        />
       </VStack>
 
       <VStack px={5} py={5}>

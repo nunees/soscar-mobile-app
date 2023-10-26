@@ -11,7 +11,7 @@ type Request<T> = {
   error: string;
 };
 
-export function useAxiosFetch<T>(params: AxiosRequestConfig) {
+export function useHandleCEP<T>(params: AxiosRequestConfig) {
   const [state, setState] = useState<Request<T>>({
     data: [] as T,
     isLoading: true,

@@ -2,6 +2,7 @@ import NewLocationSVG from '@assets/newlocation.svg';
 import { AppHeader } from '@components/AppHeader';
 import { Button } from '@components/Button';
 import { Input } from '@components/Input';
+import { MultiSelection } from '@components/MultiSelection';
 import RegisterLocationButtonSelect from '@components/RegisterLocationButtonSelect';
 import { TextArea } from '@components/TextArea';
 import { PAYMENT_TYPES } from '@data/PaymentTypes';

@@ -1,4 +1,4 @@
-export const ServicesList = [
+export const SERVICES_LIST = [
   // Acessórios
   { id: 1, category_id: 1, name: 'Calotas' },
   { id: 2, category_id: 1, name: 'Carregadores' },

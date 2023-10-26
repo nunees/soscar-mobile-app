@@ -45,7 +45,7 @@ export function dateToMonthString(date: Date): string {
   return dayjs(date).format('MMMM');
 }
 
-export function numberToMonth(month: string) {
+export function numberToMonth(month: string | undefined) {
   switch (month) {
     case '01':
       return 'Janeiro';

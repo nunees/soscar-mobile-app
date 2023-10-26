@@ -6,6 +6,7 @@ import { SearchBar } from '@components/SearchBar';
 import { ServiceCardTypes } from '@components/ServiceCardTypes';
 import { SmallSchedulleCard } from '@components/SmallSchedulleCard';
 import UserPhoto from '@components/UserPhoto';
+import { ISchedules } from '@dtos/ISchedules';
 import { useAxiosFetch } from '@hooks/axios/useAxiosFetch';
 import { useAuth } from '@hooks/useAuth';
 import { useNavigation } from '@react-navigation/native';
@@ -19,52 +20,13 @@ export function HomeScreen() {
 
   const navigation = useNavigation<AppNavigatorRoutesProps>();
 
-  const { state } = useAxiosFetch({
+  const { state } = useAxiosFetch<ISchedules>({
     method: 'GET',
     url: '/schedules/client',
     headers: {
       id: user.id,
     },
   });
-
-  // const { coords } = useGPS();
-
-  // const fetchUserData = useCallback(async (user_id: string) => {
-  //   const response = await api.get(`/user/profile/${user_id}`, {
-  //     headers: {
-  //       id: user_id,
-  //     },
-  //   });
-  //   return response;
-  // }, []);
-
-  // const fetchSchedules = useCallback(async (user_id: string) => {
-  //   const response = await api.get('/schedules/client', {
-  //     headers: {
-  //       id: user_id,
-  //     },
-  //   });
-  //   return response;
-  // }, []);
-
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     fetchUserData(user.id).then((response) => {
-  //       updateProfile({
-  //         birth_date: response.data.birth_date,
-  //         cpf: response.data.cpf,
-  //         genderId: response.data.genderId,
-  //         last_name: response.data.last_name,
-  //         name: response.data.name,
-  //         phone: response.data.mobile_phone,
-  //       });
-  //     });
-
-  //     fetchSchedules(user.id).then((response) => {
-  //       setSchedules(response.data);
-  //     });
-  //   }, [])
-  // );
 
   return (
     <SafeAreaView>
@@ -112,9 +74,6 @@ export function HomeScreen() {
                 Proximos agendamentos
               </Text>
 
-              {/* {schedulesByDate.length > 0 && (
-
-              )} */}
               {state.data && <SmallSchedulleCard data={state.data} />}
             </VStack>
           </VStack>

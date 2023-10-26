@@ -1,87 +1,49 @@
 import { AppHeader } from '@components/AppHeader';
 import { LoadingModal } from '@components/LoadingModal';
-import { ServicesList } from '@data/ServicesList';
+import { SERVICES_LIST } from '@data/ServicesList';
+import { VEHICLE_MODELS } from '@data/VehiclesModels';
 import { IQuoteList } from '@dtos/IQuoteList';
-import { Feather } from '@expo/vector-icons';
+import { useAxiosFetch } from '@hooks/axios/useAxiosFetch';
 import { useAuth } from '@hooks/useAuth';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
-import { api } from '@services/api';
-import { AppError } from '@utils/AppError';
-import {
-  VStack,
-  Text,
-  FlatList,
-  HStack,
-  Icon,
-  Pressable,
-  Center,
-  useToast,
-  Divider,
-} from 'native-base';
-import { useCallback, useEffect, useState } from 'react';
+import { numberToMonth } from '@utils/DayjsDateProvider';
+import { VStack, Text, FlatList, HStack, Center, Badge } from 'native-base';
+import { TouchableOpacity } from 'react-native';
 
 export function QuotesList() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [isLoadingMessage, setIsLoadingMessage] = useState('');
-  const [quotes, setQuotes] = useState<IQuoteList[]>([]);
-
   const { user } = useAuth();
   const navigation = useNavigation<AppNavigatorRoutesProps>();
 
-  const toast = useToast();
-
-  useFocusEffect(
-    useCallback(() => {
-      async function fetchData() {
-        try {
-          setIsLoading(true);
-          setIsLoadingMessage('Buscando orçamentos...');
-          const response = await api.get('/quotes/client', {
-            headers: {
-              id: user.id,
-            },
-          });
-
-          setQuotes(response.data);
-        } catch (error) {
-          const isAppError = error instanceof AppError;
-          const errorMessage = isAppError
-            ? error.message
-            : 'Ocorreu um erro ao buscar os orçamentos';
-          toast.show({
-            title: errorMessage,
-            placement: 'top',
-            bgColor: 'red.500',
-          });
-        } finally {
-          setIsLoading(false);
-        }
-      }
-
-      fetchData();
-    }, [])
-  );
+  const quotes = useAxiosFetch<IQuoteList[]>({
+    url: '/quotes/client',
+    method: 'get',
+    headers: {
+      id: user.id,
+    },
+  });
 
   return (
     <VStack pb={10}>
       <VStack mb={5}>
-        <AppHeader title="Orcamentos" />
+        <AppHeader
+          title="Orcamentos"
+          navigation={navigation}
+          screen="services"
+        />
       </VStack>
 
-      {isLoading && (
+      {quotes.state.isLoading && (
         <LoadingModal
-          showModal={isLoading}
-          setShowModal={() => setIsLoading(false)}
-          message={isLoadingMessage}
+          showModal={quotes.state.isLoading}
+          message={'Carregando orçamentos...'}
         />
       )}
 
       <FlatList
-        data={quotes}
+        data={quotes.state.data}
         renderItem={({ item }) => (
-          <Pressable
-            alignSelf="center"
+          <TouchableOpacity
             onPress={() =>
               navigation.navigate('quoteDetails', {
                 locationId: item.location_id,
@@ -90,96 +52,77 @@ export function QuotesList() {
               })
             }
           >
-            <VStack
-              w={350}
-              backgroundColor="white"
-              borderRadius={5}
-              py={5}
-              px={5}
-              shadow={1}
-            >
-              <HStack>
-                <VStack>
-                  <HStack>
-                    <Icon
-                      as={Feather}
-                      name="calendar"
-                      size={5}
-                      color="purple.500"
-                    />
-                    <Text pl={2}>
-                      {item.created_at
-                        ?.toString()
-                        .split('T')[0]
-                        .split('-')
-                        .reverse()
-                        .join('/')}
+            <VStack px={2} my={2} mx={3}>
+              <VStack backgroundColor={'white'} borderRadius={5}>
+                <HStack>
+                  <VStack
+                    w={100}
+                    backgroundColor={'purple.900'}
+                    borderBottomLeftRadius={5}
+                    borderTopLeftRadius={5}
+                  >
+                    <Text
+                      color={'white'}
+                      textAlign={'center'}
+                      fontSize={'3xl'}
+                      bold
+                    >
+                      {item.created_at?.toString().split('T')[0].split('-')[2]}
                     </Text>
-                  </HStack>
-                </VStack>
-                <VStack pl={5}>
-                  <HStack>
-                    <Icon
-                      as={Feather}
-                      name="clock"
-                      size={5}
-                      color="purple.500"
-                    />
-                    <Text pl={1}>
-                      {item.created_at
-                        ?.toString()
-                        .split('T')[1]
-                        .split(':')
-                        .slice(0, 2)
-                        .join(':')}
+                    <Text color={'white'} textAlign={'center'} fontSize={'xl'}>
+                      {numberToMonth(
+                        item.created_at?.toString().split('T')[0].split('-')[1]
+                      )}
                     </Text>
-                  </HStack>
-                </VStack>
-              </HStack>
+                  </VStack>
 
-              <HStack pt={3}>
-                <VStack>
-                  <HStack>
-                    <Icon
-                      as={Feather}
-                      name="tool"
-                      size={5}
-                      color="purple.400"
-                    />
-                    <Text fontWeight={'normal'} pl={2}>
-                      {
-                        ServicesList.find(
-                          (service) => service.id === item.service_type_id
-                        )?.name
-                      }
+                  <VStack ml={3}>
+                    <Text bold color="gray.600">
+                      {SERVICES_LIST.map((service) =>
+                        service.id === item.service_type_id ? service.name : ''
+                      )}
                     </Text>
-                  </HStack>
-                </VStack>
-              </HStack>
+                    <Text>
+                      {VEHICLE_MODELS.map((car) =>
+                        item.vehicles.name_id === car.id ? car.name : ''
+                      )}{' '}
+                      / {item.vehicles.year}
+                    </Text>
+                    <Text color="gray.400">
+                      {item.vehicles.plate.toUpperCase()}
+                    </Text>
+                  </VStack>
 
-              <HStack pt={3}>
-                <VStack>
-                  <HStack>
-                    <Icon
-                      as={Feather}
-                      name="life-buoy"
-                      size={5}
-                      color="purple.400"
-                    />
-                    <Text fontWeight={'normal'} pl={2}>
-                      {item.insurance_company.name}
-                    </Text>
-                  </HStack>
-                </VStack>
-              </HStack>
-              <Divider mt={2} />
-              <HStack>
-                <Text fontSize="xs" color="gray.600">
-                  key: {item.hashId}
-                </Text>
-              </HStack>
+                  <VStack ml={5}>
+                    {item.status === 1 ||
+                      (item.status === 2 && (
+                        <Badge colorScheme={'yellow'}>
+                          <Text bold fontSize={'xs'}>
+                            Aguardando
+                          </Text>
+                        </Badge>
+                      ))}
+
+                    {item.status === 3 && (
+                      <Badge colorScheme={'blue'}>
+                        <Text bold fontSize={'xs'}>
+                          Analise
+                        </Text>
+                      </Badge>
+                    )}
+
+                    {item.status === 4 && (
+                      <Badge colorScheme={'green'}>
+                        <Text bold fontSize={'xs'}>
+                          Aprovado
+                        </Text>
+                      </Badge>
+                    )}
+                  </VStack>
+                </HStack>
+              </VStack>
             </VStack>
-          </Pressable>
+          </TouchableOpacity>
         )}
         keyExtractor={(item) => item.id}
         ListEmptyComponent={() => (

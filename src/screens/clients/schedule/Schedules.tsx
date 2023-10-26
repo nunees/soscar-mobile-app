@@ -18,7 +18,11 @@ export function Schedules() {
   return (
     <VStack>
       <VStack>
-        <AppHeader title="Agendamento de Serviços" />
+        <AppHeader
+          title="Agendamento de Serviços"
+          navigation={navigation}
+          screen={'services'}
+        />
       </VStack>
 
       <ScrollView

@@ -3,67 +3,30 @@ import { ListEmpty } from '@components/ListEmpty';
 import { LoadingModal } from '@components/LoadingModal';
 import { PartnerCard } from '@components/PartnerCard';
 import { ILocation } from '@dtos/ILocation';
+import { useAxiosFetch } from '@hooks/axios/useAxiosFetch';
 import { useAuth } from '@hooks/useAuth';
-import {
-  useFocusEffect,
-  useNavigation,
-  useRoute,
-} from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
-import { api } from '@services/api';
-import { AppError } from '@utils/AppError';
-import { VStack, FlatList, useToast } from 'native-base';
-import { useCallback, useState } from 'react';
+import { VStack, FlatList } from 'native-base';
 
 type RouteParamsProps = {
   serviceId: string;
 };
 
 export function SearchSchedule() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [locations, setLocations] = useState<ILocation[]>({} as ILocation[]);
-
   const navigation = useNavigation<AppNavigatorRoutesProps>();
   const { user } = useAuth();
-  const toast = useToast();
 
   const routes = useRoute();
   const { serviceId } = routes.params as RouteParamsProps;
 
-  const findLocations = useCallback(
-    async (serviceId: string, user_id: string) => {
-      try {
-        setIsLoading(true);
-        const response = await api.get(`/locations/services/${serviceId}`, {
-          headers: {
-            id: user_id,
-          },
-        });
-
-        setLocations(response.data);
-      } catch (error) {
-        const isAppError = error instanceof AppError;
-        const message = isAppError ? error.message : 'Erro ao buscar locais';
-        toast.show({
-          title: message,
-          placement: 'top',
-          bgColor: 'red.500',
-        });
-      } finally {
-        setIsLoading(false);
-      }
+  const { state } = useAxiosFetch<ILocation[]>({
+    method: 'GET',
+    url: `/locations/services/${serviceId}`,
+    headers: {
+      id: user.id,
     },
-    [locations]
-  );
-
-  useFocusEffect(
-    useCallback(() => {
-      findLocations(serviceId, user.id);
-      return () => {
-        setLocations({} as ILocation[]);
-      };
-    }, [])
-  );
+  });
 
   return (
     <VStack pb={10}>
@@ -75,38 +38,35 @@ export function SearchSchedule() {
         />
       </VStack>
 
-      {isLoading && (
+      {state.isLoading && (
         <LoadingModal
-          showModal={isLoading}
-          setShowModal={setIsLoading}
+          showModal={state.isLoading}
           message="Buscando parceiros"
         />
       )}
 
-      <VStack>
-        <FlatList
-          contentContainerStyle={{ paddingBottom: 100 }}
-          data={locations}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => {
-            return (
-              <PartnerCard
-                onPress={() =>
-                  navigation.navigate('newSchedule', {
-                    locationId: item.id,
-                    typeofService: Number(serviceId),
-                  })
-                }
-                location={item}
-                key={item.id}
-              />
-            );
-          }}
-          ListEmptyComponent={() => (
-            <ListEmpty message="Nenhum local encontrado" />
-          )}
-        />
-      </VStack>
+      <FlatList
+        contentContainerStyle={{ paddingBottom: 100 }}
+        data={state.data}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => {
+          return (
+            <PartnerCard
+              onPress={() =>
+                navigation.navigate('newSchedule', {
+                  locationId: item.id,
+                  typeofService: Number(serviceId),
+                })
+              }
+              location={item}
+              key={item.id}
+            />
+          );
+        }}
+        ListEmptyComponent={() => (
+          <ListEmpty message="Nenhum local encontrado" />
+        )}
+      />
     </VStack>
   );
 }
