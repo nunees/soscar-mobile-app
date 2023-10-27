@@ -24,7 +24,7 @@ import {
   Text,
   VStack,
 } from 'native-base';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Alert, Linking, TouchableOpacity } from 'react-native';
 
 type RouteParams = {

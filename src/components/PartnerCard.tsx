@@ -12,7 +12,7 @@ import {
   IIconProps,
   Badge,
 } from 'native-base';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { TouchableOpacity } from 'react-native';
 
 type Props = IImageProps &
@@ -21,6 +21,8 @@ type Props = IImageProps &
   };
 
 export function PartnerCard({ location, ...rest }: Props) {
+  const [distance, setDistance] = useState(0);
+
   const { position } = useGPS();
 
   function getDistanceFromLatLonInKm(
@@ -38,20 +40,29 @@ export function PartnerCard({ location, ...rest }: Props) {
     return now >= Number(open) && now <= Number(close);
   }, []);
 
-  const calcDistance = useMemo(() => {
-    const distance = getDistanceFromLatLonInKm(
+  // const calcDistance = useMemo(() => {
+  //   const distance = getDistanceFromLatLonInKm(
+  //     [Number(position.coords.latitude), Number(position.coords.longitude)],
+  //     [Number(location?.latitude), Number(location?.longitude)]
+  //   );
+  //   return distance;
+  // }, [position, location]);
+
+  // const distance = Number(
+  //   getDistanceFromLatLonInKm(
+  //     [Number(position.coords.latitude), Number(position.coords.longitude)],
+  //     [Number(location?.latitude), Number(location?.longitude)]
+  //   ).toPrecision(3)
+  // );
+
+  useEffect(() => {
+    const userDistance = getDistanceFromLatLonInKm(
       [Number(position.coords.latitude), Number(position.coords.longitude)],
       [Number(location?.latitude), Number(location?.longitude)]
     );
-    return distance;
-  }, [position, location]);
-
-  const distance = Number(
-    getDistanceFromLatLonInKm(
-      [Number(position.coords.latitude), Number(position.coords.longitude)],
-      [Number(location?.latitude), Number(location?.longitude)]
-    ).toPrecision(3)
-  );
+    console.log(userDistance);
+    setDistance(Number(userDistance.toPrecision(3)));
+  }, [position]);
 
   return (
     <VStack
@@ -85,11 +96,12 @@ export function PartnerCard({ location, ...rest }: Props) {
                 {location?.business_name}
               </Text>
               <Text>
-                {!calcDistance
+                {/* {!calcDistance
                   ? 'Calculando distancia...'
                   : calcDistance < 1
                   ? 'bem proximo a voce'
-                  : ` ${distance} km de voce`}
+                  : ` ${distance} km de voce`} */}
+                {distance} km de voce
               </Text>
             </VStack>
           </HStack>

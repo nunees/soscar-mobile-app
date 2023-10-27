@@ -6,13 +6,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { useToast } from 'native-base';
 
 export function useUploadImage() {
-  const [state, setState] = useState({
-    data: null,
-    isLoading: false,
-    isSucess: false,
-    isError: false,
-    error: '',
-  });
+  const toast = useToast();
 
   async function handleUserProfilePictureSelect(
     id: string,

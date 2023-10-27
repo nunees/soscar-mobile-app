@@ -47,5 +47,30 @@ export function useAxiosFetch<T>(params: AxiosRequestConfig) {
     }, [])
   );
 
+  // useEffect(() => {
+  //   setState((prevState) => ({ ...prevState, isLoading: true }));
+  //   api
+  //     .request(params)
+  //     .then((response) => {
+  //       setState((prevState) => ({
+  //         ...prevState,
+  //         isLoading: false,
+  //         isSucess: true,
+  //         data: response.data,
+  //         error: '',
+  //       }));
+  //     })
+  //     .catch((error) => {
+  //       setState((prevState) => ({
+  //         ...prevState,
+  //         isLoading: false,
+  //         isSucess: false,
+  //         data: [] as T,
+  //         isError: true,
+  //         error: error.message,
+  //       }));
+  //     });
+  // }, []);
+
   return { state };
 }

@@ -124,10 +124,6 @@ export function NewSchedule() {
           }}
         >
           {location && <PartnerCard location={location.state.data} />}
-          <VStack>
-            <Button title="Mais informacoes" fontSize={'xs'} h={10} mb={1} />
-            <Button title="Mostrar no mapa" fontSize={'xs'} h={10} mb={3} />
-          </VStack>
 
           <VStack p={5} mb={5} backgroundColor="white" borderRadius={10}>
             <VStack>

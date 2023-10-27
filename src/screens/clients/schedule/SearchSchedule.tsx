@@ -3,30 +3,47 @@ import { ListEmpty } from '@components/ListEmpty';
 import { LoadingModal } from '@components/LoadingModal';
 import { PartnerCard } from '@components/PartnerCard';
 import { ILocation } from '@dtos/ILocation';
-import { useAxiosFetch } from '@hooks/axios/useAxiosFetch';
 import { useAuth } from '@hooks/useAuth';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
+import { api } from '@services/api';
 import { VStack, FlatList } from 'native-base';
+import { useEffect, useState } from 'react';
 
 type RouteParamsProps = {
   serviceId: string;
 };
 
 export function SearchSchedule() {
+  const [locations, setLocations] = useState<ILocation[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const navigation = useNavigation<AppNavigatorRoutesProps>();
   const { user } = useAuth();
 
   const routes = useRoute();
   const { serviceId } = routes.params as RouteParamsProps;
 
-  const { state } = useAxiosFetch<ILocation[]>({
-    method: 'GET',
-    url: `/locations/services/${serviceId}`,
-    headers: {
-      id: user.id,
-    },
-  });
+  useEffect(() => {
+    async function handleSearch() {
+      try {
+        setIsLoading(true);
+        console.log(serviceId);
+        const response = await api.get(`/locations/services/${serviceId}`, {
+          headers: {
+            id: user.id,
+          },
+        });
+
+        setLocations(response.data);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    handleSearch();
+  }, [serviceId]);
 
   return (
     <VStack pb={10}>
@@ -38,16 +55,13 @@ export function SearchSchedule() {
         />
       </VStack>
 
-      {state.isLoading && (
-        <LoadingModal
-          showModal={state.isLoading}
-          message="Buscando parceiros"
-        />
+      {isLoading && (
+        <LoadingModal showModal={isLoading} message="Buscando parceiros" />
       )}
 
       <FlatList
         contentContainerStyle={{ paddingBottom: 100 }}
-        data={state.data}
+        data={locations}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => {
           return (

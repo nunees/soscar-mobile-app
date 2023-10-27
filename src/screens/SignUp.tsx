@@ -101,47 +101,6 @@ export function SignUp() {
     resolver: yupResolver(registrationSchema),
   });
 
-  async function uploadUserImage(user_id: string) {
-    try {
-      await api.patch(`/user/avatar/${user_id}`, userPhotoUploadForm, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-    } catch (error) {
-      const isAppError = error instanceof AppError;
-      const title = isAppError ? error.message : 'Erro na atualização';
-      toast.show({
-        title,
-        placement: 'top',
-        bgColor: 'red.500',
-      });
-    }
-  }
-
-  async function getUserPhoto() {
-    try {
-      setIsPhotoLoading(true);
-      const profilePicture = await handleUserProfilePictureSelect(
-        generateId(32)
-      );
-      setUserPhoto(profilePicture?.photoFile.uri);
-      setUserPhotoUploadForm(profilePicture?.userPhotoUploadForm);
-    } catch (error) {
-      const isAppError = error instanceof AppError;
-      const title = isAppError
-        ? error.message
-        : 'Erro ao atualizar foto de perfil';
-      toast.show({
-        title,
-        placement: 'top',
-        bgColor: 'red.500',
-      });
-    } finally {
-      setIsPhotoLoading(false);
-    }
-  }
-
   async function handleSignClientSignUp({
     name,
     lastName,
@@ -170,8 +129,6 @@ export function SignUp() {
         isPartner: !!isPartner,
         isTermsAccepted: true,
       });
-
-      await uploadUserImage(response.data.id);
 
       await saveProfile({
         name,
@@ -212,48 +169,6 @@ export function SignUp() {
             <Text fontSize={'sm'} color={'gray.700'} textAlign={'center'}>
               Crie sua conta e encontre os melhores serviços
             </Text>
-          </Center>
-
-          <Center mt={5}>
-            {isPhotoLoading ? (
-              <Skeleton
-                borderRadius={100}
-                w={100}
-                h={100}
-                startColor="purple.100"
-                endColor="purple.900"
-              />
-            ) : (
-              <Avatar
-                w={100}
-                h={100}
-                borderWidth={3}
-                borderColor={'purple.500'}
-                source={
-                  userPhoto && {
-                    uri: userPhoto,
-                  }
-                }
-              >
-                {!userPhoto && <AvatarSVG width={100} height={100} />}
-                <Avatar.Badge
-                  bg={'purple.800'}
-                  size={10}
-                  justifyContent={'center'}
-                  alignItems={'center'}
-                  borderWidth={0}
-                >
-                  <Pressable
-                    onPress={getUserPhoto}
-                    _pressed={{
-                      opacity: 0.5,
-                    }}
-                  >
-                    <PencilSimpleLine size={16} color="white" />
-                  </Pressable>
-                </Avatar.Badge>
-              </Avatar>
-            )}
           </Center>
 
           <Center mt={3} px={10}>
@@ -473,7 +388,7 @@ export function SignUp() {
 
         <VStack px={10}>
           <Center mt={50}>
-            <Text fontSize={'md'} color="gray.200" pb={3}>
+            <Text fontSize={'md'} color="gray.600" pb={3}>
               Já tem uma conta?
             </Text>
             <Button
