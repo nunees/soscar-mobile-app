@@ -238,10 +238,6 @@ export function AddLocation() {
           </VStack>
 
           <VStack px={5} mt={10}>
-            <MultiSelection />
-          </VStack>
-
-          <VStack px={5} mt={10}>
             <Text fontSize="md" fontFamily="heading" bold mb={3}>
               Informações pessoais
             </Text>
