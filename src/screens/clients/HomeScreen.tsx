@@ -1,43 +1,84 @@
 import CalendarImage from '@assets/services/calendar.png';
 import CompliantImage from '@assets/services/compliant.png';
 import PaperImage from '@assets/services/paper.png';
-import { LoadingModal } from '@components/LoadingModal';
 import { SearchBar } from '@components/SearchBar';
 import { ServiceCardTypes } from '@components/ServiceCardTypes';
 import { SmallSchedulleCard } from '@components/SmallSchedulleCard';
 import UserPhoto from '@components/UserPhoto';
 import { ISchedules } from '@dtos/ISchedules';
-import { useAxiosFetch } from '@hooks/axios/useAxiosFetch';
 import { useAuth } from '@hooks/useAuth';
-import { useNavigation } from '@react-navigation/native';
+import { useProfile } from '@hooks/useProfile';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
 import { api } from '@services/api';
-import { HStack, ScrollView, VStack, Text, Pressable } from 'native-base';
+import { AppError } from '@utils/AppError';
+import {
+  HStack,
+  ScrollView,
+  VStack,
+  Text,
+  Pressable,
+  Center,
+  FlatList,
+  useToast,
+} from 'native-base';
+import { useCallback, useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export function HomeScreen() {
   const { user } = useAuth();
-
+  const [schedules, setSchedules] = useState<ISchedules[]>([]);
   const navigation = useNavigation<AppNavigatorRoutesProps>();
+  const { updateProfile } = useProfile();
 
-  const { state } = useAxiosFetch<ISchedules>({
-    method: 'GET',
-    url: '/schedules/client',
-    headers: {
-      id: user.id,
-    },
-  });
+  const toast = useToast();
+
+  useFocusEffect(
+    useCallback(() => {
+      async function fetchSchedules() {
+        try {
+          const response = await api.get('/schedules/client', {
+            headers: {
+              id: user.id,
+            },
+          });
+
+          setSchedules(response.data);
+        } catch (error) {
+          if (error instanceof AppError) {
+            toast.show({
+              title: 'Erro ao carregar agendamentos',
+              placement: 'top',
+              bgColor: 'red.500',
+            });
+          }
+        }
+      }
+
+      fetchSchedules();
+    }, [schedules.length])
+  );
+
+  useEffect(() => {
+    const profile = async () => {
+      try {
+        const response = await api.get(`/user/profile/${user.id}`);
+
+        await updateProfile({
+          ...response.data,
+          phone: response.data.mobile_phone,
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    profile();
+  }, []);
 
   return (
     <SafeAreaView>
       <ScrollView showsVerticalScrollIndicator={false}>
-        {state.isLoading && (
-          <LoadingModal
-            showModal={state.isLoading}
-            message="Carregando dados.."
-          />
-        )}
-
         <VStack px={5} py={2}>
           <VStack backgroundColor="white" p={5} borderRadius={10} shadow={1}>
             <HStack justifyContent={'space-between'} alignItems={'center'}>
@@ -73,8 +114,56 @@ export function HomeScreen() {
               <Text fontSize={'md'} bold pb={3}>
                 Proximos agendamentos
               </Text>
-
-              {state.data && <SmallSchedulleCard data={state.data} />}
+              <FlatList
+                data={schedules}
+                horizontal={true}
+                showsHorizontalScrollIndicator={false}
+                snapToAlignment="start"
+                pagingEnabled
+                keyExtractor={(item) => item.id!}
+                renderItem={({ item }) => {
+                  return (
+                    <VStack mb={3} borderRadius={5} shadow={0.8}>
+                      <SmallSchedulleCard
+                        id={item.id}
+                        business_name={item.location?.business_name}
+                        date={item.date}
+                        service_type={item.service_type?.category_id}
+                        time={item.time}
+                      />
+                    </VStack>
+                  );
+                }}
+                ListEmptyComponent={() => (
+                  <HStack
+                    backgroundColor="white"
+                    w={350}
+                    borderRadius={10}
+                    p={3}
+                    justifyContent={'space-around'}
+                  >
+                    <VStack w={20} h={20}>
+                      <VStack
+                        backgroundColor={'purple.700'}
+                        borderRadius={10}
+                        alignItems={'center'}
+                      >
+                        <Text bold fontSize={'4xl'} p={3} color="white">
+                          {new Date().getDate().toString()}
+                        </Text>
+                      </VStack>
+                    </VStack>
+                    <VStack pt={5}>
+                      <Center>
+                        <Text color="green.600">Tudo certo! 👍</Text>
+                        <Text color="green.600" bold>
+                          Você não possui agendamentos
+                        </Text>
+                      </Center>
+                    </VStack>
+                  </HStack>
+                )}
+              />
             </VStack>
           </VStack>
 

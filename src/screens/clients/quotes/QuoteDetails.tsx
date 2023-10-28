@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable import/no-extraneous-dependencies */
 import { AppHeader } from '@components/AppHeader';
 import { Button } from '@components/Button';
@@ -42,6 +43,9 @@ export function QuoteDetails() {
   const [quote, setQuote] = useState<IQuoteList>({} as IQuoteList);
   const [location, setLocation] = useState<ILocation>({} as ILocation);
   const [vehicle, setVehicle] = useState<IVehicleDTO>({} as IVehicleDTO);
+
+  const [userMidia, setUserMidia] = useState<any[]>([]);
+  const [partnerMidia, setPartnerMidia] = useState<any[]>([]);
 
   const { user } = useAuth();
   const navigation = useNavigation<AppNavigatorRoutesProps>();
@@ -171,7 +175,33 @@ export function QuoteDetails() {
     }, [vehicleId])
   );
 
-  console.log(quote?.UserQuotesDocuments);
+  useFocusEffect(
+    useCallback(() => {
+      async function handleQuoteDocuments() {
+        try {
+          const user = quote.UserQuotesDocuments.filter(
+            (item) => !item.isPartnerDocument
+          );
+
+          const partner = quote.UserQuotesDocuments.filter(
+            (item) => item.isPartnerDocument
+          );
+
+          setPartnerMidia(partner);
+          setUserMidia(user);
+        } catch (error) {
+          throw new AppError('Erro ao buscar arquivos do orçamento');
+        }
+      }
+
+      handleQuoteDocuments();
+    }, [quote, location])
+  );
+
+  function calculateTotalPrice() {
+    if (!quote.service_price || !quote.franchise_price) return 0;
+    return Number(quote.service_price + quote.franchise_price);
+  }
 
   return (
     <VStack pb={10}>
@@ -280,7 +310,7 @@ export function QuoteDetails() {
               </Text>
               <VStack>
                 <FlatList
-                  data={quote?.UserQuotesDocuments}
+                  data={userMidia}
                   keyExtractor={(item) => item.id}
                   pagingEnabled
                   snapToAlignment="start"
@@ -301,7 +331,7 @@ export function QuoteDetails() {
             </VStack>
           </VStack>
 
-          {quote.status === 2 && (
+          {quote.status === 3 && (
             <>
               <VStack backgroundColor="white" borderRadius={10} mt={5}>
                 <VStack px={5} py={5}>
@@ -334,14 +364,31 @@ export function QuoteDetails() {
               <VStack backgroundColor="white" borderRadius={10} mt={5}>
                 <VStack px={5} py={5}>
                   <Text bold>Valor total do documento</Text>
-                  <Text>{quote.franchise_price}</Text>
+                  <Text>{calculateTotalPrice()}</Text>
                 </VStack>
               </VStack>
 
               <VStack backgroundColor="white" borderRadius={10} mt={5}>
                 <VStack px={5} py={5}>
                   <Text bold>Documento de orcamento</Text>
-                  {}
+                  <FlatList
+                    data={partnerMidia}
+                    keyExtractor={(item) => item.id}
+                    pagingEnabled
+                    snapToAlignment="start"
+                    renderItem={({ item }) => (
+                      <Image
+                        borderRadius={5}
+                        source={{
+                          uri: `${api.defaults.baseURL}/quotes/document/${item.id}/${item.hashId}`,
+                        }}
+                        alt="Imagem do usuario"
+                        resizeMode="cover"
+                        size={350}
+                        mb={5}
+                      />
+                    )}
+                  />
                 </VStack>
               </VStack>
             </>
@@ -362,6 +409,9 @@ export function QuoteDetails() {
               <VStack px={5} py={5}>
                 <Text bold>Deixe a sua opniao sobre o profissional</Text>
                 <TextArea mt={1} />
+                <Text bold color="gray.600">
+                  Nota
+                </Text>
                 <VStack>
                   <Button title="Enviar" />
                 </VStack>

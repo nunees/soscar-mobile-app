@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { AppHeader } from '@components/AppHeader';
 import { Button } from '@components/Button';
 import getLogoImage from '@components/LogosImages';
@@ -25,8 +26,7 @@ import {
   VStack,
   useToast,
 } from 'native-base';
-import { useFocus } from 'native-base/lib/typescript/components/primitives';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Alert, Linking, TouchableOpacity } from 'react-native';
 
 type RouteParams = {
@@ -51,7 +51,6 @@ export function ScheduleDetail() {
 
   const [schedule, setSchedule] = useState<ISchedules>();
   const [loadedImages, setLoadedImages] = useState<any[]>([]);
-  const [carLogo, setCarLogo] = useState<string>('');
 
   const [observation, setObservation] = useState<string>('');
 
@@ -74,7 +73,6 @@ export function ScheduleDetail() {
 
       setSchedule(response.data);
 
-      setCarLogo(response.data.vehicles.brand.icon);
       setSchedule(response.data);
       response.data.SchedulesFiles.map((file: SchedulesFiles) =>
         setLoadedImages((oldState) => [...oldState, file])
@@ -114,34 +112,15 @@ export function ScheduleDetail() {
     );
   }
 
-  const handleChangeStatus = useCallback(async () => {
-    try {
-      if (schedule?.status === 1 || schedule?.status === 2) {
-        await api.put(
-          `/schedules/${scheduleId}`,
-          {
-            status: 2,
-          },
-          {
-            headers: {
-              id: user.id,
-            },
-          }
-        );
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }, []);
-
   const handleSubmit = useCallback(async () => {
     try {
       setIsLoading(true);
+
       await api.put(
         `/schedules/${scheduleId}`,
         {
           status: 3,
-          observation: observation ?? 'Nenhuma observação',
+          partner_notes: observation || 'Nenhuma observacao adicionada',
         },
         {
           headers: {
@@ -169,7 +148,6 @@ export function ScheduleDetail() {
       return () => {
         setSchedule({} as ISchedules);
         setLoadedImages([]);
-        setCarLogo('');
       };
     }, [])
   );
@@ -199,7 +177,11 @@ export function ScheduleDetail() {
   return (
     <VStack flex={1}>
       <VStack>
-        <AppHeader title="Detalhes do agendamento" />
+        <AppHeader
+          title="Detalhes do agendamento"
+          navigation={navigation}
+          screen="orders"
+        />
       </VStack>
 
       <ScrollView
@@ -316,15 +298,6 @@ export function ScheduleDetail() {
           </VStack>
 
           <VStack mt={5} backgroundColor="white" p={5} borderRadius={10}>
-            <VStack>
-              <Text bold>Usuario</Text>
-              <Text>
-                {user.name}#{user.username}
-              </Text>
-            </VStack>
-          </VStack>
-
-          <VStack mt={5} backgroundColor="white" p={5} borderRadius={10}>
             <Text bold>Informacoes do usuario</Text>
             <Text>{schedule?.notes ? schedule?.notes : 'Sem observações'}</Text>
           </VStack>
@@ -415,15 +388,24 @@ export function ScheduleDetail() {
               </VStack>
             </HStack>
             <HStack py={3}>
-              <VStack>
-                <TextArea
-                  w={350}
-                  h={150}
-                  value={observation}
-                  onChangeText={setObservation}
-                  placeholder="Voce pode adicionar informacoes adicionais para o cliente."
-                />
-              </VStack>
+              {schedule?.status === 4 ||
+                (schedule?.status === 3 && (
+                  <VStack>
+                    <Text>{schedule.partner_notes}</Text>
+                  </VStack>
+                ))}
+              {schedule?.status === 1 ||
+                (schedule?.status === 2 && (
+                  <VStack>
+                    <TextArea
+                      w={330}
+                      h={150}
+                      value={observation}
+                      onChangeText={setObservation}
+                      placeholder="Voce pode adicionar informacoes adicionais para o cliente."
+                    />
+                  </VStack>
+                ))}
             </HStack>
           </VStack>
 
@@ -435,6 +417,7 @@ export function ScheduleDetail() {
                   onPress={handleSubmit}
                   mb={3}
                   isLoading={isLoading}
+                  isLoadingText="Enviando..."
                 />
                 <Button
                   title="Cancelar agendamento"

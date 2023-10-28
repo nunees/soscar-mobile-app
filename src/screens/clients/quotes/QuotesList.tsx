@@ -53,13 +53,16 @@ export function QuotesList() {
             }
           >
             <VStack px={2} my={2} mx={3}>
-              <VStack backgroundColor={'white'} borderRadius={5}>
+              <VStack backgroundColor={'white'} borderRadius={5} h={110}>
                 <HStack>
                   <VStack
                     w={100}
+                    h={110}
                     backgroundColor={'purple.900'}
                     borderBottomLeftRadius={5}
                     borderTopLeftRadius={5}
+                    alignItems={'center'}
+                    justifyContent={'center'}
                   >
                     <Text
                       color={'white'}
@@ -69,7 +72,7 @@ export function QuotesList() {
                     >
                       {item.created_at?.toString().split('T')[0].split('-')[2]}
                     </Text>
-                    <Text color={'white'} textAlign={'center'} fontSize={'xl'}>
+                    <Text color={'white'} textAlign={'center'} fontSize={'lg'}>
                       {numberToMonth(
                         item.created_at?.toString().split('T')[0].split('-')[1]
                       )}
@@ -91,33 +94,92 @@ export function QuotesList() {
                     <Text color="gray.400">
                       {item.vehicles.plate.toUpperCase()}
                     </Text>
-                  </VStack>
-
-                  <VStack ml={5}>
-                    {item.status === 1 ||
-                      (item.status === 2 && (
-                        <Badge colorScheme={'yellow'}>
-                          <Text bold fontSize={'xs'}>
+                    <HStack>
+                      {item.status === 1 && (
+                        <Badge
+                          colorScheme={'info'}
+                          mt={2}
+                          borderRadius={10}
+                          variant={'solid'}
+                        >
+                          <Text fontSize={'xs'} color="white">
                             Aguardando
                           </Text>
                         </Badge>
-                      ))}
+                      )}
 
-                    {item.status === 3 && (
-                      <Badge colorScheme={'blue'}>
-                        <Text bold fontSize={'xs'}>
-                          Analise
-                        </Text>
-                      </Badge>
-                    )}
+                      {item.status === 2 && (
+                        <Badge
+                          colorScheme={'blue'}
+                          mt={2}
+                          borderRadius={10}
+                          variant={'solid'}
+                        >
+                          <Text fontSize={'xs'} color={'white'}>
+                            Analise
+                          </Text>
+                        </Badge>
+                      )}
 
-                    {item.status === 4 && (
-                      <Badge colorScheme={'green'}>
-                        <Text bold fontSize={'xs'}>
-                          Aprovado
-                        </Text>
-                      </Badge>
-                    )}
+                      {item.status === 3 && (
+                        <Badge
+                          colorScheme={'green'}
+                          mt={2}
+                          borderRadius={10}
+                          variant={'solid'}
+                        >
+                          <Text fontSize={'xs'} color={'black'}>
+                            Aprovado
+                          </Text>
+                        </Badge>
+                      )}
+
+                      {item.status === 4 && (
+                        <Badge
+                          colorScheme={'red'}
+                          mt={2}
+                          borderRadius={10}
+                          variant={'solid'}
+                        >
+                          <Text fontSize={'xs'} color={'white'}>
+                            Recusado
+                          </Text>
+                        </Badge>
+                      )}
+
+                      {item.is_juridical && (
+                        <Badge
+                          colorScheme={'purple'}
+                          mt={2}
+                          ml={3}
+                          borderRadius={10}
+                          variant={'solid'}
+                        >
+                          <Text fontSize={'xs'} color={'white'}>
+                            juridico
+                          </Text>
+                        </Badge>
+                      )}
+
+                      {!item.is_juridical && (
+                        <Badge
+                          colorScheme={'purple'}
+                          mt={2}
+                          ml={3}
+                          borderRadius={10}
+                          variant={'solid'}
+                        >
+                          <Text
+                            fontSize={'xs'}
+                            color={'white'}
+                            borderRadius={10}
+                            variant={'solid'}
+                          >
+                            comum
+                          </Text>
+                        </Badge>
+                      )}
+                    </HStack>
                   </VStack>
                 </HStack>
               </VStack>

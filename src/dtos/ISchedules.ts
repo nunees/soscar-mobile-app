@@ -73,6 +73,8 @@ export interface ISchedules {
     };
     brand_id: number;
     color: string;
+    year: number;
+    plate: string;
     engineMiles: number;
     id: string;
     insuranceCompaniesId: number;

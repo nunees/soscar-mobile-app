@@ -7,15 +7,7 @@ import { useAuth } from '@hooks/useAuth';
 import { useNavigation } from '@react-navigation/native';
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
 import { numberToMonth } from '@utils/DayjsDateProvider';
-import {
-  VStack,
-  Text,
-  FlatList,
-  HStack,
-  Pressable,
-  Badge,
-  Center,
-} from 'native-base';
+import { VStack, Text, FlatList, HStack, Pressable, Center } from 'native-base';
 
 export function SchedulesList() {
   const { user } = useAuth();
@@ -50,6 +42,7 @@ export function SchedulesList() {
         <FlatList
           showsVerticalScrollIndicator={false}
           data={state.data}
+          borderRadius={10}
           renderItem={({ item }) => (
             <Pressable
               onPress={() =>
@@ -58,29 +51,24 @@ export function SchedulesList() {
                 })
               }
               mb={5}
+              borderRadius={10}
             >
-              <Badge
-                colorScheme={
-                  item.status === 1
-                    ? 'blue'
-                    : item.status === 2
-                    ? 'yellow'
-                    : item.status === 3
-                    ? 'purple'
-                    : 'green'
-                }
+              <HStack
+                backgroundColor={'white'}
                 w={400}
-                h={100}
-                justifyContent={'space-between'}
+                h={110}
+                borderRadius={10}
+                justifyContent={'flex-start'}
               >
-                <HStack justifyContent={'flex-start'}>
+                <HStack justifyContent={'space-between'}>
                   <HStack
-                    w={70}
-                    h={100}
+                    w={90}
+                    h={110}
                     backgroundColor={'purple.700'}
                     alignItems={'center'}
                     justifyContent={'center'}
                     mr={3}
+                    borderRadius={10}
                   >
                     <VStack>
                       <Text
@@ -113,62 +101,33 @@ export function SchedulesList() {
                           .reverse()
                           .join('/')}
                       </Text>
+                      <Text>
+                        Status:{' '}
+                        <Text
+                          color={
+                            item.status === 1
+                              ? 'green.600'
+                              : item.status === 2
+                              ? 'yellow.600'
+                              : item.status === 3
+                              ? 'blue.600'
+                              : 'gray.600'
+                          }
+                        >
+                          {' '}
+                          {item.status === 1
+                            ? 'agendado'
+                            : item.status === 2
+                            ? 'aguardando'
+                            : item.status === 3
+                            ? 'em analise'
+                            : 'finalizado'}
+                        </Text>
+                      </Text>
                     </VStack>
                   </HStack>
-                  <HStack>
-                    {item.status === 1 && (
-                      <Badge
-                        colorScheme={'blue'}
-                        variant={'solid'}
-                        w={90}
-                        h={8}
-                        borderRadius={6}
-                      >
-                        <Text fontSize={'xs'} color="white">
-                          Agendado
-                        </Text>
-                      </Badge>
-                    )}
-                    {item.status === 2 && (
-                      <Badge
-                        colorScheme={'yellow'}
-                        variant={'solid'}
-                        w={90}
-                        h={8}
-                        borderRadius={10}
-                      >
-                        <Text fontSize={'xs'} color="white">
-                          Aguardando
-                        </Text>
-                      </Badge>
-                    )}
-                    {item.status === 3 && (
-                      <Badge
-                        colorScheme={'yellow'}
-                        variant={'solid'}
-                        w={90}
-                        h={8}
-                      >
-                        <Text fontSize={'xs'} color="white">
-                          Em analise
-                        </Text>
-                      </Badge>
-                    )}
-                    {item.status === 4 && (
-                      <Badge
-                        colorScheme={'green'}
-                        variant={'solid'}
-                        w={90}
-                        h={8}
-                      >
-                        <Text fontSize={'xs'} color="white">
-                          Finalizado
-                        </Text>
-                      </Badge>
-                    )}
-                  </HStack>
                 </HStack>
-              </Badge>
+              </HStack>
             </Pressable>
           )}
           keyExtractor={({ id }) => String(id)}

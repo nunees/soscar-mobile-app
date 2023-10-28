@@ -4,7 +4,6 @@ import {
   BottomTabNavigationProp,
 } from '@react-navigation/bottom-tabs';
 import { ChangePassword } from '@screens/ChangePassword';
-import { Assistance } from '@screens/clients/Assistance';
 import { HomeScreen } from '@screens/clients/HomeScreen';
 import { PartnerDetails } from '@screens/clients/PartnerDetails';
 import { LegalQuotes } from '@screens/clients/quotes/LegalQuotes';
@@ -75,7 +74,7 @@ export function AppRoutes() {
     <Navigator
       screenOptions={{
         headerShown: false,
-        tabBarShowLabel: false,
+        tabBarShowLabel: true,
         tabBarActiveTintColor: colors.purple[700],
         tabBarInactiveTintColor: colors.gray[500],
         tabBarStyle: {
@@ -180,22 +179,6 @@ export function AppRoutes() {
         options={{
           tabBarButton: () => null,
           tabBarStyle: { display: 'none' },
-        }}
-      />
-
-      <Screen
-        name="assistance"
-        component={Assistance}
-        options={{
-          title: 'Assistência',
-          tabBarIcon: ({ color }) => (
-            <Icon
-              as={FontAwesome5}
-              name="hands-helping"
-              size={iconSize}
-              color={color}
-            />
-          ),
         }}
       />
 

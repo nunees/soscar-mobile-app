@@ -5,6 +5,7 @@ import UserPhoto from '@components/UserPhoto';
 import { PAYMENT_TYPES } from '@data/PaymentTypes';
 import { SERVICES_TYPES } from '@data/ServicesTypes';
 import { ILocation } from '@dtos/ILocation';
+import { IReviewDTO } from '@dtos/IReviewDTO';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useAuth } from '@hooks/useAuth';
 import { useProfile } from '@hooks/useProfile';
@@ -23,6 +24,7 @@ import {
   FlatList,
   Icon,
   Progress,
+  Avatar,
 } from 'native-base';
 import { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -38,6 +40,8 @@ export function LocationDetails() {
 
   const [progressValue, setProgressValue] = useState(0);
   const [isPhotoLoading, setIsPhotoLoading] = useState(false);
+
+  const [reviews, setReviews] = useState<IReviewDTO[]>({} as IReviewDTO[]);
 
   const routes = useRoute();
   const toast = useToast();
@@ -95,31 +99,6 @@ export function LocationDetails() {
     }
   }
 
-  // /*
-  //   @TODO: Implementar a deleção de fotos
-  // */
-  // async function deletePhoto(photo: string) {
-  //   try {
-  //     const response = await api.delete(`/locations/photo/${photo}`, {
-  //       headers: {
-  //         id: user.id,
-  //       },
-  //     });
-
-  //     toast.show({
-  //       title: response.data.message ?? 'Foto deletada',
-  //       placement: 'top',
-  //       bgColor: 'green.500',
-  //     });
-  //   } catch (error) {
-  //     toast.show({
-  //       title: 'Erro ao deletar foto',
-  //       placement: 'top',
-  //       bgColor: 'red.500',
-  //     });
-  //   }
-  // }
-
   useEffect(() => {
     async function fetchLocationDetails() {
       try {
@@ -144,7 +123,31 @@ export function LocationDetails() {
     }
 
     fetchLocationDetails();
-  }, [locationId]);
+  }, [locationId, isPhotoLoading]);
+
+  useEffect(() => {
+    async function fetchReviews() {
+      try {
+        const response = await api.get(`/reviews/comments/${locationId}`, {
+          headers: {
+            id: user.id,
+          },
+        });
+
+        console.log(response.data);
+
+        setReviews(response.data);
+      } catch (error) {
+        toast.show({
+          title: 'Erro ao carregar avaliações',
+          placement: 'top',
+          bgColor: 'red.500',
+        });
+      }
+    }
+
+    fetchReviews();
+  }, [location]);
 
   return (
     <SafeAreaView>
@@ -270,6 +273,9 @@ export function LocationDetails() {
         </HStack>
 
         <VStack px={5}>
+          <Text bold fontSize={'xs'} color={'gray.600'} pb={1}>
+            Sobre o local
+          </Text>
           <Text textAlign={'justify'}>{location.business_description}</Text>
         </VStack>
 
@@ -358,6 +364,44 @@ export function LocationDetails() {
               {location.open_hours_weekend?.length === 7 && 'Domingo a Domingo'}
             </Text>
             <Text>{location.open_hours}</Text>
+          </VStack>
+        </VStack>
+
+        <VStack px={5} py={3}>
+          <Text bold fontSize={'xs'} color={'gray.600'} pb={1}>
+            Avaliacoes
+          </Text>
+          <VStack>
+            <FlatList
+              data={reviews}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              snapToAlignment="start"
+              pagingEnabled
+              renderItem={({ item }) => (
+                <VStack>
+                  <HStack>
+                    <Avatar
+                      source={{
+                        uri: item.users?.avatar
+                          ? `${api.defaults.baseURL}/user/avatar/${item.users?.id}/${item.users?.avatar}`
+                          : `https://ui-avatars.com/api/?format=png&name=${item.users?.name}&size=512`,
+                      }}
+                      size={20}
+                      mr={5}
+                      mt={2}
+                    />
+                    <VStack w={250}>
+                      <HStack justifyContent={'space-between'}>
+                        <Text bold>{item.users?.name}</Text>
+                        <Text color={'gray.500'}>Nota: {item.rating}</Text>
+                      </HStack>
+                      <Text>{item.review}</Text>
+                    </VStack>
+                  </HStack>
+                </VStack>
+              )}
+            />
           </VStack>
         </VStack>
 

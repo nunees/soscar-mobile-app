@@ -110,7 +110,7 @@ export function AddVehicle() {
           year: Number(year),
           plate: plate.toUpperCase() || '',
           notes,
-          insurance_id: Number(insuranceId) || 12,
+          insurance_id: Number(insuranceId) ?? 12,
           isPrimary: isMainVehicle,
         },
         {

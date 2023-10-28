@@ -5,6 +5,7 @@ export interface IQuotesDocumentDTO {
   quote_id: string;
   document_url: string;
   document_type_id: number;
+  isPartnerDocument: boolean;
   created_at: Date | null;
   updated_at: Date | null;
 }

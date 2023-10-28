@@ -1,7 +1,6 @@
 import { AppHeader } from '@components/AppHeader';
 import { Button } from '@components/Button';
 import { Input } from '@components/Input';
-import { LoadingModal } from '@components/LoadingModal';
 import { PartnerCard } from '@components/PartnerCard';
 import { ScheduleCalendar } from '@components/ScheduleCalendar';
 import { Select } from '@components/Select';
@@ -9,19 +8,22 @@ import { SelectBusinessCategories } from '@components/SelectBusinessCategories';
 import { TextArea } from '@components/TextArea';
 import { UploadFileField } from '@components/UploadFileField';
 import { ILocation } from '@dtos/ILocation';
-import { ISchedules } from '@dtos/ISchedules';
 import { IVehicleDTO } from '@dtos/IVechicleDTO';
-import { useAxiosFetch } from '@hooks/axios/useAxiosFetch';
-import { useAxiosPost } from '@hooks/axios/useAxiosPost';
 import { useAuth } from '@hooks/useAuth';
 import { useUploadFormData } from '@hooks/useUploadFormData';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
 import { api } from '@services/api';
+import { AppError } from '@utils/AppError';
 import { handleTime } from '@utils/DateTime';
-import { VStack, ScrollView, Text } from 'native-base';
-import { useState } from 'react';
+import { VStack, ScrollView, Text, useToast } from 'native-base';
+import { useCallback, useEffect, useState } from 'react';
+import { Alert } from 'react-native';
 
 type RouteParamsProps = {
   locationId: string;
@@ -36,6 +38,9 @@ type VehicleSelect = {
 export function NewSchedule() {
   const [vehicle_id, setVehicle_id] = useState<string>();
 
+  const [vehicles, setVehicles] = useState<IVehicleDTO[]>();
+  const [location, setLocation] = useState<ILocation>();
+
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [time, setTime] = useState<string>('');
   const [requiredServices, setRequiredServices] = useState<number>();
@@ -46,57 +51,104 @@ export function NewSchedule() {
   const { locationId, typeofService } = routes.params as RouteParamsProps;
 
   const navigation = useNavigation<AppNavigatorRoutesProps>();
+  const toast = useToast();
 
   const { upload, GetUploadImage } = useUploadFormData('document');
-  const { postState, postData } = useAxiosPost<ISchedules>();
 
   async function handleSubmit() {
-    await postData({
-      url: '/schedules',
-      method: 'post',
-      data: {
-        vehicle_id,
-        location_id: locationId,
-        service_type: Number(requiredServices),
-        date: selectedDate,
-        time,
-        notes,
-      },
-      headers: {
-        id: user.id,
-        'Content-Type': 'application/json',
-      },
-    });
-
-    upload.data?.forEach(async (file) => {
-      await api
-        .post(`/schedules/documents/${postState.data.id}`, file, {
+    try {
+      const response = await api.post(
+        '/schedules',
+        {
+          vehicle_id,
+          location_id: locationId,
+          service_type: Number(requiredServices),
+          date: selectedDate,
+          time,
+          notes,
+        },
+        {
           headers: {
             id: user.id,
-            'Content-Type': 'multipart/form-data',
+            'Content-Type': 'application/json',
           },
-        })
-        .then(() => {
-          navigation.navigate('taskDone', { date: selectedDate });
-        });
-    });
+        }
+      );
+
+      upload.data?.forEach(async (file) => {
+        await api
+          .post(`/schedules/documents/${response.data.id}`, file, {
+            headers: {
+              id: user.id,
+              'Content-Type': 'multipart/form-data',
+            },
+          })
+          .then(() => {
+            navigation.navigate('taskDone', { date: selectedDate });
+          });
+      });
+    } catch (error) {
+      const isAppError = error instanceof AppError;
+      const message = isAppError
+        ? error.message
+        : 'Ocorreu um erro ao enviar o agendamento';
+      toast.show({
+        title: message,
+        placement: 'top',
+        bgColor: 'red.500',
+      });
+    }
   }
 
-  const location = useAxiosFetch<ILocation>({
-    url: `/locations/${locationId}`,
-    method: 'get',
-    headers: {
-      id: user.id,
-    },
-  });
+  async function fetchLocation() {
+    try {
+      const response = await api.get(`/locations/${locationId}`, {
+        headers: {
+          id: user.id,
+        },
+      });
+      setLocation(response.data);
+    } catch (error) {
+      const isAppError = error instanceof AppError;
+      const message = isAppError ? error.message : 'Ocorreu um erro ao buscar';
+      toast.show({
+        title: message,
+        placement: 'top',
+        bgColor: 'red.500',
+      });
+    }
+  }
 
-  const vehicles = useAxiosFetch<IVehicleDTO[]>({
-    url: '/vehicles',
-    method: 'get',
-    headers: {
-      id: user.id,
-    },
-  });
+  async function fetchVehicles() {
+    const response = await api.get('/vehicles', {
+      headers: {
+        id: user.id,
+      },
+    });
+    setVehicles(response.data);
+  }
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchLocation();
+      fetchVehicles();
+    }, [locationId, typeofService])
+  );
+
+  useEffect(() => {
+    if (vehicles?.length === 0) {
+      Alert.alert(
+        'Você não possui veículos cadastrados',
+        'Cadastre um veículo para poder agendar um serviço',
+        [
+          {
+            text: 'Ok',
+            onPress: () => navigation.navigate('addVehicle'),
+          },
+        ]
+      );
+    }
+  }, [vehicles]);
 
   return (
     <VStack>
@@ -109,12 +161,12 @@ export function NewSchedule() {
         />
       </VStack>
 
-      {location.state.isLoading && (
+      {/* {location.state.isLoading && (
         <LoadingModal
           showModal={location.state.isLoading}
           message={'Carregando...'}
         />
-      )}
+      )} */}
 
       <VStack pt={3} px={5}>
         <ScrollView
@@ -123,7 +175,7 @@ export function NewSchedule() {
             paddingBottom: 130,
           }}
         >
-          {location && <PartnerCard location={location.state.data} />}
+          {location && <PartnerCard location={location} />}
 
           <VStack p={5} mb={5} backgroundColor="white" borderRadius={10}>
             <VStack>
@@ -148,8 +200,8 @@ export function NewSchedule() {
               <Select
                 label={'Selecione um veículo'}
                 data={
-                  vehicles.state.data
-                    ? vehicles.state?.data.map((item) => {
+                  vehicles
+                    ? vehicles.map((item) => {
                         return {
                           label: `${item.brand.name} - ${item.name.name}`,
                           value: String(item.id),
@@ -236,11 +288,7 @@ export function NewSchedule() {
             entendimento do problema."
           />
 
-          <Button
-            title="Agendar"
-            onPress={handleSubmit}
-            isLoading={postState.isLoading}
-          />
+          <Button title="Agendar" onPress={handleSubmit} />
         </ScrollView>
       </VStack>
     </VStack>

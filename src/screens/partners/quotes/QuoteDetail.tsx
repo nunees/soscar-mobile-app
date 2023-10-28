@@ -5,9 +5,9 @@ import { Input } from '@components/Input';
 import getLogoImage from '@components/LogosImages';
 import { TextArea } from '@components/TextArea';
 import UserPhoto from '@components/UserPhoto';
-import { ServicesList } from '@data/ServicesList';
+import { SERVICES_LIST } from '@data/ServicesList';
 import { VechiclesBrands } from '@data/VechiclesBrands';
-import { VehiclesModels } from '@data/VehiclesModels';
+import { VEHICLE_MODELS } from '@data/VehiclesModels';
 import { ILocation } from '@dtos/ILocation';
 import { IQuoteList } from '@dtos/IQuoteList';
 import { FontAwesome5 } from '@expo/vector-icons';
@@ -20,7 +20,6 @@ import {
 import { PartnerNavigatorRoutesProps } from '@routes/partner.routes';
 import { api } from '@services/api';
 import { AppError } from '@utils/AppError';
-import { ResizeMode, Video } from 'expo-av';
 import { IFileInfo } from 'expo-file-system';
 import * as FileSystem from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';
@@ -54,13 +53,12 @@ export function QuoteDetail() {
   const [location, setLocation] = useState<ILocation>({} as ILocation);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [userMidia, setUserMidia] = useState<any[]>([]);
+  const [partnerMidia, setPartnerMidia] = useState<any[]>([]);
 
   const [partnerNotes, setPartnerNotes] = useState<string>('');
   const [serviceDescription, setServiceDescription] = useState<string>('');
   const [serviceValue, setServiceValue] = useState<number>(0);
   const [franchisePrice, setFranchisePrice] = useState<number>(0);
-
-  const [file, setFile] = useState<any>({});
 
   const toast = useToast();
   const { user } = useAuth();
@@ -94,8 +92,6 @@ export function QuoteDetail() {
     const photoSelected = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       quality: 1,
-      aspect: [4, 4],
-      allowsEditing: true,
     });
 
     if (photoSelected.canceled) {
@@ -182,16 +178,23 @@ export function QuoteDetail() {
     useCallback(() => {
       async function handleQuoteDocuments() {
         try {
-          quote.UserQuotesDocuments.map((file) =>
-            setUserMidia([...userMidia, file])
+          const user = quote.UserQuotesDocuments.filter(
+            (item) => !item.isPartnerDocument
           );
+
+          const partner = quote.UserQuotesDocuments.filter(
+            (item) => item.isPartnerDocument
+          );
+
+          setPartnerMidia(partner);
+          setUserMidia(user);
         } catch (error) {
           throw new AppError('Erro ao buscar arquivos do orçamento');
         }
       }
 
       handleQuoteDocuments();
-    }, [])
+    }, [quote, location])
   );
 
   useFocusEffect(
@@ -243,7 +246,11 @@ export function QuoteDetail() {
   return (
     <VStack>
       <VStack>
-        <AppHeader title="Detalhes do orçamento" />
+        <AppHeader
+          title="Detalhes do orçamento"
+          navigation={navigation}
+          screen="orders"
+        />
       </VStack>
 
       <ScrollView
@@ -252,7 +259,9 @@ export function QuoteDetail() {
         }}
       >
         <VStack px={3} py={3}>
-          <Text bold>Dados do proprietario</Text>
+          <Text bold pb={2}>
+            Dados do proprietario
+          </Text>
           <VStack backgroundColor="white" borderRadius={10} p={5}>
             <HStack>
               <UserPhoto
@@ -284,7 +293,9 @@ export function QuoteDetail() {
         </VStack>
 
         <VStack px={3} py={3}>
-          <Text bold>Dados do veiculo</Text>
+          <Text bold pb={2}>
+            Dados do veiculo
+          </Text>
           <VStack backgroundColor="white" borderRadius={10} p={5}>
             <HStack justifyContent={'space-between'}>
               <VStack>
@@ -300,7 +311,7 @@ export function QuoteDetail() {
                 <Text bold>
                   Modelo:{' '}
                   <Text fontWeight={'normal'}>
-                    {VehiclesModels.map(
+                    {VEHICLE_MODELS.map(
                       (model) =>
                         model.id === quote.vehicles?.name_id && model.name
                     )}
@@ -337,7 +348,9 @@ export function QuoteDetail() {
         </VStack>
 
         <VStack px={3} py={3}>
-          <Text bold>Seguradora</Text>
+          <Text bold pb={2}>
+            Seguradora
+          </Text>
           <VStack backgroundColor="white" borderRadius={10} p={5}>
             <HStack>
               <VStack>
@@ -347,19 +360,15 @@ export function QuoteDetail() {
                     {quote.insurance_company?.name}
                   </Text>
                 </Text>
-                <Text fontWeight={'bold'}>
-                  Registro numero:{' '}
-                  <Text fontStyle={'normal'}>
-                    {quote.insurance_company?.id || 'Não informado'}
-                  </Text>
-                </Text>
               </VStack>
             </HStack>
           </VStack>
         </VStack>
 
         <VStack px={3} py={3}>
-          <Text bold>Dados do local</Text>
+          <Text bold pb={2}>
+            Dados do local
+          </Text>
           <VStack backgroundColor="white" borderRadius={10} p={5}>
             <HStack>
               <VStack>
@@ -391,39 +400,12 @@ export function QuoteDetail() {
         </VStack>
 
         <VStack px={3} py={3}>
-          <Text bold>Dados do profissional</Text>
-          <VStack backgroundColor="white" borderRadius={10} p={5}>
-            <HStack>
-              <VStack>
-                <UserPhoto
-                  source={{
-                    uri: location.users?.avatar
-                      ? `${api.defaults.baseURL}/user/avatar/${location.users?.id}/${location.users?.avatar}`
-                      : `https://ui-avatars.com/api/?format=png&name=${user.name}+${quote.users?.last_name}&size=512`,
-                  }}
-                  alt="Foto de perfil"
-                  size={70}
-                />
-              </VStack>
-              <VStack pl={3}>
-                <Text bold>
-                  Nome: <Text fontStyle={'normal'}>{location.users?.name}</Text>
-                </Text>
-
-                <Text bold>
-                  Email:{' '}
-                  <Text fontStyle={'normal'}>{location.users?.email}</Text>
-                </Text>
-              </VStack>
-            </HStack>
-          </VStack>
-        </VStack>
-
-        <VStack px={3} py={3}>
-          <Text bold>Servico requerido</Text>
+          <Text bold pb={2}>
+            Servico requerido
+          </Text>
           <VStack backgroundColor="white" borderRadius={10} p={5}>
             <Text>
-              {ServicesList.map(
+              {SERVICES_LIST.map(
                 (service) =>
                   service.id === quote.service_type_id && service.name
               )}
@@ -432,57 +414,39 @@ export function QuoteDetail() {
         </VStack>
 
         <VStack px={3} py={3}>
-          <Text bold>Observacoes do proprietario</Text>
+          <Text bold pb={2}>
+            Observacoes do proprietario
+          </Text>
           <VStack backgroundColor="white" borderRadius={10} p={5}>
             <Text>{quote.user_notes}</Text>
           </VStack>
         </VStack>
 
         <VStack px={3} py={3}>
-          <Text bold>Arquivos de midia</Text>
+          <Text bold pb={2}>
+            Arquivos de midia
+          </Text>
           <VStack backgroundColor="white" borderRadius={10} p={5}>
-            {quote?.UserQuotesDocuments?.map((file) => {
-              if (file.document_type_id === 1) {
-                return (
-                  <Image
-                    borderRadius={5}
-                    key={file.id}
-                    source={{
-                      uri: `${api.defaults.baseURL}/quotes/document/${file.id}/${file.hashId}`,
-                    }}
-                    alt="Imagem do usuario"
-                    resizeMode="cover"
-                    size={350}
-                    mb={5}
-                  />
-                );
-              }
-
-              if (file.document_type_id === 3) {
-                return (
-                  <Video
-                    source={{
-                      uri: `${api.defaults.baseURL}/quotes/document/${file.id}/${file.hashId}`,
-                    }}
-                    resizeMode={ResizeMode.COVER}
-                    style={{
-                      width: 330,
-                      height: 330,
-                    }}
-                    key={file.id}
-                    useNativeControls
-                    isLooping
-                    isMuted
-                  />
-                );
-              }
-              return <Text>Nao ha arquivos anexados</Text>;
-            })}
+            {userMidia.map((file) => (
+              <Image
+                borderRadius={5}
+                key={file.id}
+                source={{
+                  uri: `${api.defaults.baseURL}/quotes/document/${file.id}/${file.hashId}`,
+                }}
+                alt="Imagem do usuario"
+                resizeMode="cover"
+                size={350}
+                mb={5}
+              />
+            ))}
           </VStack>
         </VStack>
 
         <VStack px={3} py={3}>
-          <Text bold>Observacoes (opcional)</Text>
+          <Text bold pb={2}>
+            Observacoes (opcional)
+          </Text>
           <VStack backgroundColor="white" borderRadius={10} p={5}>
             <TextArea
               placeholder="Suas observacoes"
@@ -494,7 +458,9 @@ export function QuoteDetail() {
         </VStack>
 
         <VStack px={3} py={3}>
-          <Text bold>Descricao do servico</Text>
+          <Text bold pb={2}>
+            Descricao do servico
+          </Text>
           <VStack backgroundColor="white" borderRadius={10} p={5}>
             <TextArea
               placeholder="Descricao do servico"
@@ -506,7 +472,9 @@ export function QuoteDetail() {
         </VStack>
 
         <VStack px={3} py={3}>
-          <Text bold>Valor da franquia</Text>
+          <Text bold pb={2}>
+            Valor da franquia
+          </Text>
           <VStack backgroundColor="white" borderRadius={10} p={5}>
             <Input
               placeholder="Valor da franquia"
@@ -519,7 +487,9 @@ export function QuoteDetail() {
         </VStack>
 
         <VStack px={3} py={3}>
-          <Text bold>Valor do orcamento</Text>
+          <Text bold pb={2}>
+            Valor do orcamento
+          </Text>
           <VStack backgroundColor="white" borderRadius={10} p={5}>
             <Input
               placeholder="Valor do orcamento"
@@ -532,14 +502,24 @@ export function QuoteDetail() {
         </VStack>
 
         <VStack px={3} py={3}>
-          <Text bold>Documento de orcamento</Text>
+          <Text bold pb={2}>
+            Documento de orcamento
+          </Text>
           <VStack backgroundColor="white" borderRadius={10} p={5}>
-            {file && (
-              <HStack mb={3}>
-                <Icon as={FontAwesome5} name="file-alt" size={30} />
-                <Text bold>Arquivo anexado</Text>
-              </HStack>
-            )}
+            {partnerMidia.map((file) => (
+              <Image
+                borderRadius={5}
+                key={file.id}
+                source={{
+                  uri: `${api.defaults.baseURL}/quotes/document/${file.id}/${file.hashId}`,
+                }}
+                alt="Imagem do usuario"
+                resizeMode="cover"
+                size={350}
+                mb={5}
+              />
+            ))}
+
             {quote.status !== 3 && (
               <Button
                 title="Anexar arquivo"

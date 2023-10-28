@@ -1,4 +1,5 @@
 import { AppHeader } from '@components/AppHeader';
+import { Button } from '@components/Button';
 import UserPhoto from '@components/UserPhoto';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useAuth } from '@hooks/useAuth';
@@ -56,19 +57,7 @@ export function Profile() {
               @{user.username}
             </Text>
 
-            <TouchableOpacity onPress={signOut}>
-              <HStack alignItems={'center'}>
-                <Text py={1} p={1} color="purple.800" bold>
-                  Sair
-                </Text>
-                <Icon
-                  as={FontAwesome5}
-                  name="door-open"
-                  size="md"
-                  color="purple.800"
-                />
-              </HStack>
-            </TouchableOpacity>
+            <Button onPress={signOut} title="Sair" w={100} />
           </Center>
 
           <VStack px={5}>

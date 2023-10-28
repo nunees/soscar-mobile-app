@@ -6,7 +6,6 @@ import {
 import { ChangePassword } from '@screens/ChangePassword';
 import EditProfileInformation from '@screens/EditProfileInformation';
 import MyAccountInformation from '@screens/MyAccountInformation';
-import { Assistance } from '@screens/partners/Assistance';
 import { HomeScreen } from '@screens/partners/HomeScreen';
 import { AddLocation } from '@screens/partners/locations/AddLocation';
 import { EditLocation } from '@screens/partners/locations/EditLocation';
@@ -48,7 +47,7 @@ export function PartnerRoutes() {
     <Navigator
       screenOptions={{
         headerShown: false,
-        tabBarShowLabel: false,
+        tabBarShowLabel: true,
 
         tabBarActiveTintColor: colors.purple[700],
         tabBarInactiveTintColor: colors.gray[500],
@@ -120,7 +119,7 @@ export function PartnerRoutes() {
         }}
       />
 
-      <Screen
+      {/* <Screen
         name="assistance"
         component={Assistance}
         options={{
@@ -134,7 +133,7 @@ export function PartnerRoutes() {
             />
           ),
         }}
-      />
+      /> */}
 
       <Screen
         name="profile"

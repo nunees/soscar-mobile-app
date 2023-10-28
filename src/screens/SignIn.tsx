@@ -166,8 +166,8 @@ export function SignIn() {
         </VStack>
 
         <Center mt={5}>
-          <Text color="white" fontSize={'xs'}>
-            Versao 1.0.0 (alpha)
+          <Text color="gray.600" fontSize={'xs'}>
+            Versao 1.0.0 (beta-release)
           </Text>
         </Center>
       </Box>

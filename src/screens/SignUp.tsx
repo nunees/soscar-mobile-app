@@ -1,14 +1,12 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import AvatarSVG from '@assets/avatar.svg';
+
 import { Button } from '@components/Button';
 import { Input } from '@components/Input';
 import { Select } from '@components/Select';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useAuth } from '@hooks/useAuth';
 import { useDateFormater } from '@hooks/useDateFormater';
-import { useIdGenerator } from '@hooks/useIdGenerator';
 import { useProfile } from '@hooks/useProfile';
-import { useUploadImage } from '@hooks/useUploadImage';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
 import { AuthNavigatorRoutesProps } from '@routes/auth.routes';
@@ -20,17 +18,10 @@ import {
   Text,
   Center,
   useToast,
-  Avatar,
   Pressable,
   Icon,
-  Skeleton,
 } from 'native-base';
-import {
-  PencilSimpleLine,
-  Eye,
-  EyeClosed,
-  Calendar,
-} from 'phosphor-react-native';
+import { Eye, EyeClosed, Calendar } from 'phosphor-react-native';
 import { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -66,13 +57,6 @@ const registrationSchema = yup.object().shape({
 
 export function SignUp() {
   const [isLoading, setIsLoading] = useState(false);
-  const [isPhotoLoading, setIsPhotoLoading] = useState(false);
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [userPhoto, setUserPhoto] = useState<any>('');
-  const [userPhotoUploadForm, setUserPhotoUploadForm] = useState<
-    FormData | undefined
-  >({} as FormData);
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -86,8 +70,7 @@ export function SignUp() {
 
   const { signIn } = useAuth();
   const { saveProfile } = useProfile();
-  const { handleUserProfilePictureSelect } = useUploadImage();
-  const { generateId } = useIdGenerator();
+
   const { formatDate } = useDateFormater();
 
   const toast = useToast();
@@ -116,7 +99,7 @@ export function SignUp() {
       const localDate = date.split('/');
       const serverDate = `${localDate[2]}-${localDate[1]}-${localDate[0]}`;
 
-      const response = await api.post('/user/new', {
+      await api.post('/user/new', {
         name,
         last_name: lastName,
         cpf,

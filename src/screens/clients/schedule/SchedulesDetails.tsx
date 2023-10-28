@@ -3,6 +3,8 @@ import { AppHeader } from '@components/AppHeader';
 import { Button } from '@components/Button';
 import getLogoImage from '@components/LogosImages';
 import { StatusIcon } from '@components/StatusIcon';
+import { TextArea } from '@components/TextArea';
+import { IReviewDTO } from '@dtos/IReviewDTO';
 import { ISchedules } from '@dtos/ISchedules';
 import { Feather } from '@expo/vector-icons';
 import { useAuth } from '@hooks/useAuth';
@@ -20,6 +22,7 @@ import {
   Heading,
   Icon,
   Image,
+  Radio,
   ScrollView,
   Text,
   VStack,
@@ -47,7 +50,10 @@ type SchedulesFiles = {
 export function SchedulesDetails() {
   const [schedule, setSchedule] = useState<ISchedules>();
   const [loadedImages, setLoadedImages] = useState<any[]>([]);
-  const [carLogo, setCarLogo] = useState<string>('');
+  const [review, setReview] = useState<string>('');
+  const [rating, setRating] = useState<number>(0);
+
+  const [userReview, setUserReview] = useState<IReviewDTO>();
 
   const routes = useRoute();
   const { scheduleId } = routes.params as RouteParams;
@@ -67,7 +73,6 @@ export function SchedulesDetails() {
 
       setSchedule(response.data);
 
-      setCarLogo(response.data.vehicles.brand.icon);
       setSchedule(response.data);
       response.data.SchedulesFiles.map((file: SchedulesFiles) =>
         setLoadedImages((oldState) => [...oldState, file])
@@ -75,7 +80,7 @@ export function SchedulesDetails() {
     } catch (error) {
       console.log(error);
     }
-  }, []);
+  }, [scheduleId]);
 
   async function handleCancelSchedule() {
     Alert.alert(
@@ -107,15 +112,59 @@ export function SchedulesDetails() {
     );
   }
 
+  async function handleReviewSchedule() {
+    try {
+      await api.post(
+        `/reviews`,
+        {
+          location_id: schedule?.location_id,
+          rating,
+          review,
+        },
+        {
+          headers: {
+            id: user.id,
+          },
+        }
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function fetchReviews() {
+    try {
+      const response = await api.get(
+        `/reviews/comments/${schedule?.location_id}`,
+        {
+          headers: {
+            id: user.id,
+          },
+        }
+      );
+
+      const userReview: IReviewDTO = response.data.find(
+        (item: IReviewDTO) => item.user_id === user.id
+      );
+
+      setUserReview(userReview);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   useFocusEffect(
     useCallback(() => {
       fetchScheduleDetails();
+      fetchReviews();
       return () => {
         setSchedule(undefined);
         setLoadedImages([]);
       };
     }, [scheduleId])
   );
+
+  console.log(rating);
 
   return (
     <VStack flex={1}>
@@ -131,7 +180,7 @@ export function SchedulesDetails() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 120 }}
       >
-        <VStack px={5} py={5}>
+        <VStack px={5} mt={3}>
           {schedule?.status === 4 && (
             <VStack
               mb={10}
@@ -144,13 +193,13 @@ export function SchedulesDetails() {
               <Heading bold color="red.500">
                 Agendamento cancelado!
               </Heading>
-              <Text color="gray.400" px={5} textAlign="center">
+              <Text color="gray.400" textAlign="center">
                 O agendamento foi cancelado e por isso não pode ser alterado.
               </Text>
             </VStack>
           )}
 
-          <VStack mt={5} backgroundColor="white" p={5} borderRadius={10}>
+          <VStack backgroundColor="white" p={5} borderRadius={10}>
             <Text bold pb={3}>
               {' '}
               Status
@@ -328,7 +377,7 @@ export function SchedulesDetails() {
             </HStack>
           </VStack>
 
-          {schedule?.status === 4 && (
+          {schedule?.status === 3 && (
             <VStack mt={5} backgroundColor="white" p={5} borderRadius={10}>
               <HStack>
                 <VStack>
@@ -336,20 +385,83 @@ export function SchedulesDetails() {
                 </VStack>
                 <VStack ml={3}>
                   <Text bold>Informacoes finais</Text>
-                  <Text>{schedule.partner_notes}</Text>
+                  <Text>{schedule?.partner_notes}</Text>
+                </VStack>
+              </HStack>
+            </VStack>
+          )}
+
+          {userReview && (
+            <VStack mt={5} backgroundColor="white" p={5} borderRadius={10}>
+              <HStack>
+                <VStack ml={3}>
+                  <Text bold>Seus comentarios</Text>
+                  <Text>{userReview.review}</Text>
+                  <Text>Nota: {userReview.rating}</Text>
                 </VStack>
               </HStack>
             </VStack>
           )}
 
           <VStack mt={20}>
-            {schedule?.status !== 4 && (
+            {schedule?.status === 1 && (
+              <Button
+                title="Cancelar agendamento"
+                onPress={handleCancelSchedule}
+              />
+            )}
+
+            {schedule?.status === 2 && (
               <Button
                 title="Cancelar agendamento"
                 onPress={handleCancelSchedule}
               />
             )}
           </VStack>
+
+          {schedule?.status === 3 && userReview === null && (
+            <VStack mt={5} backgroundColor="white" p={5} borderRadius={10}>
+              <VStack>
+                <TextArea
+                  placeholder={'Deixe uma avaliacao'}
+                  value={review}
+                  onChangeText={setReview}
+                />
+                <Text bold pb={3}>
+                  Nota
+                </Text>
+              </VStack>
+              <Radio.Group
+                name="rating"
+                colorScheme={'purple'}
+                mb={3}
+                onChange={(value) => setRating(Number(value))}
+              >
+                <HStack>
+                  <Radio value="0" size="sm">
+                    <Text mr={3}>0</Text>
+                  </Radio>
+
+                  <Radio value="1" size="sm">
+                    <Text mr={3}>1</Text>
+                  </Radio>
+                  <Radio value="2" size="sm">
+                    <Text mr={3}>2</Text>
+                  </Radio>
+                  <Radio value="3" size="sm">
+                    <Text mr={3}>3</Text>
+                  </Radio>
+                  <Radio value="4" size="sm">
+                    <Text mr={3}>4</Text>
+                  </Radio>
+                  <Radio value="5" size="sm">
+                    <Text mr={3}>5</Text>
+                  </Radio>
+                </HStack>
+              </Radio.Group>
+              <Button title="Avaliar" onPress={handleReviewSchedule} />
+            </VStack>
+          )}
         </VStack>
       </ScrollView>
     </VStack>

@@ -1,9 +1,10 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AppHeader } from '@components/AppHeader';
 import { LoadingModal } from '@components/LoadingModal';
 import { IQuoteList } from '@dtos/IQuoteList';
 import { ISchedules } from '@dtos/ISchedules';
-import { AntDesign, FontAwesome5, Octicons } from '@expo/vector-icons';
+import { AntDesign, FontAwesome5 } from '@expo/vector-icons';
 import { useAuth } from '@hooks/useAuth';
 import { useNavigation } from '@react-navigation/native';
 import { PartnerNavigatorRoutesProps } from '@routes/partner.routes';
@@ -185,6 +186,25 @@ export function Orders() {
                 {item.time}
               </Text>
             </Text>
+            <Badge colorScheme="purple" borderRadius={10} mt={1}>
+              <Text
+                bold
+                color={
+                  item.status === 1
+                    ? 'purple.700'
+                    : item.status === 2
+                    ? 'yellow.700'
+                    : item.status === 3
+                    ? 'green.700'
+                    : 'gray.700'
+                }
+              >
+                {item.status === 1 && 'Agendado'}
+                {item.status === 2 && 'Aguardando'}
+                {item.status === 3 && 'Em processo'}
+                {item.status === 4 && 'Finalizado'}
+              </Text>
+            </Badge>
           </VStack>
           <VStack>
             <Avatar
@@ -231,23 +251,65 @@ export function Orders() {
               <Text noOfLines={1}>{item.user_notes}</Text>
             </HStack>
 
-            {item.status === 1 && (
-              <Badge mt={5} colorScheme="purple">
-                Aguardando
+            <HStack>
+              <Badge
+                colorScheme={
+                  item.status === 1
+                    ? 'purple'
+                    : item.status === 2
+                    ? 'yellow'
+                    : item.status === 3
+                    ? 'green'
+                    : 'red'
+                }
+                borderRadius={10}
+                mt={1}
+              >
+                <Text
+                  bold
+                  color={
+                    item.status === 1
+                      ? 'purple.700'
+                      : item.status === 2
+                      ? 'yellow.700'
+                      : item.status === 3
+                      ? 'green.700'
+                      : 'red.700'
+                  }
+                >
+                  {item.status === 1 && 'Solicitado'}
+                  {item.status === 2 && 'Em processo'}
+                  {item.status === 3 && 'Finalizado'}
+                  {item.status === 4 && 'Cancelado'}
+                </Text>
               </Badge>
-            )}
 
-            {item.status === 2 && (
-              <Badge mt={5} colorScheme="yellow">
-                Em processo
-              </Badge>
-            )}
+              {item.is_juridical && (
+                <Badge
+                  colorScheme="info"
+                  borderRadius={10}
+                  ml={3}
+                  variant={'solid'}
+                >
+                  <Text fontSize={'xs'} color="white" bold>
+                    juridico
+                  </Text>
+                </Badge>
+              )}
 
-            {item.status === 3 && (
-              <Badge mt={5} colorScheme="green">
-                Aguardando
-              </Badge>
-            )}
+              {!item.is_juridical && (
+                <Badge
+                  colorScheme="info"
+                  borderRadius={10}
+                  ml={3}
+                  variant={'solid'}
+                >
+                  <Text fontSize={'xs'} color="white" bold>
+                    comum
+                  </Text>
+                </Badge>
+              )}
+            </HStack>
           </VStack>
           <VStack alignItems={'center'}>
             <Avatar
@@ -260,9 +322,6 @@ export function Orders() {
               }}
               size="lg"
             />
-            {item.is_juridical && (
-              <Icon as={Octicons} name="law" size="4" mt={5} />
-            )}
           </VStack>
         </HStack>
       </Pressable>

@@ -20,12 +20,10 @@ export function SelectCar({ label, data, ...rest }: Props) {
       minWidth={'full'}
       accessibilityLabel={label}
       placeholder={label}
-      borderWidth={2}
       fontSize="md"
       color="gray.500"
       fontFamily={'body'}
       placeholderTextColor="gray.400"
-      borderColor={'purple.600'}
       {...rest}
     >
       {

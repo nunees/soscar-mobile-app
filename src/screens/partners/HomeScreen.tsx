@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { SearchBar } from '@components/SearchBar';
 import { SmallSchedulleCard } from '@components/SmallSchedulleCard';
 import UserPhoto from '@components/UserPhoto';
 import { ISchedules } from '@dtos/ISchedules';
 import { useAuth } from '@hooks/useAuth';
 import { useProfile } from '@hooks/useProfile';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { PartnerNavigatorRoutesProps } from '@routes/partner.routes';
 import { api } from '@services/api';
 import { AppError } from '@utils/AppError';
@@ -18,30 +19,11 @@ import {
   Pressable,
   FlatList,
 } from 'native-base';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-/**
- * 0 - Cancelado
- * 1 - Agendado
- * 2 - Em andamento
- * 3 - Finalizado
- */
-
-type SchedulesType = {
-  id: string | undefined | null;
-  date: Date;
-  business_name: string | undefined | null;
-  time: string | undefined | null;
-  service: string | undefined | null;
-};
-
 export function HomeScreen() {
-  const [schedulesByDate, setSchedulesByDate] = useState<SchedulesType[]>(
-    {} as SchedulesType[]
-  );
-
-  const [schedules, setSchedules] = useState<ISchedules[]>({} as ISchedules[]);
+  const [schedules, setSchedules] = useState<ISchedules[]>([]);
 
   const { user } = useAuth();
   const { updateProfile } = useProfile();
@@ -50,41 +32,43 @@ export function HomeScreen() {
 
   const navigation = useNavigation<PartnerNavigatorRoutesProps>();
 
-  useEffect(() => {
-    async function fetchSchedules() {
-      try {
-        const response = await api.get('/schedules/partner', {
-          headers: {
-            id: user.id,
-          },
-        });
-
-        setSchedules(response.data);
-
-        const schedulesByDate = schedules.map((schedule) => {
-          return {
-            id: schedule.id,
-            business_name: schedule.location?.business_name,
-            date: schedule.date,
-            time: schedule.time,
-            service: schedule.service_type?.name,
-          };
-        });
-
-        setSchedulesByDate(schedulesByDate);
-      } catch (error) {
-        if (error instanceof AppError) {
-          toast.show({
-            title: 'Erro ao carregar agendamentos',
-            placement: 'top',
-            bgColor: 'red.500',
+  useFocusEffect(
+    useCallback(() => {
+      async function fetchSchedules() {
+        try {
+          const response = await api.get('/schedules/partner', {
+            headers: {
+              id: user.id,
+            },
           });
+
+          setSchedules(response.data);
+
+          // const schedulesByDate = schedules.map((schedule) => {
+          //   return {
+          //     id: schedule.id,
+          //     business_name: schedule.location?.business_name,
+          //     date: schedule.date,
+          //     time: schedule.time,
+          //     service: schedule.service_type?.name,
+          //   };
+          // });
+
+          // setSchedulesByDate(schedulesByDate);
+        } catch (error) {
+          if (error instanceof AppError) {
+            toast.show({
+              title: 'Erro ao carregar agendamentos',
+              placement: 'top',
+              bgColor: 'red.500',
+            });
+          }
         }
       }
-    }
 
-    fetchSchedules();
-  }, [schedules.length]);
+      fetchSchedules();
+    }, [schedules.length])
+  );
 
   useEffect(() => {
     async function fetchUserData() {
@@ -105,6 +89,8 @@ export function HomeScreen() {
 
     fetchUserData();
   }, []);
+
+  console.log(schedules);
 
   return (
     <SafeAreaView>
@@ -146,7 +132,7 @@ export function HomeScreen() {
               </Text>
 
               <FlatList
-                data={schedulesByDate}
+                data={schedules}
                 horizontal={true}
                 showsHorizontalScrollIndicator={false}
                 snapToAlignment="start"
@@ -155,7 +141,13 @@ export function HomeScreen() {
                 renderItem={({ item }) => {
                   return (
                     <VStack mb={3} borderRadius={5} shadow={0.8}>
-                      <SmallSchedulleCard data={item} />
+                      <SmallSchedulleCard
+                        id={item.id}
+                        client={item.users?.name}
+                        date={item.date}
+                        service_type={item.service_type?.category_id}
+                        time={item.time}
+                      />
                     </VStack>
                   );
                 }}
