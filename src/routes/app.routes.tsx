@@ -5,14 +5,16 @@ import {
 } from '@react-navigation/bottom-tabs';
 import { ChangePassword } from '@screens/ChangePassword';
 import { HomeScreen } from '@screens/clients/HomeScreen';
+import { LegalQuoteDetails } from '@screens/clients/legalQuotes/LegalQuoteDetails';
+import { LegalQuotes } from '@screens/clients/legalQuotes/LegalQuotes';
+import { LegalQuotesList } from '@screens/clients/legalQuotes/LegalQuotesList';
+import { NewLegalQuote } from '@screens/clients/legalQuotes/NewLegalQuote';
+import { SearchLegalQuote } from '@screens/clients/legalQuotes/SearchLegalQuote';
 import { PartnerDetails } from '@screens/clients/PartnerDetails';
-import { LegalQuotes } from '@screens/clients/quotes/LegalQuotes';
-import { NewLegalQuote } from '@screens/clients/quotes/NewLegalQuote';
 import { NewQuote } from '@screens/clients/quotes/NewQuote';
 import { QuoteDetails } from '@screens/clients/quotes/QuoteDetails';
 import { Quotes } from '@screens/clients/quotes/Quotes';
 import { QuotesList } from '@screens/clients/quotes/QuotesList';
-import { SearchLegalQuote } from '@screens/clients/quotes/SearchLegalQuote';
 import { SearchQuote } from '@screens/clients/quotes/SearchQuote';
 import { NewSchedule } from '@screens/clients/schedule/NewSchedule';
 import { Schedules } from '@screens/clients/schedule/Schedules';
@@ -25,6 +27,7 @@ import { VehicleDetails } from '@screens/clients/vehicles/VehicleDetails';
 import { Vechicles } from '@screens/clients/vehicles/Vehicles';
 import EditProfileInformation from '@screens/EditProfileInformation';
 import MyAccountInformation from '@screens/MyAccountInformation';
+import { LocationDetails } from '@screens/partners/locations/LocationDetails';
 import { Profile } from '@screens/Profile';
 import { QuoteDone } from '@screens/QuoteDone';
 import { TaskDone } from '@screens/TeaskDone';
@@ -52,9 +55,15 @@ type AppRotes = {
   searchQuote: { serviceId: string };
   schedulesDetails: { scheduleId: string };
   schedulesList: undefined;
+
   legalQuotes: undefined;
+  legalQuotesList: undefined;
   newLegalQuote: { serviceId: string };
   searchLegalQuote: { serviceId: string };
+  legalQuoteDetails: { hashId: string };
+
+  locationDetails: { locationId: string };
+
   quoteDone: undefined;
 
   // Other routes
@@ -298,6 +307,15 @@ export function AppRoutes() {
       />
 
       <Screen
+        name="legalQuotesList"
+        component={LegalQuotesList}
+        options={{
+          tabBarButton: () => null,
+          tabBarStyle: { display: 'none' },
+        }}
+      />
+
+      <Screen
         name="newLegalQuote"
         component={NewLegalQuote}
         options={{
@@ -327,6 +345,24 @@ export function AppRoutes() {
       <Screen
         name="quoteDone"
         component={QuoteDone}
+        options={{
+          tabBarButton: () => null,
+          tabBarStyle: { display: 'none' },
+        }}
+      />
+
+      <Screen
+        name="legalQuoteDetails"
+        component={LegalQuoteDetails}
+        options={{
+          tabBarButton: () => null,
+          tabBarStyle: { display: 'none' },
+        }}
+      />
+
+      <Screen
+        name="locationDetails"
+        component={LocationDetails}
         options={{
           tabBarButton: () => null,
           tabBarStyle: { display: 'none' },

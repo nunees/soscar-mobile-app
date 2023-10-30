@@ -30,6 +30,9 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.felipe.sosauto",
+      "buildNumber": "1.0.0",
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"

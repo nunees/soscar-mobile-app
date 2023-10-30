@@ -26,8 +26,9 @@ import {
   HStack,
   Avatar,
   FlatList,
+  Radio,
 } from 'native-base';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Alert } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 
@@ -39,6 +40,10 @@ type RouteParamsProps = {
 
 export function QuoteDetails() {
   const [isLoading, setIsLoading] = useState(false);
+
+  const [alreadyReviewd, setAlreadyReviewd] = useState(false);
+  const [rating, setRating] = useState(0);
+  const [review, setReview] = useState('');
 
   const [quote, setQuote] = useState<IQuoteList>({} as IQuoteList);
   const [location, setLocation] = useState<ILocation>({} as ILocation);
@@ -52,6 +57,54 @@ export function QuoteDetails() {
   const route = useRoute();
   const toast = useToast();
   const { quoteId, locationId, vehicleId } = route.params as RouteParamsProps;
+
+  console.log(rating);
+
+  async function handleReview() {
+    try {
+      await api.post(
+        '/reviews',
+        {
+          rating,
+          review,
+          location_id: locationId,
+        },
+        {
+          headers: {
+            id: user.id,
+          },
+        }
+      );
+    } catch (error) {
+      throw new AppError('Erro ao avaliar orcamento');
+    }
+  }
+
+  useEffect(() => {
+    async function checkIfAlreadyReviewd() {
+      try {
+        const response = await api.get(`/reviews/comments/${locationId}`, {
+          headers: {
+            id: user.id,
+          },
+        });
+
+        const reviews = response.data;
+
+        const userReview = reviews.filter(
+          (review: any) => review.user_id === user.id
+        );
+
+        if (userReview.length > 0) {
+          setAlreadyReviewd(true);
+        }
+      } catch (error) {
+        throw new AppError('Erro ao buscar avaliacoes');
+      }
+    }
+
+    checkIfAlreadyReviewd();
+  }, [quote]);
 
   async function handleCancelQuote() {
     Alert.alert(
@@ -404,18 +457,47 @@ export function QuoteDetails() {
             </VStack>
           )}
 
-          {quote.status === 3 && (
-            <VStack backgroundColor="white" borderRadius={10} mt={5}>
-              <VStack px={5} py={5}>
-                <Text bold>Deixe a sua opniao sobre o profissional</Text>
-                <TextArea mt={1} />
-                <Text bold color="gray.600">
+          {quote?.status === 3 && !alreadyReviewd && (
+            <VStack mt={5} backgroundColor="white" p={5} borderRadius={10}>
+              <VStack>
+                <TextArea
+                  placeholder={'Deixe uma avaliacao'}
+                  value={review}
+                  onChangeText={setReview}
+                />
+                <Text bold pb={3}>
                   Nota
                 </Text>
-                <VStack>
-                  <Button title="Enviar" />
-                </VStack>
               </VStack>
+              <Radio.Group
+                name="rating"
+                colorScheme={'purple'}
+                mb={3}
+                onChange={(value) => setRating(Number(value))}
+              >
+                <HStack>
+                  <Radio value="0" size="sm">
+                    <Text mr={3}>0</Text>
+                  </Radio>
+
+                  <Radio value="1" size="sm">
+                    <Text mr={3}>1</Text>
+                  </Radio>
+                  <Radio value="2" size="sm">
+                    <Text mr={3}>2</Text>
+                  </Radio>
+                  <Radio value="3" size="sm">
+                    <Text mr={3}>3</Text>
+                  </Radio>
+                  <Radio value="4" size="sm">
+                    <Text mr={3}>4</Text>
+                  </Radio>
+                  <Radio value="5" size="sm">
+                    <Text mr={3}>5</Text>
+                  </Radio>
+                </HStack>
+              </Radio.Group>
+              <Button title="Avaliar" onPress={handleReview} />
             </VStack>
           )}
         </ScrollView>

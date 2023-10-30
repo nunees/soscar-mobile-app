@@ -45,6 +45,10 @@ export function dateToMonthString(date: Date): string {
   return dayjs(date).format('MMMM');
 }
 
+export function formatDateAndTime(date: Date): string {
+  return dayjs(date).format('DD/MM/YYYY HH:mm');
+}
+
 export function numberToMonth(month: string | undefined) {
   switch (month) {
     case '01':

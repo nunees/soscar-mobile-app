@@ -297,7 +297,7 @@ export function AddLocation() {
                   <Input
                     placeholder="Email"
                     fontSize={'md'}
-                    keyboardType="numeric"
+                    keyboardType="email-address"
                     onChangeText={onChange}
                     value={value}
                     errorMessage={errors.cnpj?.message}

@@ -12,6 +12,7 @@ import { EditLocation } from '@screens/partners/locations/EditLocation';
 import { LocationDetails } from '@screens/partners/locations/LocationDetails';
 import { Locations } from '@screens/partners/locations/Locations';
 import { Orders } from '@screens/partners/Orders';
+import { LegalQuoteDetail } from '@screens/partners/quotes/LegalQuoteDetail';
 import { QuoteDetail } from '@screens/partners/quotes/QuoteDetail';
 import { ScheduleDetail } from '@screens/partners/schedules/ScheduleDetail';
 import { Profile } from '@screens/Profile';
@@ -31,6 +32,7 @@ type PartnerRoutes = {
   editLocation: { locationId: string };
   scheduleDetail: { scheduleId: string };
   quoteDetail: { quoteId: string; locationId: string };
+  legalQuoteDetail: { legalQuoteId: string; locationId: string };
 };
 
 export type PartnerNavigatorRoutesProps =
@@ -182,6 +184,15 @@ export function PartnerRoutes() {
       <Screen
         name="quoteDetail"
         component={QuoteDetail}
+        options={{
+          tabBarButton: () => null,
+          tabBarStyle: { display: 'none' },
+        }}
+      />
+
+      <Screen
+        name="legalQuoteDetail"
+        component={LegalQuoteDetail}
         options={{
           tabBarButton: () => null,
           tabBarStyle: { display: 'none' },

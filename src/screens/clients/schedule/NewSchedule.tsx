@@ -175,7 +175,16 @@ export function NewSchedule() {
             paddingBottom: 130,
           }}
         >
-          {location && <PartnerCard location={location} />}
+          {location && (
+            <PartnerCard
+              location={location}
+              onPress={() =>
+                navigation.navigate('locationDetails', {
+                  locationId: location.id,
+                })
+              }
+            />
+          )}
 
           <VStack p={5} mb={5} backgroundColor="white" borderRadius={10}>
             <VStack>

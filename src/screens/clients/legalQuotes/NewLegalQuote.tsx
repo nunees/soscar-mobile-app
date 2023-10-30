@@ -97,13 +97,30 @@ export function NewLegalQuote() {
   }
 
   function handleLocationSelect(locationId: string) {
-    if (locationsSelected.includes(locationId)) {
-      const newLocations = locationsSelected.filter(
-        (location) => location !== locationId
-      );
-      setLocationsSelected(newLocations);
+    if (locationsSelected.length < 3) {
+      if (locationsSelected.includes(locationId)) {
+        const newLocations = locationsSelected.filter(
+          (location) => location !== locationId
+        );
+        setLocationsSelected(newLocations);
+      } else {
+        setLocationsSelected([...locationsSelected, locationId]);
+      }
+    }
+
+    if (locationsSelected.length > 3) {
+      if (locationsSelected.includes(locationId)) {
+        const newLocations = locationsSelected.filter(
+          (id) => id !== locationId
+        );
+        setLocationsSelected(newLocations);
+      }
     } else {
-      setLocationsSelected([...locationsSelected, locationId]);
+      toast.show({
+        title: 'Voce pode selecionar ate 3 locais',
+        placement: 'top',
+        bgColor: 'red.500',
+      });
     }
   }
 
@@ -117,7 +134,7 @@ export function NewLegalQuote() {
       setIsSaving(true);
       const generatedHash = generateId(128);
 
-      const response = await api.post(
+      await api.post(
         '/quotes/legal',
         {
           user_id: user.id,
@@ -137,16 +154,12 @@ export function NewLegalQuote() {
       );
 
       upload.data?.forEach(async (file) => {
-        await api.post(
-          `/quotes/legal/document/${response.data.id}/${generatedHash}`,
-          file,
-          {
-            headers: {
-              id: user.id,
-              'Content-Type': 'multipart/form-data',
-            },
-          }
-        );
+        await api.post(`/quotes/legal/document/${generatedHash}`, file, {
+          headers: {
+            id: user.id,
+            'Content-Type': 'multipart/form-data',
+          },
+        });
       });
 
       setIsSaving(false);
@@ -155,7 +168,7 @@ export function NewLegalQuote() {
         placement: 'top',
         bgColor: 'green.500',
       });
-      // navigation.navigate('home');
+      navigation.navigate('quotes');
     } catch (error) {
       setIsSaving(false);
       const isAppError = error instanceof AppError;
@@ -248,7 +261,7 @@ export function NewLegalQuote() {
               h={150}
               placeholder="Insira informacoes que possam ajudar o profissional a entender
               melhor o seu problema e te ajudar da melhor forma possivel"
-              fontSize="xs"
+              fontSize="sm"
               textAlign="left"
               onChangeText={setUserNotes}
               value={userNotes}
@@ -286,12 +299,7 @@ export function NewLegalQuote() {
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
                 <TouchableOpacity onPress={() => handleLocationSelect(item.id)}>
-                  <HStack
-                    px={5}
-                    py={5}
-                    w={330}
-                    justifyContent={'space-between'}
-                  >
+                  <HStack px={5} py={5} w={330} justifyContent={'flex-start'}>
                     {locationsSelected.includes(item.id) && (
                       <Badge
                         colorScheme={'purple'}
@@ -306,12 +314,14 @@ export function NewLegalQuote() {
                     <HStack>
                       <Avatar
                         source={{
-                          uri: `${api.defaults.baseURL}/user/avatar/${user.id}/${item.users?.avatar}`,
+                          uri: item.users?.avatar
+                            ? `${api.defaults.baseURL}/user/avatar/${user.id}/${item.users?.avatar}`
+                            : `https://ui-avatars.com/api/?name=${item.users?.name}&background=random&length=1&size=128`,
                         }}
                         size={20}
                       />
                     </HStack>
-                    <HStack>
+                    <HStack ml={3} mt={2}>
                       <VStack>
                         <Text bold fontSize={'md'}>
                           {item?.business_name}{' '}

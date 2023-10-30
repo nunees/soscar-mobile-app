@@ -60,6 +60,15 @@ export function Services() {
 
         <ServiceCardTypes
           icon="save"
+          title={'Histórico de orçamentos judiciais'}
+          text={'Acompanhe seus orçamentos judiciais realizados'}
+          image={TimeImage}
+          alt="Acompanhe seus orçamentos realizados"
+          onPress={() => navigation.navigate('legalQuotesList')}
+        />
+
+        <ServiceCardTypes
+          icon="save"
           title={'Histórico de agendamentos'}
           text={'Acompanhe seus orçamentos realizados'}
           image={TimeImage}

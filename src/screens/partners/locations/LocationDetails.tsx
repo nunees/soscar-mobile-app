@@ -11,6 +11,7 @@ import { useAuth } from '@hooks/useAuth';
 import { useProfile } from '@hooks/useProfile';
 import { useUploadImage } from '@hooks/useUploadImage';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { AppNavigatorRoutesProps } from '@routes/app.routes';
 import { PartnerNavigatorRoutesProps } from '@routes/partner.routes';
 import { api } from '@services/api';
 import { AppError } from '@utils/AppError';
@@ -25,6 +26,7 @@ import {
   Icon,
   Progress,
   Avatar,
+  Heading,
 } from 'native-base';
 import { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -49,7 +51,9 @@ export function LocationDetails() {
   const { profile } = useProfile();
 
   const { locationId } = routes.params as RouteParamsProps;
-  const navigation = useNavigation<PartnerNavigatorRoutesProps>();
+
+  const partnerNavigation = useNavigation<PartnerNavigatorRoutesProps>();
+  const userNavigation = useNavigation<AppNavigatorRoutesProps>();
 
   const { handleUserProfilePictureSelect } = useUploadImage();
 
@@ -154,8 +158,8 @@ export function LocationDetails() {
       <VStack>
         <AppHeader
           title="Detalhes"
-          navigation={navigation}
-          screen="locations"
+          navigation={user.isPartner ? partnerNavigation : userNavigation}
+          screen={user.isPartner ? 'locations' : 'home'}
         />
       </VStack>
 
@@ -204,14 +208,27 @@ export function LocationDetails() {
                 maxH={300}
                 backgroundColor={'purple.100'}
               >
-                <VStack alignSelf={'center'} mr={70} mt={50}>
-                  <Text textAlign={'center'} bold>
-                    Nenhuma foto adicionada
-                  </Text>
-                  <Text textAlign={'center'}>
-                    Adicione fotos para atrair mais clientes
-                  </Text>
-                </VStack>
+                {user.isPartner && (
+                  <VStack alignSelf={'center'} mr={70} mt={50}>
+                    <Text textAlign={'center'} bold>
+                      Nenhuma foto adicionada
+                    </Text>
+                    <Text textAlign={'center'}>
+                      Adicione fotos para atrair mais clientes
+                    </Text>
+                  </VStack>
+                )}
+                {!user.isPartner && (
+                  <VStack alignSelf={'center'} mr={70} mt={50}>
+                    <Text textAlign={'center'} bold>
+                      Nao ha fotos disponiveis
+                    </Text>
+                    <Text textAlign={'center'}>
+                      Quando o profissional adicionar fotos, elas aparecerao
+                      aqui
+                    </Text>
+                  </VStack>
+                )}
               </VStack>
             </HStack>
           )}
@@ -219,22 +236,31 @@ export function LocationDetails() {
 
         <HStack px={5} py={5}>
           <HStack>
-            <UserPhoto
-              source={{
-                uri: user.avatar
-                  ? `${api.defaults.baseURL}/user/avatar/${user.id}/${user.avatar}`
-                  : `https://ui-avatars.com/api/?format=png&name=${user.name}+${profile.last_name}&size=512`,
-              }}
-              alt="Foto de perfil"
-              size={10}
-            />
+            {user.isPartner && (
+              <UserPhoto
+                source={{
+                  uri: user.avatar
+                    ? `${api.defaults.baseURL}/user/avatar/${user.id}/${user.avatar}`
+                    : `https://ui-avatars.com/api/?format=png&name=${user.name}+${profile.last_name}&size=512`,
+                }}
+                alt="Foto de perfil"
+                size={10}
+              />
+            )}
           </HStack>
-          <HStack ml={3}>
+          <HStack ml={user.isPartner ? 3 : 0}>
             <VStack>
-              <Text bold fontSize={'xs'}>
-                {user.name}
-              </Text>
-              <Text fontSize={'xs'}>{location.business_name}</Text>
+              {user.isPartner && (
+                <Text bold fontSize={'xs'}>
+                  {user.name}
+                </Text>
+              )}
+              {user.isPartner && (
+                <Text fontSize={'xs'}>{location.business_name}</Text>
+              )}
+              {!user.isPartner && (
+                <Heading bold>{location.business_name}</Heading>
+              )}
             </VStack>
           </HStack>
 
@@ -261,7 +287,7 @@ export function LocationDetails() {
           )}
 
           {!user.isPartner && (
-            <HStack position={'absolute'} right={5} bottom={5}>
+            <HStack position={'absolute'} right={5} bottom={-10}>
               <Button
                 h={50}
                 variant={'dark'}
@@ -410,30 +436,12 @@ export function LocationDetails() {
             <Button
               title={'Editar Local'}
               onPress={() =>
-                navigation.navigate('editLocation', {
+                partnerNavigation.navigate('editLocation', {
                   locationId: location.id,
                 })
               }
               h={50}
             />
-          )}
-
-          {!user.isPartner && (
-            <VStack>
-              <Button
-                title="Agendar Servico"
-                onPress={() => null}
-                h={50}
-                variant={'dark'}
-              />
-
-              <Button
-                title="Solicitar orcamento"
-                onPress={() => null}
-                h={50}
-                variant={'dark'}
-              />
-            </VStack>
           )}
         </VStack>
       </ScrollView>

@@ -8,9 +8,9 @@ import UserPhoto from '@components/UserPhoto';
 import { SERVICES_LIST } from '@data/ServicesList';
 import { VechiclesBrands } from '@data/VechiclesBrands';
 import { VEHICLE_MODELS } from '@data/VehiclesModels';
+import { IlegalQuoteDocument } from '@dtos/ILegalQuoteDocument';
 import { ILocation } from '@dtos/ILocation';
 import { IQuoteList } from '@dtos/IQuoteList';
-import { yupResolver } from '@hookform/resolvers/yup';
 import { useAuth } from '@hooks/useAuth';
 import {
   useFocusEffect,
@@ -25,82 +25,61 @@ import * as FileSystem from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';
 import { VStack, useToast, Text, HStack, Image, ScrollView } from 'native-base';
 import { useCallback, useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
-import * as yup from 'yup';
 
 type RouteParams = {
-  quoteId: string;
+  legalQuoteId: string;
   locationId: string;
 };
 
-type FormDataProps = {
-  partnerNotes: string;
-  serviceDescription: string;
-  serviceValue: string;
-  franchisePrice: string;
-};
+/**
+ * 1 - Solicitado
+ * 2 - Em analise
+ * 3 - Aprovado
+ * 4 - Recusado
+ */
 
-const quoteSchema = yup.object().shape({
-  partnerNotes: yup.string().required('Informe suas observacoes'),
-  serviceDescription: yup.string().required('Informe a descricao do servico'),
-  serviceValue: yup.string().required('Informe o valor do servico'),
-  franchisePrice: yup
-    .string()
-    .required('Informe o valor da franquia da seguradora'),
-});
-
-export function QuoteDetail() {
+export function LegalQuoteDetail() {
   const [isLoading, setIsLoading] = useState(false);
 
   const [quote, setQuote] = useState<IQuoteList>({} as IQuoteList);
+  const [files, setFiles] = useState<IlegalQuoteDocument[]>([]);
+
   const [location, setLocation] = useState<ILocation>({} as ILocation);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [userMidia, setUserMidia] = useState<any[]>([]);
+
+  const [partnerNotes, setPartnerNotes] = useState<string>('');
+  const [serviceDescription, setServiceDescription] = useState<string>('');
+  const [serviceValue, setServiceValue] = useState<number>(0);
+  const [franchisePrice, setFranchisePrice] = useState<number>(0);
+
   const [partnerMidia, setPartnerMidia] = useState<any[]>([]);
 
   const toast = useToast();
   const { user } = useAuth();
-
   const route = useRoute();
-  const { quoteId, locationId } = route.params as RouteParams;
-
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<FormDataProps>({
-    resolver: yupResolver(quoteSchema),
-  });
+  const { legalQuoteId, locationId } = route.params as RouteParams;
 
   const navigation = useNavigation<PartnerNavigatorRoutesProps>();
 
-  const handleSubmitSucess = useCallback(
-    async ({
-      partnerNotes,
-      franchisePrice,
-      serviceDescription,
-      serviceValue,
-    }: FormDataProps) => {
-      await api.patch(
-        `/quotes/${quoteId}`,
-        {
-          partner_notes: partnerNotes,
-          service_description: serviceDescription,
-          service_price: Number(serviceValue),
-          status: 3,
-          franchise_price: Number(franchisePrice),
+  const handleSubmitSucess = useCallback(async () => {
+    await api.patch(
+      `/legal/update/${legalQuoteId}`,
+      {
+        partner_notes: partnerNotes,
+        service_description: serviceDescription,
+        service_price: serviceValue,
+        status: 3,
+        franchise_price: franchisePrice,
+      },
+      {
+        headers: {
+          id: user.id,
         },
-        {
-          headers: {
-            id: user.id,
-          },
-        }
-      );
+      }
+    );
 
-      navigation.navigate('orders');
-    },
-    []
-  );
+    // navigation.navigate('orders');
+  }, []);
 
   const handleDocumentUpload = useCallback(async () => {
     const photoSelected = await ImagePicker.launchImageLibraryAsync({
@@ -135,11 +114,11 @@ export function QuoteDetail() {
       } as any;
 
       const userDocumentUploadForm = new FormData();
-      userDocumentUploadForm.append('file', photoFile);
+      userDocumentUploadForm.append('document', photoFile);
 
       try {
         const response = await api.post(
-          `/quotes/partner/document/${quoteId}/${quote.hashId}`,
+          `/legal/document/${quote.hashId}`,
           userDocumentUploadForm,
           {
             headers: {
@@ -149,19 +128,16 @@ export function QuoteDetail() {
           }
         );
 
-        await api.put(
-          `/quotes/document/owner/${response.data.id}/${user.id}/`,
-          {
-            headers: {
-              id: user.id,
-            },
-          }
-        );
+        await api.put(`/legal/document/owner/${response.data.id}`, {
+          headers: {
+            id: user.id,
+          },
+        });
       } catch (error) {
         throw new AppError('Erro ao enviar arquivo');
       }
 
-      setPartnerMidia(photoFile);
+      setPartnerMidia([...partnerMidia, photoFile]);
     }
   }, []);
 
@@ -169,23 +145,38 @@ export function QuoteDetail() {
     useCallback(() => {
       async function fetchQuote() {
         try {
-          const response = await api.get(`/quotes/find/${quoteId}`, {
+          const response = await api.get(`/legal/get/${legalQuoteId}`, {
             headers: {
               id: user.id,
             },
           });
+
+          console.log(response.data.LegalQuoteDocuments);
 
           setQuote(response.data);
           setFranchisePrice(response.data.franchise_price);
           setServiceDescription(response.data.service_decription);
           setServiceValue(response.data.service_price);
           setPartnerNotes(response.data.partner_notes);
+
+          const documents = await api.get(
+            `/legal/documents/${response.data.hashId}`,
+            {
+              headers: {
+                id: user.id,
+              },
+            }
+          );
+
+          console.log(documents.data);
+
+          setFiles(documents.data);
         } catch (error) {
           throw new AppError('Erro ao buscar detalhes do orçamento');
         }
       }
       fetchQuote();
-    }, [quoteId])
+    }, [legalQuoteId])
   );
 
   useFocusEffect(
@@ -216,8 +207,8 @@ export function QuoteDetail() {
       async function handleQuoteStatus() {
         try {
           if (quote.status === 1) {
-            await api.put(
-              `/quotes/status/${quoteId}`,
+            await api.patch(
+              `/legal/status/${legalQuoteId}`,
               {
                 status: 2,
               },
@@ -281,7 +272,7 @@ export function QuoteDetail() {
               <UserPhoto
                 source={{
                   uri: quote.users?.avatar
-                    ? `${api.defaults.baseURL}/user/avatar/${quote.users?.id}/${quote.users?.avatar}`
+                    ? `${api.defaults.baseURL}/user/avatar/${quote.users?.id}/${quote.users.avatar}`
                     : `https://ui-avatars.com/api/?format=png&name=${user.name}+${quote.users?.last_name}&size=512`,
                 }}
                 alt="Foto de perfil"
@@ -441,19 +432,22 @@ export function QuoteDetail() {
             Arquivos de midia
           </Text>
           <VStack backgroundColor="white" borderRadius={10} p={5}>
-            {userMidia.map((file) => (
-              <Image
-                borderRadius={5}
-                key={file.id}
-                source={{
-                  uri: `${api.defaults.baseURL}/quotes/document/${file.id}/${file.hashId}`,
-                }}
-                alt="Imagem do usuario"
-                resizeMode="cover"
-                size={350}
-                mb={5}
-              />
-            ))}
+            {files.map(
+              (file) =>
+                !file.isPartnerDocument && (
+                  <Image
+                    borderRadius={5}
+                    key={file.id}
+                    source={{
+                      uri: `${api.defaults.baseURL}/legal/documents/get/${file.id}/${quote.hashId}`,
+                    }}
+                    alt="Imagem do usuario"
+                    resizeMode="cover"
+                    w={350}
+                    h={200}
+                  />
+                )
+            )}
           </VStack>
         </VStack>
 
@@ -462,23 +456,16 @@ export function QuoteDetail() {
             Observacoes (opcional)
           </Text>
           <VStack backgroundColor="white" borderRadius={10} p={5}>
-            {quote.status !== 3 && (
-              <Controller
-                control={control}
-                name="partnerNotes"
-                rules={{ required: 'Adicione informacoes adicionais' }}
-                render={({ field: { onChange, value } }) => (
-                  <TextArea
-                    placeholder="Suas observacoes"
-                    fontSize="sm"
-                    onChangeText={onChange}
-                    value={value}
-                    errorMessage={errors.partnerNotes?.message}
-                  />
-                )}
+            {!quote.partner_notes && (
+              <TextArea
+                placeholder="Suas observacoes"
+                fontSize="sm"
+                value={partnerNotes}
+                onChangeText={setPartnerNotes}
               />
             )}
-            {quote.status === 3 && <Text>{quote.partner_notes}</Text>}
+
+            {quote.partner_notes && <Text>{quote.partner_notes}</Text>}
           </VStack>
         </VStack>
 
@@ -487,24 +474,17 @@ export function QuoteDetail() {
             Descricao do servico
           </Text>
           <VStack backgroundColor="white" borderRadius={10} p={5}>
-            {quote.status !== 3 && (
-              <Controller
-                control={control}
-                name="serviceDescription"
-                rules={{ required: 'Descreve o servico' }}
-                render={({ field: { onChange, value } }) => (
-                  <TextArea
-                    placeholder="Descricao do servico"
-                    fontSize="sm"
-                    defaultValue=""
-                    onChangeText={onChange}
-                    value={value}
-                    errorMessage={errors.serviceDescription?.message}
-                  />
-                )}
+            {!quote.service_decription && (
+              <TextArea
+                placeholder="Descricao do servico"
+                fontSize="sm"
+                value={serviceDescription}
+                onChangeText={setServiceDescription}
               />
             )}
-            {quote.status === 3 && <Text>{quote.service_decription}</Text>}
+            {quote.service_decription && (
+              <Text>{quote.service_decription}</Text>
+            )}
           </VStack>
         </VStack>
 
@@ -513,54 +493,34 @@ export function QuoteDetail() {
             Valor da franquia
           </Text>
           <VStack backgroundColor="white" borderRadius={10} p={5}>
-            {quote.status !== 3 && (
-              <Controller
-                control={control}
-                name="franchisePrice"
-                rules={{
-                  required:
-                    'Insira o valor da franquia, caso nao haja coloque 0',
-                }}
-                render={({ field: { onChange, value } }) => (
-                  <Input
-                    placeholder="Valor da franquia"
-                    fontSize="sm"
-                    onChangeText={onChange}
-                    value={value}
-                    keyboardType="numeric"
-                    errorMessage={errors.partnerNotes?.message}
-                  />
-                )}
+            {!quote.franchise_price && (
+              <Input
+                placeholder="Valor da franquia"
+                keyboardType="decimal-pad"
+                fontSize="sm"
+                value={String(franchisePrice)}
+                onChangeText={(value) => setFranchisePrice(Number(value))}
               />
             )}
-            {quote.status === 3 && <Text>R$ {quote.franchise_price}</Text>}
+            {quote.franchise_price && <Text>R$ {quote.franchise_price}</Text>}
           </VStack>
         </VStack>
 
         <VStack px={3} py={3}>
           <Text bold pb={2}>
-            Valor do servico
+            Valor do orcamento
           </Text>
           <VStack backgroundColor="white" borderRadius={10} p={5}>
-            {quote.status !== 3 && (
-              <Controller
-                control={control}
-                name="serviceValue"
-                rules={{ required: 'Insira o valor do servico' }}
-                render={({ field: { onChange, value } }) => (
-                  <Input
-                    placeholder="Valor do servico"
-                    fontSize="sm"
-                    defaultValue=""
-                    onChangeText={onChange}
-                    value={value}
-                    keyboardType="numeric"
-                    errorMessage={errors.partnerNotes?.message}
-                  />
-                )}
+            {!quote.service_price && (
+              <Input
+                placeholder="Valor do orcamento"
+                keyboardType="decimal-pad"
+                fontSize="sm"
+                value={String(serviceValue)}
+                onChangeText={(value) => setServiceValue(Number(value))}
               />
             )}
-            {quote.status === 3 && <Text>R$ {quote.franchise_price}</Text>}
+            {quote.service_price && <Text>R$ {quote.service_price}</Text>}
           </VStack>
         </VStack>
 
@@ -569,21 +529,22 @@ export function QuoteDetail() {
             Documento de orcamento
           </Text>
           <VStack backgroundColor="white" borderRadius={10} p={5}>
-            {partnerMidia.length > 0 &&
-              partnerMidia?.map((file) => (
-                <Image
-                  borderRadius={5}
-                  key={file.id}
-                  source={{
-                    uri: `${api.defaults.baseURL}/quotes/document/${file.id}/${file.hashId}`,
-                  }}
-                  alt="Imagem do usuario"
-                  resizeMode="cover"
-                  size={350}
-                  mb={5}
-                />
-              ))}
-
+            {files.map(
+              (file) =>
+                file.isPartnerDocument && (
+                  <Image
+                    borderRadius={5}
+                    key={file.id}
+                    source={{
+                      uri: `${api.defaults.baseURL}/legal/documents/get/${file.id}/${quote.hashId}`,
+                    }}
+                    alt="Imagem do usuario"
+                    resizeMode="cover"
+                    w={350}
+                    h={200}
+                  />
+                )
+            )}
             {quote.status !== 3 && (
               <Button
                 title="Anexar arquivo"
@@ -599,7 +560,7 @@ export function QuoteDetail() {
             <Button
               title="Enviar orcamento"
               mt={5}
-              onPress={handleSubmit(handleSubmitSucess)}
+              onPress={handleSubmitSucess}
               isLoading={isLoading}
             />
             <Button title="Recusar orcamento" variant={'outline'} mt={5} />
