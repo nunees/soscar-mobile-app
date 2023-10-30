@@ -12,7 +12,16 @@
       "backgroundColor": "#4a0778"
     },
     "plugins": [
-      "@notifee/react-native",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 31,
+            "targetSdkVersion": 31,
+            "buildToolsVersion": "31.0.0"
+          }
+        }
+      ],
       [
         "expo-image-picker",
         {
@@ -23,17 +32,6 @@
         "expo-location",
         {
           "locationAlwaysAndWhenInUsePermission": "Allow SOS Auto to use your location."
-        }
-      ],
-
-      [
-        "expo-build-properties",
-        {
-          "android": {
-            "compileSdkVersion": 31,
-            "targetSdkVersion": 31,
-            "buildToolsVersion": "31.0.0"
-          }
         }
       ]
     ],
