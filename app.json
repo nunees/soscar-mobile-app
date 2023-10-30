@@ -12,6 +12,7 @@
       "backgroundColor": "#4a0778"
     },
     "plugins": [
+      "@notifee/react-native",
       [
         "expo-image-picker",
         {
@@ -24,7 +25,7 @@
           "locationAlwaysAndWhenInUsePermission": "Allow SOS Auto to use your location."
         }
       ],
-      "@notifee/react-native",
+
       [
         "expo-build-properties",
         {
