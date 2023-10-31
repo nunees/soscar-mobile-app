@@ -29,7 +29,7 @@ export function ListServices({ image, alt, title, content, ...rest }: Props) {
       >
         <Image source={image} alt={alt} size={20} {...rest} />
         <VStack pl={3} w={250}>
-          <Text bold fontSize="xs">
+          <Text bold fontSize="md">
             {title}
           </Text>
           <Text

@@ -6,10 +6,9 @@ import {
   Nunito_400Regular,
   Nunito_700Bold,
 } from '@expo-google-fonts/nunito';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { Routes } from '@routes/index';
 import { NativeBaseProvider } from 'native-base';
-import { LogBox, StatusBar } from 'react-native';
+import { StatusBar } from 'react-native';
 
 import { THEME } from './src/theme';
 
@@ -19,10 +18,43 @@ export default function App() {
     Nunito_700Bold,
   });
 
-  LogBox.ignoreLogs(['Possible Unhandled Promise Rejection']);
+  // async function bootstrap() {
+  //   const initialNotification = await notifee.getInitialNotification();
+  //   if (initialNotification) {
+  //     console.log(
+  //       'Notification caused application to open',
+  //       initialNotification.notification
+  //     );
+  //     console.log(
+  //       'Press action used to open the app',
+  //       initialNotification.pressAction
+  //     );
+  //   }
+  // }
+
+  // useEffect(() => {
+  //   bootstrap()
+  //     .then(() => setLoading(false))
+  //     .catch((err) => console.log(err));
+  // }, []);
+
+  // useEffect(() => {
+  //   return notifee.onBackgroundEvent(async ({ type, detail }) => {
+  //     switch (type) {
+  //       case EventType.DISMISSED:
+  //         console.log('User dismissed notification', detail.notification);
+  //         break;
+  //       case EventType.PRESS:
+  //         console.log('User pressed notification action button', detail);
+  //         break;
+  //       default:
+  //         break;
+  //     }
+  //   });
+  // }, []);
 
   return (
-    <NativeBaseProvider theme={THEME} isSSR={false}>
+    <NativeBaseProvider theme={THEME}>
       <StatusBar barStyle="light-content" backgroundColor="#340554" />
       <AuthContextProvider>
         <ProfileContextProvider>

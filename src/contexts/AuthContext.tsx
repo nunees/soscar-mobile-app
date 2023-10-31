@@ -1,4 +1,7 @@
+import { IPushNotificationDTO } from '@dtos/IPushNotificationDTO';
 import { IUserDTO } from '@dtos/IUserDTO';
+import { useNotification } from '@hooks/notification/useNotification';
+import { usePushNotification } from '@hooks/notification/usePushNotification';
 import { useProfile } from '@hooks/useProfile';
 import { api } from '@services/api';
 import {
@@ -135,6 +138,33 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
     return () => {
       subscribe();
     };
+  }, []);
+
+  const { sendNotification } = usePushNotification();
+  const { markAsRead } = useNotification();
+
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      const response = await api.get('/notifications', {
+        headers: {
+          id: user.id,
+        },
+      });
+
+      response.data.map(async (notification: IPushNotificationDTO) => {
+        const notificationId = notification.id;
+        if (!notification.received) {
+          await markAsRead(user.id, notificationId);
+          await sendNotification(
+            notification.title,
+            notification.body,
+            notification.channel
+          );
+        }
+      });
+    }, 30000);
+
+    return () => clearInterval(interval);
   }, []);
 
   return (

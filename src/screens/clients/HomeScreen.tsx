@@ -1,3 +1,4 @@
+import QRCodeImage from '@assets/qrcode.png';
 import CalendarImage from '@assets/services/calendar.png';
 import CompliantImage from '@assets/services/compliant.png';
 import PaperImage from '@assets/services/paper.png';
@@ -112,7 +113,7 @@ export function HomeScreen() {
           <VStack mt={5}>
             <VStack>
               <Text fontSize={'md'} bold pb={3}>
-                Proximos agendamentos
+                Próximos agendamentos
               </Text>
               <FlatList
                 data={schedules}
@@ -170,7 +171,7 @@ export function HomeScreen() {
           <VStack mt={5}>
             <VStack>
               <Text fontSize={'md'} bold pb={3}>
-                Servicos mais procurados
+                Serviços mais procurados
               </Text>
               <ServiceCardTypes
                 icon="calendar"
@@ -184,7 +185,7 @@ export function HomeScreen() {
               <ServiceCardTypes
                 icon="file-text"
                 title={'Orçamento de  serviços'}
-                text={'Realize orcamentos sem sair de casa'}
+                text={'Realize orçamentos sem sair de casa'}
                 onPress={() => navigation.navigate('quotes')}
                 image={PaperImage}
                 alt="Orçamento de serviços"
@@ -198,13 +199,14 @@ export function HomeScreen() {
                 onPress={() => navigation.navigate('legalQuotes')}
               />
 
-              {/* <ServiceCardTypes
+              <ServiceCardTypes
                 icon="compass"
-                title={'Encontre um profissional'}
-                text={'Encontre um profissional para realizar seu serviço'}
-                image={FindImage}
-                alt="Encontre um profissional para realizar seu serviço"
-              /> */}
+                title={'Validar orçamento jurídico'}
+                text={'Valide a autenticidade do documento de orçamento'}
+                image={QRCodeImage}
+                alt="Valide a autenticidade do documento de orçamento"
+                onPress={() => navigation.navigate('validateDocument')}
+              />
             </VStack>
           </VStack>
         </VStack>

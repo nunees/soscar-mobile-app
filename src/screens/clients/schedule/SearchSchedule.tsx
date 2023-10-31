@@ -7,7 +7,8 @@ import { useAuth } from '@hooks/useAuth';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
 import { api } from '@services/api';
-import { VStack, FlatList } from 'native-base';
+import { AppError } from '@utils/AppError';
+import { VStack, FlatList, useToast } from 'native-base';
 import { useEffect, useState } from 'react';
 
 type RouteParamsProps = {
@@ -23,6 +24,8 @@ export function SearchSchedule() {
   const routes = useRoute();
   const { serviceId } = routes.params as RouteParamsProps;
 
+  const toast = useToast();
+
   useEffect(() => {
     async function handleSearch() {
       try {
@@ -36,7 +39,13 @@ export function SearchSchedule() {
 
         setLocations(response.data);
       } catch (error) {
-        console.log(error);
+        const isAppError = error instanceof AppError;
+        const message = isAppError ? error.message : 'Erro ao buscar parceiros';
+        toast.show({
+          title: message,
+          placement: 'top',
+          bgColor: 'red.500',
+        });
       } finally {
         setIsLoading(false);
       }
@@ -56,7 +65,7 @@ export function SearchSchedule() {
       </VStack>
 
       {isLoading && (
-        <LoadingModal showModal={isLoading} message="Buscando parceiros" />
+        <LoadingModal showModal={isLoading} message="Buscando locais" />
       )}
 
       <FlatList

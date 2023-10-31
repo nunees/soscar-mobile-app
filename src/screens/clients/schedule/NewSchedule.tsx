@@ -9,6 +9,7 @@ import { TextArea } from '@components/TextArea';
 import { UploadFileField } from '@components/UploadFileField';
 import { ILocation } from '@dtos/ILocation';
 import { IVehicleDTO } from '@dtos/IVechicleDTO';
+import { useNotification } from '@hooks/notification/useNotification';
 import { useAuth } from '@hooks/useAuth';
 import { useUploadFormData } from '@hooks/useUploadFormData';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
@@ -54,6 +55,7 @@ export function NewSchedule() {
   const toast = useToast();
 
   const { upload, GetUploadImage } = useUploadFormData('document');
+  const { sendNotification } = useNotification();
 
   async function handleSubmit() {
     try {
@@ -87,6 +89,14 @@ export function NewSchedule() {
             navigation.navigate('taskDone', { date: selectedDate });
           });
       });
+
+      await sendNotification(
+        location?.users?.id as string,
+        `Você recebeu um novo agendamento de ${user.name}`,
+        'Novo agendamento',
+        'schedule',
+        user.id
+      );
     } catch (error) {
       const isAppError = error instanceof AppError;
       const message = isAppError

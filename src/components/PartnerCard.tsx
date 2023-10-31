@@ -21,7 +21,7 @@ type Props = IImageProps &
   };
 
 export function PartnerCard({ location, ...rest }: Props) {
-  const [distance, setDistance] = useState(0);
+  const [distance, setDistance] = useState<number>(0);
 
   const { position } = useGPS();
 
@@ -40,29 +40,14 @@ export function PartnerCard({ location, ...rest }: Props) {
     return now >= Number(open) && now <= Number(close);
   }, []);
 
-  // const calcDistance = useMemo(() => {
-  //   const distance = getDistanceFromLatLonInKm(
-  //     [Number(position.coords.latitude), Number(position.coords.longitude)],
-  //     [Number(location?.latitude), Number(location?.longitude)]
-  //   );
-  //   return distance;
-  // }, [position, location]);
-
-  // const distance = Number(
-  //   getDistanceFromLatLonInKm(
-  //     [Number(position.coords.latitude), Number(position.coords.longitude)],
-  //     [Number(location?.latitude), Number(location?.longitude)]
-  //   ).toPrecision(3)
-  // );
-
   useEffect(() => {
+    console.log(position);
     const userDistance = getDistanceFromLatLonInKm(
       [Number(position.coords.latitude), Number(position.coords.longitude)],
       [Number(location?.latitude), Number(location?.longitude)]
     );
-    console.log(userDistance);
     setDistance(Number(userDistance.toPrecision(3)));
-  }, [position]);
+  }, [location]);
 
   return (
     <VStack
@@ -96,12 +81,11 @@ export function PartnerCard({ location, ...rest }: Props) {
                 {location?.business_name}
               </Text>
               <Text>
-                {/* {!calcDistance
+                {!distance
                   ? 'Calculando distancia...'
-                  : calcDistance < 1
+                  : distance < 1
                   ? 'bem proximo a voce'
-                  : ` ${distance} km de voce`} */}
-                {distance} km de voce
+                  : ` ${distance} km de voce`}
               </Text>
             </VStack>
           </HStack>

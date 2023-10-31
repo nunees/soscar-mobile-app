@@ -31,6 +31,7 @@ import { LocationDetails } from '@screens/partners/locations/LocationDetails';
 import { Profile } from '@screens/Profile';
 import { QuoteDone } from '@screens/QuoteDone';
 import { TaskDone } from '@screens/TeaskDone';
+import { ValidateDocument } from '@screens/ValidateDocument';
 import { Icon, useTheme } from 'native-base';
 
 type AppRotes = {
@@ -68,6 +69,7 @@ type AppRotes = {
 
   // Other routes
   taskDone: { date: string };
+  validateDocument: undefined;
 };
 
 export type AppNavigatorRoutesProps = BottomTabNavigationProp<AppRotes>;
@@ -363,6 +365,15 @@ export function AppRoutes() {
       <Screen
         name="locationDetails"
         component={LocationDetails}
+        options={{
+          tabBarButton: () => null,
+          tabBarStyle: { display: 'none' },
+        }}
+      />
+
+      <Screen
+        name="validateDocument"
+        component={ValidateDocument}
         options={{
           tabBarButton: () => null,
           tabBarStyle: { display: 'none' },

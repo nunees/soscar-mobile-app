@@ -31,8 +31,10 @@ export function ServiceCardTypes({ title, image, text, alt, ...rest }: Props) {
         <HStack w={'full'} p={5}>
           <Image source={image} alt={alt} w={20} h={20} {...rest} />
           <HStack flexDirection={'column'} pl={3}>
-            <Text bold>{title}</Text>
-            <Text width={200} color="gray.400">
+            <Text bold fontSize={'md'}>
+              {title}
+            </Text>
+            <Text width={220} color="gray.400">
               {text}
             </Text>
           </HStack>

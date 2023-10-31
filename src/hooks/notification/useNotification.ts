@@ -13,6 +13,8 @@ export function useNotification() {
   async function sendNotification(
     user_id: string,
     body: string,
+    title: string,
+    channel: string,
     auth_id: string
   ) {
     try {
@@ -26,6 +28,8 @@ export function useNotification() {
         {
           user_id,
           body,
+          title,
+          channel,
         },
         {
           headers: {

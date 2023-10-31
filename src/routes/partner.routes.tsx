@@ -16,6 +16,7 @@ import { LegalQuoteDetail } from '@screens/partners/quotes/LegalQuoteDetail';
 import { QuoteDetail } from '@screens/partners/quotes/QuoteDetail';
 import { ScheduleDetail } from '@screens/partners/schedules/ScheduleDetail';
 import { Profile } from '@screens/Profile';
+import { ValidateDocument } from '@screens/ValidateDocument';
 import { Icon, useTheme } from 'native-base';
 
 type PartnerRoutes = {
@@ -33,6 +34,7 @@ type PartnerRoutes = {
   scheduleDetail: { scheduleId: string };
   quoteDetail: { quoteId: string; locationId: string };
   legalQuoteDetail: { legalQuoteId: string; locationId: string };
+  validateDocument: undefined;
 };
 
 export type PartnerNavigatorRoutesProps =
@@ -193,6 +195,15 @@ export function PartnerRoutes() {
       <Screen
         name="legalQuoteDetail"
         component={LegalQuoteDetail}
+        options={{
+          tabBarButton: () => null,
+          tabBarStyle: { display: 'none' },
+        }}
+      />
+
+      <Screen
+        name="validateDocument"
+        component={ValidateDocument}
         options={{
           tabBarButton: () => null,
           tabBarStyle: { display: 'none' },
