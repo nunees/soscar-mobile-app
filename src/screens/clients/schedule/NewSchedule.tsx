@@ -91,8 +91,8 @@ export function NewSchedule() {
       });
 
       await sendNotification(
-        location?.users?.id as string,
-        `Você recebeu um novo agendamento de ${user.name}`,
+        location?.user_id as string,
+        `Você tem um novo pedido de agendamento de ${user.name}`,
         'Novo agendamento',
         'schedule',
         user.id
@@ -199,7 +199,7 @@ export function NewSchedule() {
           <VStack p={5} mb={5} backgroundColor="white" borderRadius={10}>
             <VStack>
               <Text bold pb={1}>
-                Tipo de servico
+                Tipo de serviço
               </Text>
             </VStack>
             <VStack>
@@ -258,7 +258,7 @@ export function NewSchedule() {
             justifyContent="space-between"
           >
             <Text bold pb={1}>
-              Horario
+              Horário
             </Text>
 
             <Input
@@ -276,15 +276,15 @@ export function NewSchedule() {
               }}
             />
             <Text fontSize="xs" color="gray.600" textAlign="justify" w={320}>
-              O tempo medio de reparo e de 1 hora, no entanto pode ser
-              necessario mais tempo. Nao se preocupe, seu mecanico ira
-              informa-lo se necessario.
+              O tempo médio de reparo é de 1 hora, no entanto pode ser
+              necessário mais tempo. Não se preocupe, seu mecânico irá
+              informá-lo se necessário.
             </Text>
           </VStack>
 
           <VStack p={5} mb={5} backgroundColor="white" borderRadius={10}>
             <VStack>
-              <Text bold>Informacoes adicionais (Opcional)</Text>
+              <Text bold>Informações adicionais (Opcional)</Text>
             </VStack>
             <VStack>
               <TextArea
@@ -292,7 +292,7 @@ export function NewSchedule() {
                 w={'full'}
                 h={150}
                 fontSize="sm"
-                color="gray.300"
+                color="gray.900"
                 mt={5}
                 onChangeText={(text) => setNotes(text)}
               />
@@ -302,8 +302,8 @@ export function NewSchedule() {
           <UploadFileField
             upload={upload}
             GetUploadImage={GetUploadImage}
-            text=" Você pode adicionar fotos adicionais que demonstram os problemas
-            relatados e ajudam o prestador de serviço a ter o melhor
+            text="Você pode adicionar fotos adicionais que demonstram os problemas
+            relatados, elas podem ajudar o prestador de serviço a ter o melhor
             entendimento do problema."
           />
 

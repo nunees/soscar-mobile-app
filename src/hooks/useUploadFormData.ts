@@ -41,7 +41,6 @@ export function useUploadFormData(field: string) {
       const photoSelected = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         quality: 1,
-        aspect: [4, 4],
         allowsEditing: true,
       });
 
@@ -49,6 +48,7 @@ export function useUploadFormData(field: string) {
         ...prevState,
         progress: 50,
       }));
+
       if (photoSelected.canceled) {
         return;
       }

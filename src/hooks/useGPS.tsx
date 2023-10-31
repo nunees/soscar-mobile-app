@@ -1,10 +1,11 @@
 import { useFocusEffect } from '@react-navigation/native';
 import {
+  Accuracy,
   LocationObjectCoords,
   getCurrentPositionAsync,
   requestForegroundPermissionsAsync,
 } from 'expo-location';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 export function useGPS() {
   const [position, setPosition] = useState({
@@ -21,7 +22,7 @@ export function useGPS() {
         .then((response) => {
           if (response.granted) {
             getCurrentPositionAsync({
-              accuracy: 6,
+              accuracy: Accuracy.High,
             })
               .then((response) => {
                 setPosition({

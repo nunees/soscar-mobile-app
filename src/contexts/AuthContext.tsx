@@ -145,7 +145,7 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
 
   useEffect(() => {
     const interval = setInterval(async () => {
-      const response = await api.get('/notifications', {
+      const response = await api.get(`/notifications/user/${user.id}`, {
         headers: {
           id: user.id,
         },
