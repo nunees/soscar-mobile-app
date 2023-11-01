@@ -37,6 +37,7 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
   const { removeProfile } = useProfile();
 
   const [user, setUser] = useState<IUserDTO>({} as IUserDTO);
+  const [userId, setUserId] = useState<string>('');
   const [isLoadingUserStorageData, setIsLoadingUserStorageData] =
     useState(true);
 
@@ -72,6 +73,8 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
         email,
         password,
       });
+
+      setUserId(data.user.id);
 
       if (data.user && data.token && data.refresh_token) {
         await storageUserAndTokenSave(
@@ -145,11 +148,13 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
 
   useEffect(() => {
     const interval = setInterval(async () => {
-      const response = await api.get(`/notifications/user/${user.id}`, {
+      const response = await api.get(`/notifications/user/${userId}`, {
         headers: {
-          id: user.id,
+          id: userId,
         },
       });
+
+      console.log(response.data);
 
       response.data.map(async (notification: IPushNotificationDTO) => {
         const notificationId = notification.id;

@@ -1,59 +1,16 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Input } from '@components/Input';
 import { Feather } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
-import { AppNavigatorRoutesProps } from '@routes/app.routes';
 import { VStack, Icon, FlatList, Text, Pressable } from 'native-base';
 import { useState } from 'react';
-import { TouchableOpacity } from 'react-native';
 
-const queryStrings = [
-  'pilhas',
-  'eletrônicos',
-  'eletronicos',
-  'baterias',
-  'lampada',
-  'lâmpadas',
-  'óleo de cozinha',
-  'oleo de cozinha',
-  'vidros',
-  'vidro',
-  'embalagens',
-  'plasticos',
-  'plásticos',
-  'metais',
-  'metal',
-  'ferros',
-  'ferro',
-  'aluminio',
-  'alumínio',
-  'aluminios',
-  'alumínios',
-  'latas',
-  'lata',
-  'lixo',
-  'lixo eletrônico',
-  'lixo eletronico',
-  'pilha',
-  'papel',
-  'papeis',
-  'papelão',
-  'papelao',
-  'papelões',
-  'papeloes',
-  'garrafas',
-  'garrafa',
-  'garrafas pet',
-  'celular',
-  'celulares',
-  'computador',
-  'computadores',
-  'entulho',
-  'entulhos',
-  'entulhos de construção',
-  'entulho de construção',
-];
+const queryStrings = ['orçamento', 'agendamento', 'orçamento jurídico'];
 
-export function SearchBar() {
+type Props = {
+  navigation: any;
+};
+
+export function SearchBar({ navigation }: Props) {
   // const [search, setSearch] = useState('');
   // const { searchUser } = useSearch();
 
@@ -69,7 +26,7 @@ export function SearchBar() {
   function handleSearch(query: string) {
     setQuery(query);
 
-    if (query.length >= 1) {
+    if (query.length >= 3) {
       const filteredQuery = queryStrings.filter((item) =>
         item.includes(query.toLowerCase())
       );
@@ -80,13 +37,29 @@ export function SearchBar() {
     }
   }
 
+  function handleNavigateToService() {
+    switch (query) {
+      case 'orçamento':
+        navigation.navigate('schedule');
+        break;
+      case 'agendamento':
+        navigation.navigate('quotes');
+        break;
+      case 'orçamento jurídico':
+        navigation.navigate('legalQuotes');
+        break;
+      default:
+        break;
+    }
+  }
+
   return (
     <VStack w={'full'}>
       <Input
         h={50}
         borderRadius={6}
         fontSize={'md'}
-        placeholder="O que deseja fazer?"
+        placeholder="O que procura?"
         rightElement={
           query.length > 0 ? (
             <Icon
@@ -118,7 +91,7 @@ export function SearchBar() {
       {query.length > 0 && (
         <FlatList
           data={suggestions}
-          keyExtractor={(item) => item}
+          keyExtractor={(item: any) => item}
           renderItem={({ item }) => (
             <Pressable
               bg={'white'}
@@ -126,10 +99,10 @@ export function SearchBar() {
               _pressed={{
                 bg: 'gray.100',
               }}
-              onPress={() => null}
+              onPress={handleNavigateToService}
             >
               <Text color="gray.400">
-                Quero descartar{' '}
+                Quero fazer um{' '}
                 <Text bold color="gray.900">
                   {item}
                 </Text>

@@ -1,15 +1,10 @@
 import { useFocusEffect } from '@react-navigation/native';
-import {
-  Accuracy,
-  LocationObjectCoords,
-  getCurrentPositionAsync,
-  requestForegroundPermissionsAsync,
-} from 'expo-location';
+import * as Location from 'expo-location';
 import { useCallback, useState } from 'react';
 
 export function useGPS() {
   const [position, setPosition] = useState({
-    coords: {} as LocationObjectCoords,
+    coords: {} as Location.LocationObjectCoords,
     isLoading: true,
     isError: false,
     isSucess: false,
@@ -18,80 +13,42 @@ export function useGPS() {
 
   useFocusEffect(
     useCallback(() => {
-      requestForegroundPermissionsAsync()
-        .then((response) => {
-          if (response.granted) {
-            getCurrentPositionAsync({
-              accuracy: Accuracy.High,
-            })
-              .then((response) => {
-                setPosition({
-                  coords: response.coords,
-                  isLoading: false,
-                  isError: false,
-                  isSucess: true,
-                  error: '',
-                });
-              })
-              .catch((error) => {
-                setPosition({
-                  coords: {} as LocationObjectCoords,
-                  isLoading: false,
-                  isError: true,
-                  isSucess: false,
-                  error,
-                });
-              });
+      (async () => {
+        try {
+          const { status } = await Location.requestForegroundPermissionsAsync();
+          if (status !== 'granted') {
+            setPosition({
+              coords: {} as Location.LocationObjectCoords,
+              isLoading: false,
+              isError: true,
+              isSucess: false,
+              error: 'Permissão de acesso negada',
+            });
           }
-        })
-        .catch((error) => {
+
+          const location = await Location.getCurrentPositionAsync({
+            accuracy: Location.Accuracy.High,
+          });
           setPosition({
-            coords: {} as LocationObjectCoords,
+            coords: location.coords,
+            isLoading: false,
+            isError: false,
+            isSucess: true,
+            error: '',
+          });
+        } catch (error) {
+          console.log(error);
+          setPosition({
+            coords: {} as Location.LocationObjectCoords,
             isLoading: false,
             isError: true,
             isSucess: false,
-            error,
+            error: 'Ocorrerram erros ao buscar sua localização',
           });
-        });
+        }
+      })();
     }, [])
   );
-  // useEffect(() => {
-  //   requestForegroundPermissionsAsync()
-  //     .then((response) => {
-  //       if (response.granted) {
-  //         getCurrentPositionAsync({
-  //           accuracy: 6,
-  //         })
-  //           .then((response) => {
-  //             setPosition({
-  //               coords: response.coords,
-  //               isLoading: false,
-  //               isError: false,
-  //               isSucess: true,
-  //               error: '',
-  //             });
-  //           })
-  //           .catch((error) => {
-  //             setPosition({
-  //               coords: {} as LocationObjectCoords,
-  //               isLoading: false,
-  //               isError: true,
-  //               isSucess: false,
-  //               error,
-  //             });
-  //           });
-  //       }
-  //     })
-  //     .catch((error) => {
-  //       setPosition({
-  //         coords: {} as LocationObjectCoords,
-  //         isLoading: false,
-  //         isError: true,
-  //         isSucess: false,
-  //         error,
-  //       });
-  //     });
-  // }, []);
 
   return { position };
 }

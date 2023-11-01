@@ -10,6 +10,7 @@ import UserPhoto from '@components/UserPhoto';
 import { ILocation } from '@dtos/ILocation';
 import { IVehicleDTO } from '@dtos/IVechicleDTO';
 import { FontAwesome5 } from '@expo/vector-icons';
+import { useNotification } from '@hooks/notification/useNotification';
 import { useAuth } from '@hooks/useAuth';
 import { useGPS } from '@hooks/useGPS';
 import { useIdGenerator } from '@hooks/useIdGenerator';
@@ -55,6 +56,8 @@ export function NewQuote() {
 
   const { upload, GetUploadImage } = useUploadFormData('file');
 
+  const { sendNotification } = useNotification();
+
   async function handleFetchLocation() {
     try {
       setIsLoading(true);
@@ -66,7 +69,7 @@ export function NewQuote() {
       setLocation(response.data);
       setIsLoading(false);
     } catch (error) {
-      throw new AppError('Erro ao buscar localizacao');
+      throw new AppError('Erro ao buscar localização');
     } finally {
       setIsLoading(false);
     }
@@ -84,7 +87,7 @@ export function NewQuote() {
       setIsLoading(false);
     } catch (error) {
       toast.show({
-        title: 'Erro ao buscar informacoes do veiculo',
+        title: 'Erro ao buscar informações do veículo',
         placement: 'top',
         bgColor: 'red.500',
       });
@@ -147,9 +150,17 @@ export function NewQuote() {
         });
       });
 
+      await sendNotification(
+        location?.user_id as string,
+        `Você têm um novo pedido de orçamento de ${user.name}`,
+        'Novo orçamento',
+        'quote',
+        user.id
+      );
+
       setIsSaving(false);
       toast.show({
-        title: 'Orcamento solicitado com sucesso',
+        title: 'Orçamento solicitado com sucesso',
         placement: 'top',
         bgColor: 'green.500',
       });
@@ -159,7 +170,7 @@ export function NewQuote() {
       const isAppError = error instanceof AppError;
       const title = isAppError
         ? error.message
-        : 'Ocorreu um erro ao solicitar o orcamento';
+        : 'Ocorreu um erro ao solicitar o orçamento';
       toast.show({
         title,
         placement: 'top',
@@ -177,7 +188,7 @@ export function NewQuote() {
     <VStack pb={10}>
       <VStack mb={5}>
         <AppHeader
-          title="Novo orcamento"
+          title="Novo orçamento"
           navigation={navigation}
           screen="quotes"
         />
@@ -187,7 +198,7 @@ export function NewQuote() {
         <LoadingModal
           showModal={isLoading}
           setShowModal={setIsLoading}
-          message="Carregando informacoes"
+          message="Carregando informaçoes"
         />
       )}
       <ScrollView
@@ -252,7 +263,7 @@ export function NewQuote() {
         <VStack px={5} py={1}>
           <VStack backgroundColor="white" borderRadius={10} p={5}>
             <Text fontSize="sm" bold mb={2}>
-              Veiculo
+              Veículo
             </Text>
             <Select
               w={'full'}
@@ -285,7 +296,7 @@ export function NewQuote() {
         <VStack px={5} py={1}>
           <VStack backgroundColor="white" borderRadius={10} p={5}>
             <Text fontSize="sm" bold mb={2}>
-              Tipo de Servico
+              Tipo de Serviço
             </Text>
             <SelectBusinessCategories
               label={'Tipo de Serviço'}
@@ -298,7 +309,7 @@ export function NewQuote() {
         <VStack px={5} py={1}>
           <VStack backgroundColor="white" borderRadius={10} p={5}>
             <Text fontSize="sm" bold mb={2}>
-              Informacoes adicionais (opcional)
+              Informações adicionais (opcional)
             </Text>
             <TextArea
               h={150}
@@ -320,10 +331,10 @@ export function NewQuote() {
         <VStack px={5} py={1}>
           <VStack backgroundColor="white" borderRadius={10} p={5}>
             <Text fontSize="md" bold mb={2}>
-              Confirmacao
+              Confirmação
             </Text>
             <Text fontSize="xs" mb={3} color="gray.400">
-              Ao solicitar o orcamento, voce concorda com os termos de uso e
+              Ao solicitar o orçamento, você concorda com os termos de uso e
               politica de privacidade
             </Text>
             <Button

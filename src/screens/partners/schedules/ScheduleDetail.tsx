@@ -5,6 +5,7 @@ import getLogoImage from '@components/LogosImages';
 import { StatusIcon } from '@components/StatusIcon';
 import { TextArea } from '@components/TextArea';
 import { ISchedules } from '@dtos/ISchedules';
+import { AppError } from '@utils/AppError';
 import { Feather } from '@expo/vector-icons';
 import { useAuth } from '@hooks/useAuth';
 import { useMapsLinking } from '@hooks/useMapsLinking';
@@ -15,7 +16,6 @@ import {
 } from '@react-navigation/native';
 import { PartnerNavigatorRoutesProps } from '@routes/partner.routes';
 import { api } from '@services/api';
-import { AppError } from '@utils/AppError';
 import {
   HStack,
   Heading,

@@ -49,7 +49,7 @@
     <key>NSCameraUsageDescription</key>
     <string>Allow $(PRODUCT_NAME) to access your camera.</string>
     <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-    <string>Allow SOS Auto to use your location.</string>
+    <string>Allow $(PRODUCT_NAME) to use your location.</string>
     <key>NSLocationAlwaysUsageDescription</key>
     <string>Allow $(PRODUCT_NAME) to access your location</string>
     <key>NSLocationWhenInUseUsageDescription</key>

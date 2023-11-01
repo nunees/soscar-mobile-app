@@ -11,6 +11,7 @@ import { VEHICLE_MODELS } from '@data/VehiclesModels';
 import { IlegalQuoteDocument } from '@dtos/ILegalQuoteDocument';
 import { ILocation } from '@dtos/ILocation';
 import { IQuoteList } from '@dtos/IQuoteList';
+import { AppError } from '@utils/AppError';
 import { useAuth } from '@hooks/useAuth';
 import {
   useFocusEffect,
@@ -19,7 +20,6 @@ import {
 } from '@react-navigation/native';
 import { PartnerNavigatorRoutesProps } from '@routes/partner.routes';
 import { api } from '@services/api';
-import { AppError } from '@utils/AppError';
 import { IFileInfo } from 'expo-file-system';
 import * as FileSystem from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';

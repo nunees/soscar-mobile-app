@@ -1,6 +1,6 @@
+import QRCodeImage from '@assets/qrcode.png';
 import CalendarImage from '@assets/services/calendar.png';
 import CompliantImage from '@assets/services/compliant.png';
-import FindImage from '@assets/services/find.png';
 import PaperImage from '@assets/services/paper.png';
 import TimeImage from '@assets/services/time.png';
 import { AppHeader } from '@components/AppHeader';
@@ -78,11 +78,20 @@ export function Services() {
 
         <ServiceCardTypes
           icon="compass"
+          title={'Validar orçamento jurídico'}
+          text={'Valide a autenticidade do documento de orçamento'}
+          image={QRCodeImage}
+          alt="Valide a autenticidade do documento de orçamento"
+          onPress={() => navigation.navigate('validateDocument')}
+        />
+
+        {/* <ServiceCardTypes
+          icon="compass"
           title={'Encontre um profissional'}
           text={'Encontre um profissional para realizar seu serviço'}
           image={FindImage}
           alt="Encontre um profissional para realizar seu serviço"
-        />
+        /> */}
       </ScrollView>
     </VStack>
   );

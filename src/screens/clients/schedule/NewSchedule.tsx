@@ -1,6 +1,7 @@
 import { AppHeader } from '@components/AppHeader';
 import { Button } from '@components/Button';
 import { Input } from '@components/Input';
+import { LoadingModal } from '@components/LoadingModal';
 import { PartnerCard } from '@components/PartnerCard';
 import { ScheduleCalendar } from '@components/ScheduleCalendar';
 import { Select } from '@components/Select';
@@ -37,6 +38,8 @@ type VehicleSelect = {
 };
 
 export function NewSchedule() {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isSubmiting, setIsSubmiting] = useState<boolean>(false);
   const [vehicle_id, setVehicle_id] = useState<string>();
 
   const [vehicles, setVehicles] = useState<IVehicleDTO[]>();
@@ -59,6 +62,7 @@ export function NewSchedule() {
 
   async function handleSubmit() {
     try {
+      setIsSubmiting(true);
       const response = await api.post(
         '/schedules',
         {
@@ -92,11 +96,12 @@ export function NewSchedule() {
 
       await sendNotification(
         location?.user_id as string,
-        `Você tem um novo pedido de agendamento de ${user.name}`,
+        `Você têm um novo pedido de agendamento de ${user.name}`,
         'Novo agendamento',
         'schedule',
         user.id
       );
+      setIsSubmiting(false);
     } catch (error) {
       const isAppError = error instanceof AppError;
       const message = isAppError
@@ -107,11 +112,14 @@ export function NewSchedule() {
         placement: 'top',
         bgColor: 'red.500',
       });
+    } finally {
+      setIsSubmiting(false);
     }
   }
 
   async function fetchLocation() {
     try {
+      setIsLoading(true);
       const response = await api.get(`/locations/${locationId}`, {
         headers: {
           id: user.id,
@@ -119,6 +127,7 @@ export function NewSchedule() {
       });
       setLocation(response.data);
     } catch (error) {
+      setIsLoading(false);
       const isAppError = error instanceof AppError;
       const message = isAppError ? error.message : 'Ocorreu um erro ao buscar';
       toast.show({
@@ -126,6 +135,8 @@ export function NewSchedule() {
         placement: 'top',
         bgColor: 'red.500',
       });
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -171,12 +182,13 @@ export function NewSchedule() {
         />
       </VStack>
 
-      {/* {location.state.isLoading && (
+      {isLoading && (
         <LoadingModal
-          showModal={location.state.isLoading}
+          showModal={isLoading}
           message={'Carregando...'}
+          setShowModal={setIsLoading}
         />
-      )} */}
+      )}
 
       <VStack pt={3} px={5}>
         <ScrollView
@@ -266,7 +278,11 @@ export function NewSchedule() {
               editable={false}
               value={time}
               caretHidden
-              onPressIn={() => {
+            />
+            <Button
+              title="Selecionar horário"
+              bgColor={'purple.500'}
+              onPress={() => {
                 DateTimePickerAndroid.open({
                   mode: 'time',
                   is24Hour: true,
@@ -275,7 +291,13 @@ export function NewSchedule() {
                 });
               }}
             />
-            <Text fontSize="xs" color="gray.600" textAlign="justify" w={320}>
+            <Text
+              fontSize="xs"
+              color="gray.600"
+              textAlign="justify"
+              w={320}
+              onPressIn={() => console.log('ok')}
+            >
               O tempo médio de reparo é de 1 hora, no entanto pode ser
               necessário mais tempo. Não se preocupe, seu mecânico irá
               informá-lo se necessário.
@@ -302,12 +324,17 @@ export function NewSchedule() {
           <UploadFileField
             upload={upload}
             GetUploadImage={GetUploadImage}
-            text="Você pode adicionar fotos adicionais que demonstram os problemas
+            text="Você pode adicionar imagens adicionais que demonstram os problemas
             relatados, elas podem ajudar o prestador de serviço a ter o melhor
             entendimento do problema."
           />
 
-          <Button title="Agendar" onPress={handleSubmit} />
+          <Button
+            title="Agendar"
+            onPress={handleSubmit}
+            isLoading={isSubmiting}
+            isLoadingText={'Salvando'}
+          />
         </ScrollView>
       </VStack>
     </VStack>

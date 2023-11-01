@@ -24,7 +24,7 @@ export function UploadFileField({ text, upload, GetUploadImage }: Props) {
     <VStack p={5} mb={5} backgroundColor="white" borderRadius={10}>
       {text && (
         <HStack mb={5}>
-          <Text fontSize="xs" color="gray.500" textAlign="justify">
+          <Text fontSize="md" bold color="gray.900" textAlign="justify">
             {text}
           </Text>
         </HStack>

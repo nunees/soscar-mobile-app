@@ -2,6 +2,7 @@
 import UserPhoto from '@components/UserPhoto';
 import { ILocation } from '@dtos/ILocation';
 import { useGPS } from '@hooks/useGPS';
+import { useFocusEffect } from '@react-navigation/native';
 import { api } from '@services/api';
 import { CalculatePositionDistance } from '@utils/CalculatePositionDistance';
 import {
@@ -12,7 +13,7 @@ import {
   IIconProps,
   Badge,
 } from 'native-base';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { TouchableOpacity } from 'react-native';
 
 type Props = IImageProps &
@@ -32,22 +33,27 @@ export function PartnerCard({ location, ...rest }: Props) {
     return CalculatePositionDistance([lat1, lon1], [lat2, lon2]);
   }
 
-  const isPartnerOpen = useMemo(() => {
+  const isPartnerOpen = useCallback(() => {
     if (!location?.open_hours) return false;
     const open = location?.open_hours.split('-')[0].split(':')[0];
     const close = location?.open_hours.split('-')[1].split(':')[0];
     const now = new Date().getHours();
     return now >= Number(open) && now <= Number(close);
-  }, []);
+  }, [location]);
 
-  useEffect(() => {
-    console.log(position);
+  const getDistance = useCallback(() => {
     const userDistance = getDistanceFromLatLonInKm(
       [Number(position.coords.latitude), Number(position.coords.longitude)],
       [Number(location?.latitude), Number(location?.longitude)]
     );
-    setDistance(Number(userDistance.toPrecision(3)));
+    setDistance(userDistance);
   }, [location]);
+
+  useFocusEffect(
+    useCallback(() => {
+      getDistance();
+    }, [location])
+  );
 
   return (
     <VStack
@@ -80,26 +86,23 @@ export function PartnerCard({ location, ...rest }: Props) {
               <Text bold fontSize="sm">
                 {location?.business_name}
               </Text>
-              <Text>
-                {!distance
-                  ? 'Calculando distancia...'
-                  : distance < 1
-                  ? 'bem proximo a voce'
-                  : ` ${distance} km de voce`}
-              </Text>
+              {distance > 0 && (
+                <Text>{distance.toFixed(1)} km de distância</Text>
+              )}
+              <Text>{location?.address_line}</Text>
             </VStack>
           </HStack>
 
           <HStack>
             <VStack>
               <Badge
-                colorScheme={isPartnerOpen ? 'success' : 'danger'}
+                colorScheme={isPartnerOpen() ? 'success' : 'danger'}
                 variant="solid"
                 h={8}
                 borderRadius={6}
               >
-                <Text color={isPartnerOpen ? 'green.900' : 'white'} bold>
-                  {isPartnerOpen ? 'Aberto' : 'Fechado'}
+                <Text color={'white'} bold>
+                  {isPartnerOpen() ? 'Aberto' : 'Fechado'}
                 </Text>
               </Badge>
             </VStack>

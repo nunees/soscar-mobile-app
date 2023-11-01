@@ -34,7 +34,7 @@ export function ServiceCardTypes({ title, image, text, alt, ...rest }: Props) {
             <Text bold fontSize={'md'}>
               {title}
             </Text>
-            <Text width={220} color="gray.400">
+            <Text width={230} color="gray.400">
               {text}
             </Text>
           </HStack>

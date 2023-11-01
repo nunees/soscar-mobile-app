@@ -30,11 +30,11 @@ export function CalculatePositionDistance(
 export async function ConvertAddressToLatLong(address: string) {
   try {
     // Solicitar permissão de localização, se ainda não estiver concedida
-    // const { status } = await Location.requestForegroundPermissionsAsync();
-    // if (status !== 'granted') {
-    //   console.error('Permissão de localização não concedida');
-    //   return null;
-    // }
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+      console.error('Permissão de localização não concedida');
+      return null;
+    }
 
     // Obter as coordenadas do endereço
     const location = await Location.geocodeAsync(address);

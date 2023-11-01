@@ -2,24 +2,63 @@
 import { AppHeader } from '@components/AppHeader';
 import { LoadingModal } from '@components/LoadingModal';
 import { ISchedules } from '@dtos/ISchedules';
-import { useAxiosFetch } from '@hooks/axios/useAxiosFetch';
 import { useAuth } from '@hooks/useAuth';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
+import { api } from '@services/api';
+import { AppError } from '@utils/AppError';
 import { numberToMonth } from '@utils/DayjsDateProvider';
-import { VStack, Text, FlatList, HStack, Pressable, Center } from 'native-base';
+import {
+  VStack,
+  Text,
+  FlatList,
+  HStack,
+  Pressable,
+  Center,
+  useToast,
+} from 'native-base';
+import { useCallback, useState } from 'react';
 
 export function SchedulesList() {
+  const [schedules, setSchedules] = useState<ISchedules[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const { user } = useAuth();
   const navigation = useNavigation<AppNavigatorRoutesProps>();
 
-  const { state } = useAxiosFetch<ISchedules[]>({
-    method: 'GET',
-    url: '/schedules/client',
-    headers: {
-      id: user.id,
-    },
-  });
+  const toast = useToast();
+
+  async function fetchSchedules() {
+    try {
+      setIsLoading(true);
+      const response = await api.get<ISchedules[]>('/schedules/client', {
+        headers: {
+          id: user.id,
+        },
+      });
+
+      setSchedules(response.data);
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+      const isAppError = error instanceof AppError;
+      const message = isAppError
+        ? error.message
+        : 'Ocorreu um erro ao buscar os agendamentos';
+      toast.show({
+        title: message,
+        placement: 'top',
+        bg: 'red.500',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchSchedules();
+    }, [])
+  );
 
   return (
     <VStack pb={10}>
@@ -31,17 +70,18 @@ export function SchedulesList() {
         />
       </VStack>
 
-      {state.isLoading && (
+      {isLoading && (
         <LoadingModal
-          showModal={state.isLoading}
+          showModal={isLoading}
           message={'Carregando agendamentos...'}
+          onClose={() => setIsLoading(false)}
         />
       )}
 
       <VStack px={5} paddingBottom={100}>
         <FlatList
           showsVerticalScrollIndicator={false}
-          data={state.data}
+          data={schedules}
           borderRadius={10}
           renderItem={({ item }) => (
             <Pressable

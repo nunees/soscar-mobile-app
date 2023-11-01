@@ -4,12 +4,16 @@ import { LoadingModal } from '@components/LoadingModal';
 import { PartnerCard } from '@components/PartnerCard';
 import { ILocation } from '@dtos/ILocation';
 import { useAuth } from '@hooks/useAuth';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
 import { api } from '@services/api';
 import { AppError } from '@utils/AppError';
 import { VStack, FlatList, useToast } from 'native-base';
-import { useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 type RouteParamsProps = {
   serviceId: string;
@@ -26,33 +30,37 @@ export function SearchSchedule() {
 
   const toast = useToast();
 
-  useEffect(() => {
-    async function handleSearch() {
-      try {
-        setIsLoading(true);
-        console.log(serviceId);
-        const response = await api.get(`/locations/services/${serviceId}`, {
-          headers: {
-            id: user.id,
-          },
-        });
+  useFocusEffect(
+    useCallback(() => {
+      async function handleSearch() {
+        try {
+          setIsLoading(true);
+          console.log(serviceId);
+          const response = await api.get(`/locations/services/${serviceId}`, {
+            headers: {
+              id: user.id,
+            },
+          });
 
-        setLocations(response.data);
-      } catch (error) {
-        const isAppError = error instanceof AppError;
-        const message = isAppError ? error.message : 'Erro ao buscar parceiros';
-        toast.show({
-          title: message,
-          placement: 'top',
-          bgColor: 'red.500',
-        });
-      } finally {
-        setIsLoading(false);
+          setLocations(response.data);
+        } catch (error) {
+          const isAppError = error instanceof AppError;
+          const message = isAppError
+            ? error.message
+            : 'Erro ao buscar parceiros';
+          toast.show({
+            title: message,
+            placement: 'top',
+            bgColor: 'red.500',
+          });
+        } finally {
+          setIsLoading(false);
+        }
       }
-    }
 
-    handleSearch();
-  }, [serviceId]);
+      handleSearch();
+    }, [serviceId])
+  );
 
   return (
     <VStack pb={10}>

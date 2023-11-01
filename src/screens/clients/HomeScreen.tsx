@@ -2,7 +2,6 @@ import QRCodeImage from '@assets/qrcode.png';
 import CalendarImage from '@assets/services/calendar.png';
 import CompliantImage from '@assets/services/compliant.png';
 import PaperImage from '@assets/services/paper.png';
-import { SearchBar } from '@components/SearchBar';
 import { ServiceCardTypes } from '@components/ServiceCardTypes';
 import { SmallSchedulleCard } from '@components/SmallSchedulleCard';
 import UserPhoto from '@components/UserPhoto';
@@ -99,14 +98,11 @@ export function HomeScreen() {
                       : `https://ui-avatars.com/api/?format=png&name=${user.name}W&size=512`,
                   }}
                   alt="Foto de perfil"
-                  size={10}
+                  size={16}
                   borderWidth={3}
                   borderColor="purple.700"
                 />
               </Pressable>
-            </HStack>
-            <HStack mt={3}>
-              <SearchBar />
             </HStack>
           </VStack>
 

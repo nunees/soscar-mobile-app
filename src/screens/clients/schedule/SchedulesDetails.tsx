@@ -7,6 +7,7 @@ import { TextArea } from '@components/TextArea';
 import { IReviewDTO } from '@dtos/IReviewDTO';
 import { ISchedules } from '@dtos/ISchedules';
 import { Feather } from '@expo/vector-icons';
+import { useNotification } from '@hooks/notification/useNotification';
 import { useAuth } from '@hooks/useAuth';
 import { useMapsLinking } from '@hooks/useMapsLinking';
 import {
@@ -28,7 +29,7 @@ import {
   VStack,
 } from 'native-base';
 import { useCallback, useState } from 'react';
-import { Alert, Linking, TouchableOpacity } from 'react-native';
+import { Alert, Linking } from 'react-native';
 
 type RouteParams = {
   scheduleId: string;
@@ -58,6 +59,8 @@ export function SchedulesDetails() {
   const routes = useRoute();
   const { scheduleId } = routes.params as RouteParams;
 
+  const { sendNotification } = useNotification();
+
   const navigation = useNavigation<AppNavigatorRoutesProps>();
 
   const { user } = useAuth();
@@ -85,7 +88,7 @@ export function SchedulesDetails() {
   async function handleCancelSchedule() {
     Alert.alert(
       'Deseja realmente cancelar o agendamento?',
-      'Essa acao nao pode ser desfeita',
+      'Essa açãoo não pode ser desfeita',
       [
         {
           text: 'Cancelar',
@@ -104,6 +107,22 @@ export function SchedulesDetails() {
                   id: user.id,
                 },
               }
+            );
+            await sendNotification(
+              schedule?.location?.user_id as string,
+              `O agendamento do dia ${schedule?.date
+                ?.toString()
+                .split('T')[0]
+                .split('-')
+                .reverse()
+                .toLocaleString()
+                .replace(
+                  /,/g,
+                  '/'
+                )} as ${schedule?.time} foi cancelado pelo cliente`,
+              'Agendamento cancelado',
+              'schedule',
+              user.id
             );
             fetchScheduleDetails();
           },
@@ -221,7 +240,7 @@ export function SchedulesDetails() {
                 <VStack alignItems="center">
                   <Text>Aguardando confirmacao</Text>
                   <Text fontSize={'xs'} color="gray.400">
-                    Seu agendamento esta pendente de confirmacao
+                    Seu agendamento esta pendente de confirmação
                   </Text>
                 </VStack>
               )}
@@ -229,8 +248,8 @@ export function SchedulesDetails() {
                 <VStack alignItems="center">
                   <Text>Em processo de analise</Text>
                   <Text fontSize={'xs'} color="gray.400">
-                    Seu agendamento esta em processo de analise e o prestador de
-                    servico entrara em contato.
+                    Seu agendamento está em processo de análise e o prestador de
+                    serviço entrará em contato.
                   </Text>
                 </VStack>
               )}
@@ -239,7 +258,7 @@ export function SchedulesDetails() {
                   <Text>Finalizado</Text>
                   <Text fontSize={'xs'} color="gray.400">
                     Seu agendamento foi confirmado, aguarde o prestador de
-                    servico entrar em contato.
+                    serviço entrar em contato.
                   </Text>
                 </VStack>
               )}
@@ -259,7 +278,7 @@ export function SchedulesDetails() {
               borderRadius={10}
             >
               <VStack>
-                <Text bold>Veiculo</Text>
+                <Text bold>Veículo</Text>
                 <Text bold fontSize={'md'}>
                   {schedule?.vehicles?.brand.name}
                 </Text>
@@ -287,7 +306,7 @@ export function SchedulesDetails() {
           </VStack>
 
           <VStack mt={5} backgroundColor="white" p={3} borderRadius={10}>
-            <Text bold>Tipo de servico</Text>
+            <Text bold>Tipo de serviço</Text>
             <Text>{schedule?.notes ? schedule?.notes : 'Sem observações'}</Text>
           </VStack>
         </VStack>
@@ -301,14 +320,18 @@ export function SchedulesDetails() {
           </VStack>
 
           <VStack mt={5} backgroundColor="white" p={3} borderRadius={10}>
-            <Text bold>Endereco</Text>
+            <Text bold>Endereço</Text>
             <Text>
               {schedule?.location?.address_line}, {schedule?.location?.number}
             </Text>
             <Text>
               {schedule?.location?.district} / {schedule?.location?.state}
             </Text>
-            <TouchableOpacity
+
+            <Button
+              mt={1}
+              title="Ver no mapa"
+              backgroundColor={'purple.500'}
               onPress={() =>
                 schedule?.location &&
                 Linking.openURL(
@@ -319,11 +342,7 @@ export function SchedulesDetails() {
                   )
                 )
               }
-            >
-              <Text color="purple.500" bold>
-                Ver no mapa
-              </Text>
-            </TouchableOpacity>
+            />
           </VStack>
 
           <VStack mt={5} backgroundColor="white" p={5} borderRadius={10}>
