@@ -27,6 +27,7 @@ import { VehicleDetails } from '@screens/clients/vehicles/VehicleDetails';
 import { Vechicles } from '@screens/clients/vehicles/Vehicles';
 import EditProfileInformation from '@screens/EditProfileInformation';
 import MyAccountInformation from '@screens/MyAccountInformation';
+import { Notifications } from '@screens/Notifications';
 import { LocationDetails } from '@screens/partners/locations/LocationDetails';
 import { Profile } from '@screens/Profile';
 import { QuoteDone } from '@screens/QuoteDone';
@@ -70,6 +71,7 @@ type AppRotes = {
   // Other routes
   taskDone: { date: string };
   validateDocument: undefined;
+  notifications: undefined;
 };
 
 export type AppNavigatorRoutesProps = BottomTabNavigationProp<AppRotes>;
@@ -374,6 +376,15 @@ export function AppRoutes() {
       <Screen
         name="validateDocument"
         component={ValidateDocument}
+        options={{
+          tabBarButton: () => null,
+          tabBarStyle: { display: 'none' },
+        }}
+      />
+
+      <Screen
+        name="notifications"
+        component={Notifications}
         options={{
           tabBarButton: () => null,
           tabBarStyle: { display: 'none' },

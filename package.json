@@ -46,7 +46,9 @@
     "react-native-screens": "~3.18.0",
     "react-native-svg": "13.4.0",
     "uuid": "^9.0.1",
-    "yup": "^1.2.0"
+    "yup": "^1.2.0",
+    "expo-background-fetch": "~11.0.1",
+    "expo-task-manager": "~11.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.19.3",

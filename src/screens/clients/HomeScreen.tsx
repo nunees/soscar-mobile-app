@@ -6,6 +6,7 @@ import { ServiceCardTypes } from '@components/ServiceCardTypes';
 import { SmallSchedulleCard } from '@components/SmallSchedulleCard';
 import UserPhoto from '@components/UserPhoto';
 import { ISchedules } from '@dtos/ISchedules';
+import { FontAwesome5 } from '@expo/vector-icons';
 import { useAuth } from '@hooks/useAuth';
 import { useProfile } from '@hooks/useProfile';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
@@ -21,6 +22,7 @@ import {
   Center,
   FlatList,
   useToast,
+  Icon,
 } from 'native-base';
 import { useCallback, useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -90,19 +92,29 @@ export function HomeScreen() {
                   {user.name}!
                 </Text>
               </VStack>
-              <Pressable onPress={() => navigation.navigate('profile')}>
-                <UserPhoto
-                  source={{
-                    uri: user.avatar
-                      ? `${api.defaults.baseURL}/user/avatar/${user.id}/${user.avatar}`
-                      : `https://ui-avatars.com/api/?format=png&name=${user.name}W&size=512`,
-                  }}
-                  alt="Foto de perfil"
-                  size={16}
-                  borderWidth={3}
-                  borderColor="purple.700"
-                />
-              </Pressable>
+              <HStack>
+                <Pressable onPress={() => navigation.navigate('notifications')}>
+                  <Icon
+                    as={FontAwesome5}
+                    name="bell"
+                    size={5}
+                    color={'gray.600'}
+                  />
+                </Pressable>
+                <Pressable onPress={() => navigation.navigate('profile')}>
+                  <UserPhoto
+                    source={{
+                      uri: user.avatar
+                        ? `${api.defaults.baseURL}/user/avatar/${user.id}/${user.avatar}`
+                        : `https://ui-avatars.com/api/?format=png&name=${user.name}W&size=512`,
+                    }}
+                    alt="Foto de perfil"
+                    size={16}
+                    borderWidth={3}
+                    borderColor="purple.700"
+                  />
+                </Pressable>
+              </HStack>
             </HStack>
           </VStack>
 

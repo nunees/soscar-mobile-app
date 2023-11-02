@@ -6,6 +6,7 @@ import {
 import { ChangePassword } from '@screens/ChangePassword';
 import EditProfileInformation from '@screens/EditProfileInformation';
 import MyAccountInformation from '@screens/MyAccountInformation';
+import { Notifications } from '@screens/Notifications';
 import { HomeScreen } from '@screens/partners/HomeScreen';
 import { AddLocation } from '@screens/partners/locations/AddLocation';
 import { EditLocation } from '@screens/partners/locations/EditLocation';
@@ -35,6 +36,7 @@ type PartnerRoutes = {
   quoteDetail: { quoteId: string; locationId: string };
   legalQuoteDetail: { legalQuoteId: string; locationId: string };
   validateDocument: undefined;
+  notifications: undefined;
 };
 
 export type PartnerNavigatorRoutesProps =
@@ -204,6 +206,15 @@ export function PartnerRoutes() {
       <Screen
         name="validateDocument"
         component={ValidateDocument}
+        options={{
+          tabBarButton: () => null,
+          tabBarStyle: { display: 'none' },
+        }}
+      />
+
+      <Screen
+        name="notifications"
+        component={Notifications}
         options={{
           tabBarButton: () => null,
           tabBarStyle: { display: 'none' },

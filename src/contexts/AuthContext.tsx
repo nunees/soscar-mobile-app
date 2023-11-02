@@ -14,6 +14,11 @@ import {
   storageUserRemove,
   storageUserSave,
 } from '@storage/storageUser';
+import {
+  storageUserKeysGet,
+  storageUserKeysRemove,
+  storageUserKeysSave,
+} from '@storage/storageUserKeys';
 import { AppError } from '@utils/AppError';
 import { createContext, ReactNode, useEffect, useState } from 'react';
 
@@ -37,9 +42,11 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
   const { removeProfile } = useProfile();
 
   const [user, setUser] = useState<IUserDTO>({} as IUserDTO);
-  const [userId, setUserId] = useState<string>('');
   const [isLoadingUserStorageData, setIsLoadingUserStorageData] =
     useState(true);
+
+  const { sendNotification } = usePushNotification();
+  const { markAsRead } = useNotification();
 
   async function userAndTokenUpdate(userData: IUserDTO, token: string) {
     try {
@@ -74,8 +81,6 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
         password,
       });
 
-      setUserId(data.user.id);
-
       if (data.user && data.token && data.refresh_token) {
         await storageUserAndTokenSave(
           data.user,
@@ -83,9 +88,14 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
           data.refresh_token
         );
         userAndTokenUpdate(data.user, data.token);
+        storageUserKeysSave({
+          user_id: data.user.id,
+          email: data.user.email,
+          password: data.user.password,
+        });
       }
     } catch (error) {
-      throw new AppError('Erro ao autenticar usuário');
+      throw new AppError('Usuário ou senha incorretos');
     } finally {
       setIsLoadingUserStorageData(false);
     }
@@ -98,7 +108,9 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
       await storageUserRemove();
       await storageAuthTokenRemove();
       await removeProfile();
+      await storageUserKeysRemove();
     } catch (error) {
+      console.log(error);
       throw new AppError('Erro ao deslogar usuário');
     } finally {
       setIsLoadingUserStorageData(false);
@@ -131,6 +143,29 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
     }
   }
 
+  async function notificationsRoutine() {
+    const { user_id } = await storageUserKeysGet();
+    const { data } = await api.get(`/notifications/all/new`, {
+      headers: {
+        id: user_id,
+      },
+    });
+
+    if (data !== undefined) {
+      data?.map(async (notification: IPushNotificationDTO) => {
+        const notificationId = notification.id;
+        if (!notification.received) {
+          await markAsRead(user.id, notificationId);
+          await sendNotification(
+            notification.title,
+            notification.body,
+            notification.channel
+          );
+        }
+      });
+    }
+  }
+
   useEffect(() => {
     loadUserData();
   }, []);
@@ -143,31 +178,10 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
     };
   }, []);
 
-  const { sendNotification } = usePushNotification();
-  const { markAsRead } = useNotification();
-
   useEffect(() => {
     const interval = setInterval(async () => {
-      const response = await api.get(`/notifications/user/${userId}`, {
-        headers: {
-          id: userId,
-        },
-      });
-
-      console.log(response.data);
-
-      response.data.map(async (notification: IPushNotificationDTO) => {
-        const notificationId = notification.id;
-        if (!notification.received) {
-          await markAsRead(user.id, notificationId);
-          await sendNotification(
-            notification.title,
-            notification.body,
-            notification.channel
-          );
-        }
-      });
-    }, 30000);
+      notificationsRoutine();
+    }, 10000);
 
     return () => clearInterval(interval);
   }, []);

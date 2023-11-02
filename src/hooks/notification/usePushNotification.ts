@@ -1,4 +1,8 @@
-import notifee, { AndroidImportance, TriggerType } from '@notifee/react-native';
+import notifee, {
+  AndroidImportance,
+  AndroidVisibility,
+  TriggerType,
+} from '@notifee/react-native';
 import { useEffect, useState } from 'react';
 
 export function usePushNotification() {
@@ -15,7 +19,9 @@ export function usePushNotification() {
         id: 'quote',
         name: 'Orcamentos',
         importance: AndroidImportance.HIGH,
-        sound: 'System sound',
+        sound: 'horn',
+        vibration: true,
+        visibility: AndroidVisibility.PUBLIC,
       })
       .then((channelId) =>
         setChannels({ ...channels, quoteChannelId: channelId })
@@ -26,6 +32,9 @@ export function usePushNotification() {
         id: 'legalQuote',
         name: 'Orcamentos',
         importance: AndroidImportance.HIGH,
+        sound: 'horn',
+        vibration: true,
+        visibility: AndroidVisibility.PUBLIC,
       })
       .then((channelId) =>
         setChannels({ ...channels, legalQuoteChannel: channelId })
@@ -36,6 +45,9 @@ export function usePushNotification() {
         id: 'schedule',
         name: 'Agendamentos',
         importance: AndroidImportance.HIGH,
+        sound: 'horn',
+        vibration: true,
+        visibility: AndroidVisibility.PUBLIC,
       })
       .then((channelId) =>
         setChannels({ ...channels, scheduleChannel: channelId })
@@ -46,6 +58,9 @@ export function usePushNotification() {
         id: 'news',
         name: 'Noticias',
         importance: AndroidImportance.HIGH,
+        sound: 'horn',
+        vibration: true,
+        visibility: AndroidVisibility.PUBLIC,
       })
       .then((channelId) =>
         setChannels({ ...channels, newsChannel: channelId })
@@ -57,16 +72,20 @@ export function usePushNotification() {
     body: string,
     channelId: string
   ) {
-    await notifee.requestPermission();
+    try {
+      await notifee.requestPermission();
 
-    await notifee.displayNotification({
-      id: Math.random().toString(),
-      title,
-      body,
-      android: {
-        channelId,
-      },
-    });
+      await notifee.displayNotification({
+        id: Math.random().toString(),
+        title,
+        body,
+        android: {
+          channelId,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async function cancelNotification(id: string) {

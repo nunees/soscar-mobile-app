@@ -18,7 +18,7 @@ type FormDataProps = {
 };
 
 export function ChangePassword() {
-  const [showModal, setShowModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const { user } = useAuth();
 
@@ -33,7 +33,7 @@ export function ChangePassword() {
   } = useForm<FormDataProps>();
 
   async function handleSubmitForm(data: FormDataProps) {
-    setShowModal(true);
+    setIsLoading(true);
     try {
       await api.put(
         '/user/password/update',
@@ -52,10 +52,10 @@ export function ChangePassword() {
         placement: 'top',
         bgColor: 'green.500',
       });
-      setShowModal(false);
+      setIsLoading(false);
       navigation.navigate('home');
     } catch (error) {
-      setShowModal(false);
+      setIsLoading(false);
       const isAppError = error instanceof AppError;
       toast.show({
         title: isAppError ? error.message : 'Erro ao obter dados',
@@ -63,7 +63,7 @@ export function ChangePassword() {
         bgColor: 'red.500',
       });
     } finally {
-      setShowModal(false);
+      setIsLoading(false);
     }
   }
 
@@ -78,9 +78,6 @@ export function ChangePassword() {
       </VStack>
 
       <VStack px={10} py={10}>
-        {showModal && (
-          <LoadingModal showModal={showModal} setShowModal={setShowModal} />
-        )}
         <Text bold fontSize="xs">
           Senha Atual
         </Text>
@@ -133,7 +130,8 @@ export function ChangePassword() {
         />
 
         <Button
-          isLoading={showModal}
+          isLoading={isLoading}
+          isLoadingText={'Atualizando...'}
           title="Atualizar informações"
           mt={10}
           onPress={handleSubmit(handleSubmitForm)}

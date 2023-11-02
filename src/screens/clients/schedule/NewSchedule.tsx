@@ -82,26 +82,23 @@ export function NewSchedule() {
       );
 
       upload.data?.forEach(async (file) => {
-        await api
-          .post(`/schedules/documents/${response.data.id}`, file, {
-            headers: {
-              id: user.id,
-              'Content-Type': 'multipart/form-data',
-            },
-          })
-          .then(() => {
-            navigation.navigate('taskDone', { date: selectedDate });
-          });
+        await api.post(`/schedules/documents/${response.data.id}`, file, {
+          headers: {
+            id: user.id,
+            'Content-Type': 'multipart/form-data',
+          },
+        });
       });
 
       await sendNotification(
         location?.user_id as string,
-        `Você têm um novo pedido de agendamento de ${user.name}`,
-        'Novo agendamento',
+        `Você têm um novo pedido de agendamento de <strong>${user.name}</strong> , abra o app e confira`,
+        'Novo agendamento 🤩',
         'schedule',
         user.id
       );
       setIsSubmiting(false);
+      navigation.navigate('taskDone', { date: selectedDate });
     } catch (error) {
       const isAppError = error instanceof AppError;
       const message = isAppError

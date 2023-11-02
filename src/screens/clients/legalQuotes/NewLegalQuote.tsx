@@ -9,6 +9,7 @@ import { UploadFileField } from '@components/UploadFileField';
 import { ILocation } from '@dtos/ILocation';
 import { IVehicleDTO } from '@dtos/IVechicleDTO';
 import { useAxiosFetch } from '@hooks/axios/useAxiosFetch';
+import { useNotification } from '@hooks/notification/useNotification';
 import { useAuth } from '@hooks/useAuth';
 import { useGPS } from '@hooks/useGPS';
 import { useIdGenerator } from '@hooks/useIdGenerator';
@@ -58,6 +59,7 @@ export function NewLegalQuote() {
 
   const { generateId } = useIdGenerator();
   const { upload, GetUploadImage } = useUploadFormData('document');
+  const { sendNotification } = useNotification();
 
   const locations = useAxiosFetch<ILocation[]>({
     url: `/locations/services/${serviceId}`,
@@ -160,6 +162,21 @@ export function NewLegalQuote() {
             'Content-Type': 'multipart/form-data',
           },
         });
+      });
+
+      locationsSelected.map(async (location: string) => {
+        const result = await api.get<ILocation>(`/locations/${location}`, {
+          headers: {
+            id: user.id,
+          },
+        });
+        await sendNotification(
+          result.data.user_id as string,
+          `Você têm um novo pedido de orçamento jurídico de <strong>${user.name}</strong> , abra o app e confira`,
+          'Pedido de orçamento jurídico 🧑🏾‍⚖️',
+          'quotes',
+          user.id
+        );
       });
 
       setIsSaving(false);

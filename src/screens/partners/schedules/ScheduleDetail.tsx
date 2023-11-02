@@ -5,8 +5,8 @@ import getLogoImage from '@components/LogosImages';
 import { StatusIcon } from '@components/StatusIcon';
 import { TextArea } from '@components/TextArea';
 import { ISchedules } from '@dtos/ISchedules';
-import { AppError } from '@utils/AppError';
 import { Feather } from '@expo/vector-icons';
+import { useNotification } from '@hooks/notification/useNotification';
 import { useAuth } from '@hooks/useAuth';
 import { useMapsLinking } from '@hooks/useMapsLinking';
 import {
@@ -16,6 +16,7 @@ import {
 } from '@react-navigation/native';
 import { PartnerNavigatorRoutesProps } from '@routes/partner.routes';
 import { api } from '@services/api';
+import { AppError } from '@utils/AppError';
 import {
   HStack,
   Heading,
@@ -63,6 +64,8 @@ export function ScheduleDetail() {
 
   const navigation = useNavigation<PartnerNavigatorRoutesProps>();
 
+  const { sendNotification } = useNotification();
+
   const fetchScheduleDetails = useCallback(async () => {
     try {
       const response = await api.get(`/schedules/find/${scheduleId}`, {
@@ -109,6 +112,13 @@ export function ScheduleDetail() {
           },
         },
       ]
+    );
+    await sendNotification(
+      schedule?.user_id as string,
+      `Seu agendamento foi cancelado pelo prestador de serviço`,
+      'Não foi dessa vez! 😢',
+      'quotes',
+      user.id
     );
   }
 

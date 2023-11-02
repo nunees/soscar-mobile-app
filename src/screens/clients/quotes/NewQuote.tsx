@@ -153,8 +153,8 @@ export function NewQuote() {
       await sendNotification(
         location?.user_id as string,
         `Você têm um novo pedido de orçamento de ${user.name}`,
-        'Novo orçamento',
-        'quote',
+        'Novo pedido de orçamento 📄',
+        'legalQuote',
         user.id
       );
 

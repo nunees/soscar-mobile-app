@@ -37,7 +37,6 @@ export function useGPS() {
             error: '',
           });
         } catch (error) {
-          console.log(error);
           setPosition({
             coords: {} as Location.LocationObjectCoords,
             isLoading: false,

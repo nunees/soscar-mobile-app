@@ -16,15 +16,13 @@ export function MultiSelection() {
 
   const onPressHandler = (id: number) => {
     const { selected } = state;
-    console.log('Initial value of selected: ', selected);
+
     const renderData = [...state.renderData];
 
     const index = selected.findIndex((item) => item === id);
     if (index === -1) {
       selected.push(id);
     }
-
-    console.log(selected);
   };
 
   return (

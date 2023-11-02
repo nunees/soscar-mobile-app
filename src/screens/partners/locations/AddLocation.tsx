@@ -128,7 +128,7 @@ export function AddLocation() {
         .split(':')
         .slice(0, 2)
         .join(':');
-      console.log(tempDate);
+
       if (state === 'open') {
         setValue('openAt', tempDate);
       } else if (state === 'close') {

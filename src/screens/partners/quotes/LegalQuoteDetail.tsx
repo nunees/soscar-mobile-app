@@ -11,7 +11,7 @@ import { VEHICLE_MODELS } from '@data/VehiclesModels';
 import { IlegalQuoteDocument } from '@dtos/ILegalQuoteDocument';
 import { ILocation } from '@dtos/ILocation';
 import { IQuoteList } from '@dtos/IQuoteList';
-import { AppError } from '@utils/AppError';
+import { useNotification } from '@hooks/notification/useNotification';
 import { useAuth } from '@hooks/useAuth';
 import {
   useFocusEffect,
@@ -20,6 +20,7 @@ import {
 } from '@react-navigation/native';
 import { PartnerNavigatorRoutesProps } from '@routes/partner.routes';
 import { api } from '@services/api';
+import { AppError } from '@utils/AppError';
 import { IFileInfo } from 'expo-file-system';
 import * as FileSystem from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';
@@ -61,6 +62,8 @@ export function LegalQuoteDetail() {
 
   const navigation = useNavigation<PartnerNavigatorRoutesProps>();
 
+  const { sendNotification } = useNotification();
+
   const handleSubmitSucess = useCallback(async () => {
     await api.patch(
       `/legal/update/${legalQuoteId}`,
@@ -78,7 +81,15 @@ export function LegalQuoteDetail() {
       }
     );
 
-    // navigation.navigate('orders');
+    await sendNotification(
+      location?.user_id as string,
+      `Seu pedido de orçamento foi aprovado!`,
+      'Boas notícias 😄',
+      'legalQuote',
+      user.id
+    );
+
+    navigation.navigate('orders');
   }, []);
 
   const handleDocumentUpload = useCallback(async () => {
@@ -183,16 +194,16 @@ export function LegalQuoteDetail() {
     useCallback(() => {
       async function handleQuoteDocuments() {
         try {
-          const user = quote.UserQuotesDocuments.filter(
-            (item) => !item.isPartnerDocument
-          );
+          // const user = quote.UserQuotesDocuments.filter(
+          //   (item) => !item.isPartnerDocument
+          // );
 
           const partner = quote.UserQuotesDocuments.filter(
             (item) => item.isPartnerDocument
           );
 
           setPartnerMidia(partner);
-          setUserMidia(user);
+          // setUserMidia(user);
         } catch (error) {
           throw new AppError('Erro ao buscar arquivos do orçamento');
         }

@@ -35,7 +35,7 @@ export function SearchSchedule() {
       async function handleSearch() {
         try {
           setIsLoading(true);
-          console.log(serviceId);
+
           const response = await api.get(`/locations/services/${serviceId}`, {
             headers: {
               id: user.id,

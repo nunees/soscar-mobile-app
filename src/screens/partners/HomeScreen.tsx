@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { SearchBar } from '@components/SearchBar';
 import { SmallSchedulleCard } from '@components/SmallSchedulleCard';
 import UserPhoto from '@components/UserPhoto';
 import { ISchedules } from '@dtos/ISchedules';
+import { FontAwesome5 } from '@expo/vector-icons';
 import { useAuth } from '@hooks/useAuth';
 import { useProfile } from '@hooks/useProfile';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
@@ -18,6 +18,7 @@ import {
   Center,
   Pressable,
   FlatList,
+  Icon,
 } from 'native-base';
 import { useCallback, useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -90,12 +91,10 @@ export function HomeScreen() {
     fetchUserData();
   }, []);
 
-  console.log(schedules);
-
   return (
     <SafeAreaView>
       <ScrollView showsVerticalScrollIndicator={false}>
-        <VStack>
+        <VStack px={5}>
           <VStack backgroundColor="white" p={5} borderRadius={10} shadow={1}>
             <HStack justifyContent={'space-between'} alignItems={'center'}>
               <VStack>
@@ -106,82 +105,92 @@ export function HomeScreen() {
                   {user.name}!
                 </Text>
               </VStack>
-              <Pressable onPress={() => navigation.navigate('profile')}>
-                <UserPhoto
-                  source={{
-                    uri: user.avatar
-                      ? `${api.defaults.baseURL}/user/avatar/${user.id}/${user.avatar}`
-                      : `https://ui-avatars.com/api/?format=png&name=${user.name}W&size=512`,
-                  }}
-                  alt="Foto de perfil"
-                  size={10}
-                  borderWidth={3}
-                  borderColor="purple.700"
-                />
-              </Pressable>
-            </HStack>
-            <HStack mt={3}>
-              <SearchBar />
+              <HStack alignItems={'center'}>
+                <Pressable
+                  onPress={() => navigation.navigate('notifications')}
+                  mr={5}
+                >
+                  <Icon
+                    as={FontAwesome5}
+                    name="bell"
+                    size={5}
+                    color={'gray.600'}
+                  />
+                </Pressable>
+                <Pressable onPress={() => navigation.navigate('profile')}>
+                  <UserPhoto
+                    source={{
+                      uri: user.avatar
+                        ? `${api.defaults.baseURL}/user/avatar/${user.id}/${user.avatar}`
+                        : `https://ui-avatars.com/api/?format=png&name=${user.name}W&size=512`,
+                    }}
+                    alt="Foto de perfil"
+                    size={10}
+                    borderWidth={3}
+                    borderColor="purple.700"
+                  />
+                </Pressable>
+              </HStack>
             </HStack>
           </VStack>
+        </VStack>
 
-          <VStack px={5} mt={5}>
-            <VStack>
-              <Text fontSize={'md'} bold pb={3}>
-                Seus proximos clientes
-              </Text>
+        <VStack px={5} mt={5}>
+          <VStack>
+            <Text fontSize={'md'} bold pb={3}>
+              Seus proximos clientes
+            </Text>
 
-              <FlatList
-                data={schedules}
-                horizontal={true}
-                showsHorizontalScrollIndicator={false}
-                snapToAlignment="start"
-                pagingEnabled
-                keyExtractor={(item) => item.id!}
-                renderItem={({ item }) => {
-                  return (
-                    <VStack mb={3} borderRadius={5} shadow={0.8}>
-                      <SmallSchedulleCard
-                        id={item.id}
-                        client={item.users?.name}
-                        date={item.date}
-                        service_type={item.service_type?.category_id}
-                        time={item.time}
-                      />
+            <FlatList
+              data={schedules}
+              horizontal={true}
+              showsHorizontalScrollIndicator={false}
+              snapToAlignment="start"
+              pagingEnabled
+              keyExtractor={(item) => item.id!}
+              renderItem={({ item }) => {
+                return (
+                  <VStack mb={3} borderRadius={5} shadow={0.8}>
+                    <SmallSchedulleCard
+                      id={item.id}
+                      client={item.users?.name}
+                      date={item.date}
+                      service_type={item.service_type?.category_id}
+                      time={item.time}
+                    />
+                  </VStack>
+                );
+              }}
+              ListEmptyComponent={() => (
+                <HStack
+                  backgroundColor="white"
+                  w={350}
+                  borderRadius={10}
+                  p={3}
+                  justifyContent={'space-around'}
+                >
+                  <VStack w={20} h={20}>
+                    <VStack
+                      backgroundColor={'purple.700'}
+                      borderRadius={10}
+                      alignItems={'center'}
+                    >
+                      <Text bold fontSize={'4xl'} p={3} color="white">
+                        {new Date().getDate().toString()}
+                      </Text>
                     </VStack>
-                  );
-                }}
-                ListEmptyComponent={() => (
-                  <HStack
-                    backgroundColor="white"
-                    w={350}
-                    borderRadius={10}
-                    p={3}
-                    justifyContent={'space-around'}
-                  >
-                    <VStack w={20} h={20}>
-                      <VStack
-                        backgroundColor={'purple.700'}
-                        borderRadius={10}
-                        alignItems={'center'}
-                      >
-                        <Text bold fontSize={'4xl'} p={3} color="white">
-                          {new Date().getDate().toString()}
-                        </Text>
-                      </VStack>
-                    </VStack>
-                    <VStack pt={5}>
-                      <Center>
-                        <Text color="green.600">Tudo certo! 👍</Text>
-                        <Text color="green.600" bold>
-                          Você não possui agendamentos
-                        </Text>
-                      </Center>
-                    </VStack>
-                  </HStack>
-                )}
-              />
-            </VStack>
+                  </VStack>
+                  <VStack pt={5}>
+                    <Center>
+                      <Text color="green.600">Tudo certo! 👍</Text>
+                      <Text color="green.600" bold>
+                        Você não possui agendamentos
+                      </Text>
+                    </Center>
+                  </VStack>
+                </HStack>
+              )}
+            />
           </VStack>
         </VStack>
       </ScrollView>
