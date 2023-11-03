@@ -23,15 +23,23 @@ type Props = IImageProps &
 
 export function PartnerCard({ location, ...rest }: Props) {
   const [distance, setDistance] = useState<number>(0);
+  const [latitude, setLatitude] = useState<number>(0);
+  const [longitude, setLongitude] = useState<number>(0);
 
-  const { position } = useGPS();
+  // const { position } = useGPS();
 
-  function getDistanceFromLatLonInKm(
-    [lat1, lon1]: number[],
-    [lat2, lon2]: number[]
-  ) {
-    return CalculatePositionDistance([lat1, lon1], [lat2, lon2]);
-  }
+  const useGPSHook = useGPS();
+
+  const fetchUserPosition = async () => {
+    await useGPSHook.requestPermissions();
+    setLatitude(useGPSHook.position.coords.latitude);
+    setLongitude(useGPSHook.position.coords.longitude);
+    const newDistance = CalculatePositionDistance(
+      [latitude, longitude],
+      [Number(location.latitude), Number(location.longitude)]
+    );
+    setDistance(newDistance);
+  };
 
   const isPartnerOpen = useCallback(() => {
     if (!location?.open_hours) return false;
@@ -41,17 +49,9 @@ export function PartnerCard({ location, ...rest }: Props) {
     return now >= Number(open) && now <= Number(close);
   }, [location]);
 
-  const getDistance = useCallback(() => {
-    const userDistance = getDistanceFromLatLonInKm(
-      [Number(position.coords.latitude), Number(position.coords.longitude)],
-      [Number(location?.latitude), Number(location?.longitude)]
-    );
-    setDistance(userDistance);
-  }, [location]);
-
   useFocusEffect(
     useCallback(() => {
-      getDistance();
+      fetchUserPosition();
     }, [location])
   );
 

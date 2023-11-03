@@ -11,6 +11,40 @@ export function useGPS() {
     error: '',
   });
 
+  async function requestPermissions() {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setPosition({
+          coords: {} as Location.LocationObjectCoords,
+          isLoading: false,
+          isError: true,
+          isSucess: false,
+          error: 'Permissão de acesso negada',
+        });
+      }
+
+      const location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.High,
+      });
+      setPosition({
+        coords: location.coords,
+        isLoading: false,
+        isError: false,
+        isSucess: true,
+        error: '',
+      });
+    } catch (error) {
+      setPosition({
+        coords: {} as Location.LocationObjectCoords,
+        isLoading: false,
+        isError: true,
+        isSucess: false,
+        error: 'Ocorrerram erros ao buscar sua localização',
+      });
+    }
+  }
+
   useFocusEffect(
     useCallback(() => {
       (async () => {
@@ -49,5 +83,5 @@ export function useGPS() {
     }, [])
   );
 
-  return { position };
+  return { position, requestPermissions };
 }

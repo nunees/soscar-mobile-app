@@ -84,6 +84,7 @@ export function AddLocation() {
 
   const handleCepInput = useCallback(async () => {
     try {
+      console.log('teste');
       setIsLoading(true);
       const fields = getValues();
 
@@ -618,7 +619,7 @@ export function AddLocation() {
           <VStack px={5}>
             <Button
               title="Criar local"
-              onPress={handleSubmit(handleSubmitBusiness)}
+              onPress={handleSubmitBusiness}
               isLoading={isLoading}
             />
           </VStack>

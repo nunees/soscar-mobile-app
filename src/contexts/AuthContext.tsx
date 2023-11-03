@@ -179,11 +179,14 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
   }, []);
 
   useEffect(() => {
-    const interval = setInterval(async () => {
-      notificationsRoutine();
-    }, 10000);
+    if (user.id !== undefined) {
+      const interval = setInterval(async () => {
+        notificationsRoutine();
+      }, 10000);
 
-    return () => clearInterval(interval);
+      return () => clearInterval(interval);
+    }
+    return () => {};
   }, []);
 
   return (

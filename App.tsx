@@ -113,7 +113,7 @@ export default function App() {
 
   useEffect(() => {
     triggerNotification();
-  }, [state]);
+  }, []);
 
   // useEffect(() => {
   //   try {

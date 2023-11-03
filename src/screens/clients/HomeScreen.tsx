@@ -92,8 +92,11 @@ export function HomeScreen() {
                   {user.name}!
                 </Text>
               </VStack>
-              <HStack>
-                <Pressable onPress={() => navigation.navigate('notifications')}>
+              <HStack alignItems={'center'}>
+                <Pressable
+                  onPress={() => navigation.navigate('notifications')}
+                  mr={5}
+                >
                   <Icon
                     as={FontAwesome5}
                     name="bell"
@@ -109,7 +112,7 @@ export function HomeScreen() {
                         : `https://ui-avatars.com/api/?format=png&name=${user.name}W&size=512`,
                     }}
                     alt="Foto de perfil"
-                    size={16}
+                    size={10}
                     borderWidth={3}
                     borderColor="purple.700"
                   />

@@ -18,7 +18,7 @@ import {
 import { Eye, EyeClosed } from 'phosphor-react-native';
 import React, { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { Pressable } from 'react-native';
+import { Pressable, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as yup from 'yup';
 
@@ -137,9 +137,13 @@ export function SignIn() {
               />
 
               <Center mb={5}>
-                <Text fontSize={'xs'} color="purple.700" bold>
-                  Esqueceu sua senha?
-                </Text>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate('recoverPassword')}
+                >
+                  <Text fontSize={'xs'} color="purple.700" bold>
+                    Esqueceu sua senha?
+                  </Text>
+                </TouchableOpacity>
               </Center>
 
               <Button

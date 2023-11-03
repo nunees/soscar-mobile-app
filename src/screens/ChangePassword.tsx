@@ -1,7 +1,6 @@
 import { AppHeader } from '@components/AppHeader';
 import { Button } from '@components/Button';
 import { Input } from '@components/Input';
-import { LoadingModal } from '@components/LoadingModal';
 import { useAuth } from '@hooks/useAuth';
 import { useNavigation } from '@react-navigation/native';
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
