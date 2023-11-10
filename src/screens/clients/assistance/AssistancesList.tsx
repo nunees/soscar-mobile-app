@@ -5,65 +5,38 @@ import TowCarImage from '@assets/services/tow-car.png';
 import TireImage from '@assets/services/wheel.png';
 import { AppHeader } from '@components/AppHeader';
 import { ListServices } from '@components/ListServices';
-import { useAuth } from '@hooks/useAuth';
 import { useNavigation } from '@react-navigation/native';
-import { api } from '@services/api';
-import { VStack, Text, ScrollView } from 'native-base';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { AppNavigatorRoutesProps } from '@routes/app.routes';
+import { ScrollView, VStack } from 'native-base';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-export function Assistance() {
-  const navigation = useNavigation();
-
-  const { user } = useAuth();
-
-  async function createAssistance(serviceId: string) {
-    try {
-      const response = await api.post(
-        `/assistances/${serviceId}`,
-        {
-          milesFee: 0,
-        },
-        {
-          headers: {
-            id: user.id,
-          },
-        }
-      );
-    } catch (error) {
-      console.log(error);
-    }
-  }
+export function AssistancesList() {
+  const navigation = useNavigation<AppNavigatorRoutesProps>();
 
   return (
-    <SafeAreaProvider>
+    <SafeAreaView>
       <VStack>
         <AppHeader
-          title={'Assistência'}
+          title="Tipos de assistencia"
           navigation={navigation}
-          screen={'home'}
+          screen={'services'}
         />
       </VStack>
 
       <ScrollView
-        contentContainerStyle={{
-          paddingBottom: 100,
-        }}
+        showsVerticalScrollIndicator={false}
+        marginBottom={100}
+        mb={5}
       >
-        <VStack px={3}>
-          <VStack background={'white'} p={3} borderRadius={10} mt={3}>
-            <Text bold textAlign={'center'}>
-              Qual tipo de serviço você quer prestar?
-            </Text>
-          </VStack>
-        </VStack>
-
-        <VStack px={3} py={3}>
+        <VStack px={3} mt={3}>
           <ListServices
             image={TireImage}
             alt={'Borracheiro'}
             title={'Borracheiro'}
             content={'Problema com os pneus do veiculo?'}
-            onPress={() => undefined}
+            onPress={() =>
+              navigation.navigate('assistanceContactType', { serviceId: 1 })
+            }
           />
 
           <ListServices
@@ -71,7 +44,9 @@ export function Assistance() {
             alt={'Chaveiro'}
             title={'Chaveiro'}
             content={'Problema com a chave do veiculo? '}
-            onPress={() => undefined}
+            onPress={() =>
+              navigation.navigate('assistanceContactType', { serviceId: 2 })
+            }
           />
 
           <ListServices
@@ -79,7 +54,9 @@ export function Assistance() {
             alt={'Guinchos'}
             title={'Guinchos'}
             content={'O carro quebrou?'}
-            onPress={() => undefined}
+            onPress={() =>
+              navigation.navigate('assistanceContactType', { serviceId: 3 })
+            }
           />
 
           <ListServices
@@ -87,7 +64,9 @@ export function Assistance() {
             alt={'Pane Eletrica'}
             title={'Pane Eletrica'}
             content={'Problema com a bateria? '}
-            onPress={() => undefined}
+            onPress={() =>
+              navigation.navigate('assistanceContactType', { serviceId: 4 })
+            }
           />
 
           <ListServices
@@ -95,10 +74,12 @@ export function Assistance() {
             alt={'Pane Seca'}
             title={'Pane Seca'}
             content={'Acabou a combustivel?'}
-            onPress={() => undefined}
+            onPress={() =>
+              navigation.navigate('assistanceContactType', { serviceId: 5 })
+            }
           />
         </VStack>
       </ScrollView>
-    </SafeAreaProvider>
+    </SafeAreaView>
   );
 }

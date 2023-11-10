@@ -7,6 +7,8 @@ import { ChangePassword } from '@screens/ChangePassword';
 import EditProfileInformation from '@screens/EditProfileInformation';
 import MyAccountInformation from '@screens/MyAccountInformation';
 import { Notifications } from '@screens/Notifications';
+import { Assistance } from '@screens/partners/Assistance';
+import { AssistanceMap } from '@screens/partners/assistance/AssistanceMap';
 import { HomeScreen } from '@screens/partners/HomeScreen';
 import { AddLocation } from '@screens/partners/locations/AddLocation';
 import { EditLocation } from '@screens/partners/locations/EditLocation';
@@ -37,6 +39,7 @@ type PartnerRoutes = {
   legalQuoteDetail: { legalQuoteId: string; locationId: string };
   validateDocument: undefined;
   notifications: undefined;
+  assistanceMap: undefined;
 };
 
 export type PartnerNavigatorRoutesProps =
@@ -45,7 +48,7 @@ export type PartnerNavigatorRoutesProps =
 const { Screen, Navigator } = createBottomTabNavigator<PartnerRoutes>();
 
 export function PartnerRoutes() {
-  const { colors } = useTheme();
+  const { colors, fonts } = useTheme();
 
   const iconSize = 7;
 
@@ -54,14 +57,20 @@ export function PartnerRoutes() {
       screenOptions={{
         headerShown: false,
         tabBarShowLabel: true,
-
         tabBarActiveTintColor: colors.purple[700],
         tabBarInactiveTintColor: colors.gray[500],
         tabBarStyle: {
+          paddingBottom: 5,
           backgroundColor: '#f5f4f5',
           minHeight: 60,
           borderTopWidth: 0,
           borderTopColor: '#f5f4f5',
+        },
+        tabBarLabelStyle: {
+          fontFamily: fonts.body,
+          fontWeight: 'bold',
+          fontSize: 12,
+          marginTop: -5,
         },
       }}
     >
@@ -125,11 +134,11 @@ export function PartnerRoutes() {
         }}
       />
 
-      {/* <Screen
+      <Screen
         name="assistance"
         component={Assistance}
         options={{
-          title: 'Assistencia',
+          title: 'Assistência',
           tabBarIcon: ({ color }) => (
             <Icon
               as={FontAwesome5}
@@ -139,7 +148,7 @@ export function PartnerRoutes() {
             />
           ),
         }}
-      /> */}
+      />
 
       <Screen
         name="profile"
@@ -215,6 +224,15 @@ export function PartnerRoutes() {
       <Screen
         name="notifications"
         component={Notifications}
+        options={{
+          tabBarButton: () => null,
+          tabBarStyle: { display: 'none' },
+        }}
+      />
+
+      <Screen
+        name="assistanceMap"
+        component={AssistanceMap}
         options={{
           tabBarButton: () => null,
           tabBarStyle: { display: 'none' },

@@ -144,7 +144,7 @@ export default function App() {
   }, []);
 
   return (
-    <NativeBaseProvider theme={THEME}>
+    <NativeBaseProvider theme={THEME} isSSR={false}>
       <StatusBar barStyle="light-content" backgroundColor="#340554" />
       <AuthContextProvider>
         <ProfileContextProvider>

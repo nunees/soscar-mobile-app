@@ -1,8 +1,9 @@
 import QRCodeImage from '@assets/qrcode.png';
+import ArchiveImage from '@assets/services/archive.png';
 import CalendarImage from '@assets/services/calendar.png';
 import CompliantImage from '@assets/services/compliant.png';
 import PaperImage from '@assets/services/paper.png';
-import TimeImage from '@assets/services/time.png';
+import TowCarImage from '@assets/services/tow-car.png';
 import { AppHeader } from '@components/AppHeader';
 import { ServiceCardTypes } from '@components/ServiceCardTypes';
 import { useNavigation } from '@react-navigation/native';
@@ -50,30 +51,21 @@ export function Services() {
           onPress={() => navigation.navigate('legalQuotes')}
         />
         <ServiceCardTypes
-          icon="save"
-          title={'Histórico de orçamentos'}
-          text={'Acompanhe seus orçamentos realizados'}
-          image={TimeImage}
-          alt="Acompanhe seus orçamentos realizados"
-          onPress={() => navigation.navigate('quotesList')}
+          icon="briefcase"
+          title={'Assistência'}
+          text={'Encontre profissionais que prestam assistência'}
+          image={TowCarImage}
+          alt="Orçamento judiciais de serviços"
+          onPress={() => navigation.navigate('assistanceList')}
         />
 
         <ServiceCardTypes
           icon="save"
-          title={'Histórico de orçamentos judiciais'}
-          text={'Acompanhe seus orçamentos judiciais realizados'}
-          image={TimeImage}
+          title={'Históricos'}
+          text={'Veja todos os seus históricos'}
+          image={ArchiveImage}
           alt="Acompanhe seus orçamentos realizados"
-          onPress={() => navigation.navigate('legalQuotesList')}
-        />
-
-        <ServiceCardTypes
-          icon="save"
-          title={'Histórico de agendamentos'}
-          text={'Acompanhe seus orçamentos realizados'}
-          image={TimeImage}
-          alt="Acompanhe seus orçamentos realizados"
-          onPress={() => navigation.navigate('schedulesList')}
+          onPress={() => navigation.navigate('archives')}
         />
 
         <ServiceCardTypes

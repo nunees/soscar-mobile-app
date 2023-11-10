@@ -4,6 +4,11 @@ import {
   BottomTabNavigationProp,
 } from '@react-navigation/bottom-tabs';
 import { ChangePassword } from '@screens/ChangePassword';
+import { Archives } from '@screens/clients/Archives';
+import { AssistanceArchieve } from '@screens/clients/assistance/AssistanceArchive';
+import { AssistanceContactType } from '@screens/clients/assistance/AssistanceContactType';
+import { AssistancesList } from '@screens/clients/assistance/AssistancesList';
+import { AssistanceSearch } from '@screens/clients/assistance/AsssistanceSearch';
 import { HomeScreen } from '@screens/clients/HomeScreen';
 import { LegalQuoteDetails } from '@screens/clients/legalQuotes/LegalQuoteDetails';
 import { LegalQuotes } from '@screens/clients/legalQuotes/LegalQuotes';
@@ -41,7 +46,6 @@ type AppRotes = {
   profile: undefined;
   myaccountInformation: undefined;
   editProfileInformation: undefined;
-  assistance: undefined;
   vehicleDetails: { vehicleId: string };
   addVehicle: undefined;
   changePassword: undefined;
@@ -58,11 +62,29 @@ type AppRotes = {
   schedulesDetails: { scheduleId: string };
   schedulesList: undefined;
 
+  // Archives routes
+  archives: undefined;
+
+  // Legal quotes routes
   legalQuotes: undefined;
   legalQuotesList: undefined;
   newLegalQuote: { serviceId: string };
   searchLegalQuote: { serviceId: string };
   legalQuoteDetails: { hashId: string };
+
+  // Assistance routes
+
+  // List all assistances
+  assistanceList: undefined;
+
+  // Assistance contact type (on-line and archive)
+  assistanceContactType: { serviceId: number };
+
+  // Assistance contact search
+  assistanceSearch: { serviceId: number };
+
+  // Assistance saved on archive
+  assistanceArchive: { serviceId: number };
 
   locationDetails: { locationId: string };
 
@@ -79,7 +101,7 @@ export type AppNavigatorRoutesProps = BottomTabNavigationProp<AppRotes>;
 const { Screen, Navigator } = createBottomTabNavigator<AppRotes>();
 
 export function AppRoutes() {
-  const { colors } = useTheme();
+  const { colors, fonts } = useTheme();
 
   const iconSize = 7;
 
@@ -91,10 +113,17 @@ export function AppRoutes() {
         tabBarActiveTintColor: colors.purple[700],
         tabBarInactiveTintColor: colors.gray[500],
         tabBarStyle: {
+          paddingBottom: 5,
           backgroundColor: '#f5f4f5',
           minHeight: 60,
           borderTopWidth: 0,
           borderTopColor: '#f5f4f5',
+        },
+        tabBarLabelStyle: {
+          fontFamily: fonts.body,
+          fontWeight: 'bold',
+          fontSize: 12,
+          marginTop: -5,
         },
       }}
     >
@@ -132,6 +161,7 @@ export function AppRoutes() {
           title: 'Veiculos',
           tabBarIcon: ({ color }) => (
             <Icon
+              mt={2}
               as={Ionicons}
               name="md-car-sport"
               size={iconSize}
@@ -385,6 +415,51 @@ export function AppRoutes() {
       <Screen
         name="notifications"
         component={Notifications}
+        options={{
+          tabBarButton: () => null,
+          tabBarStyle: { display: 'none' },
+        }}
+      />
+
+      <Screen
+        name="assistanceList"
+        component={AssistancesList}
+        options={{
+          tabBarButton: () => null,
+          tabBarStyle: { display: 'none' },
+        }}
+      />
+
+      <Screen
+        name="assistanceContactType"
+        component={AssistanceContactType}
+        options={{
+          tabBarButton: () => null,
+          tabBarStyle: { display: 'none' },
+        }}
+      />
+
+      <Screen
+        name="assistanceSearch"
+        component={AssistanceSearch}
+        options={{
+          tabBarButton: () => null,
+          tabBarStyle: { display: 'none' },
+        }}
+      />
+
+      <Screen
+        name="assistanceArchive"
+        component={AssistanceArchieve}
+        options={{
+          tabBarButton: () => null,
+          tabBarStyle: { display: 'none' },
+        }}
+      />
+
+      <Screen
+        name="archives"
+        component={Archives}
         options={{
           tabBarButton: () => null,
           tabBarStyle: { display: 'none' },
