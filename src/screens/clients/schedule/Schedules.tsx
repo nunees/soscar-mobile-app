@@ -19,7 +19,7 @@ export function Schedules() {
     <VStack>
       <VStack>
         <AppHeader
-          title="Agendamento de Serviços"
+          title="Agendamento"
           navigation={navigation}
           screen={'services'}
         />

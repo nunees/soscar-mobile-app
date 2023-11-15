@@ -28,7 +28,7 @@ export function Services() {
       >
         <ServiceCardTypes
           icon="calendar"
-          title={'Agendamento de  serviços'}
+          title={'Agendamentos'}
           text={'Agende seus serviços sem sair de casa'}
           onPress={() => navigation.navigate('schedules')}
           image={CalendarImage}
@@ -36,7 +36,7 @@ export function Services() {
         />
         <ServiceCardTypes
           icon="file-text"
-          title={'Orçamento de  serviços'}
+          title={'Orçamentos'}
           text={'Realize orcamentos sem sair de casa'}
           onPress={() => navigation.navigate('quotes')}
           image={PaperImage}
@@ -70,7 +70,7 @@ export function Services() {
 
         <ServiceCardTypes
           icon="compass"
-          title={'Validar orçamento jurídico'}
+          title={'Validar documento'}
           text={'Valide a autenticidade do documento de orçamento'}
           image={QRCodeImage}
           alt="Valide a autenticidade do documento de orçamento"

@@ -42,6 +42,7 @@ export const THEME = extendTheme({
     body: 'Nunito_400Regular',
   },
   fontSizes: {
+    xxs: 8,
     xs: 12,
     sm: 14,
     md: 16,

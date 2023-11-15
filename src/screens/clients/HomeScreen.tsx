@@ -13,6 +13,7 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
 import { api } from '@services/api';
 import { AppError } from '@utils/AppError';
+import { countDaysBetweenDates } from '@utils/DayjsDateProvider';
 import {
   HStack,
   ScrollView,
@@ -45,7 +46,11 @@ export function HomeScreen() {
             },
           });
 
-          setSchedules(response.data);
+          const filteredSchedules = response.data.filter(
+            (schedule: ISchedules) =>
+              countDaysBetweenDates(new Date(), schedule.date) > 0
+          );
+          setSchedules(filteredSchedules);
         } catch (error) {
           if (error instanceof AppError) {
             toast.show({
@@ -77,6 +82,18 @@ export function HomeScreen() {
 
     profile();
   }, []);
+
+  function renderNextSchedules(item: ISchedules) {
+    return (
+      <SmallSchedulleCard
+        id={item.id}
+        business_name={item.location?.business_name}
+        date={item.date}
+        service_type={item.service_type?.category_id}
+        time={item.time}
+      />
+    );
+  }
 
   return (
     <SafeAreaView>
@@ -133,19 +150,7 @@ export function HomeScreen() {
                 snapToAlignment="start"
                 pagingEnabled
                 keyExtractor={(item) => item.id!}
-                renderItem={({ item }) => {
-                  return (
-                    <VStack mb={3} borderRadius={5} shadow={0.8}>
-                      <SmallSchedulleCard
-                        id={item.id}
-                        business_name={item.location?.business_name}
-                        date={item.date}
-                        service_type={item.service_type?.category_id}
-                        time={item.time}
-                      />
-                    </VStack>
-                  );
-                }}
+                renderItem={({ item }) => renderNextSchedules(item)}
                 ListEmptyComponent={() => (
                   <HStack
                     backgroundColor="white"
@@ -186,7 +191,7 @@ export function HomeScreen() {
               </Text>
               <ServiceCardTypes
                 icon="calendar"
-                title={'Agendamento de  serviços'}
+                title={'Agendamentos'}
                 text={'Agende seus serviços sem sair de casa'}
                 onPress={() => navigation.navigate('schedules')}
                 image={CalendarImage}
@@ -195,7 +200,7 @@ export function HomeScreen() {
 
               <ServiceCardTypes
                 icon="file-text"
-                title={'Orçamento de  serviços'}
+                title={'Orçamentos'}
                 text={'Realize orçamentos sem sair de casa'}
                 onPress={() => navigation.navigate('quotes')}
                 image={PaperImage}
@@ -212,7 +217,7 @@ export function HomeScreen() {
 
               <ServiceCardTypes
                 icon="compass"
-                title={'Validar orçamento jurídico'}
+                title={'Validar orçamento'}
                 text={'Valide a autenticidade do documento de orçamento'}
                 image={QRCodeImage}
                 alt="Valide a autenticidade do documento de orçamento"

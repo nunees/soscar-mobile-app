@@ -12,7 +12,8 @@ export function handleTime(date: Date) {
   if (date) {
     const fullHours = date.toLocaleTimeString('pt-BR');
     const currentTime = fullHours.split(':');
-    return `${currentTime[0]}:${currentTime[1]}`;
+    const minutes = '00';
+    return `${currentTime[0]}:${minutes}`;
   }
   return '';
 }

@@ -99,30 +99,32 @@ export function NewLegalQuote() {
   }
 
   function handleLocationSelect(locationId: string) {
-    if (locationsSelected.length < 3) {
+    if (
+      locationsSelected.length < 3 &&
+      !locationsSelected.includes(locationId)
+    ) {
       if (locationsSelected.includes(locationId)) {
         const newLocations = locationsSelected.filter(
           (location) => location !== locationId
         );
+        if (newLocations.length > 3) {
+          toast.show({
+            title: 'Voce pode selecionar ate 3 locais',
+            placement: 'top',
+            bgColor: 'red.500',
+          });
+        }
         setLocationsSelected(newLocations);
       } else {
         setLocationsSelected([...locationsSelected, locationId]);
       }
     }
 
-    if (locationsSelected.length > 3) {
-      if (locationsSelected.includes(locationId)) {
-        const newLocations = locationsSelected.filter(
-          (id) => id !== locationId
-        );
-        setLocationsSelected(newLocations);
-      }
-    } else {
-      toast.show({
-        title: 'Voce pode selecionar ate 3 locais',
-        placement: 'top',
-        bgColor: 'red.500',
-      });
+    if (locationsSelected.includes(locationId)) {
+      const locations = locationsSelected.filter(
+        (location) => location !== locationId
+      );
+      setLocationsSelected(locations);
     }
   }
 
@@ -214,7 +216,7 @@ export function NewLegalQuote() {
         <LoadingModal
           showModal={isLoading}
           setShowModal={setIsLoading}
-          message="Carregando informacoes"
+          message="Carregando informações"
         />
       )}
       <ScrollView
@@ -225,7 +227,7 @@ export function NewLegalQuote() {
       >
         <VStack px={5} py={1}>
           <VStack backgroundColor="white" borderRadius={10} p={5}>
-            <Text fontSize="md" bold mb={2}>
+            <Text fontSize="sm" bold mb={2}>
               Veiculo
             </Text>
             <Select
@@ -249,7 +251,7 @@ export function NewLegalQuote() {
 
         <VStack px={5} py={1}>
           <VStack backgroundColor="white" borderRadius={10} p={5}>
-            <Text fontSize="md" bold>
+            <Text fontSize="sm" bold>
               Seguradora
             </Text>
             <Text>{vehicleDetails?.InsuranceCompanies?.name}</Text>
@@ -258,8 +260,8 @@ export function NewLegalQuote() {
 
         <VStack px={5} py={1}>
           <VStack backgroundColor="white" borderRadius={10} p={5}>
-            <Text fontSize="md" bold mb={2}>
-              Tipo de Servico
+            <Text fontSize="sm" bold mb={2}>
+              Tipo de Serviço
             </Text>
             <SelectBusinessCategories
               label={'Tipo de Serviço'}
@@ -271,13 +273,11 @@ export function NewLegalQuote() {
 
         <VStack px={5} py={1}>
           <VStack backgroundColor="white" borderRadius={10} p={5}>
-            <Text fontSize="md" bold mb={2}>
-              Informacoes adicionais
+            <Text fontSize="sm" bold mb={2}>
+              Informações adicionais
             </Text>
             <TextArea
               h={150}
-              placeholder="Insira informacoes que possam ajudar o profissional a entender
-              melhor o seu problema e te ajudar da melhor forma possivel"
               fontSize="sm"
               textAlign="left"
               onChangeText={setUserNotes}
@@ -290,8 +290,7 @@ export function NewLegalQuote() {
           <UploadFileField
             upload={upload}
             GetUploadImage={GetUploadImage}
-            text=" Fotos e videos podem agilizar o processo de analise e reduzir o
-            tempo de espera."
+            text="Imagens"
           />
         </VStack>
 
@@ -299,21 +298,23 @@ export function NewLegalQuote() {
           <VStack backgroundColor="white" borderRadius={10} p={5}>
             <HStack justifyContent={'space-between'}>
               <VStack>
-                <Text fontSize="md" bold>
+                <Text fontSize="sm" bold mb={1}>
                   Locais
                 </Text>
-                <Text fontSize="xs">
-                  Voce pode escolher ate 3 locais, deslize para a direita para
-                  visualizar mais locais
+                <Text fontSize="xxs" mb={3}>
+                  Voce pode escolher até 3 locais, deslize para a direita ou
+                  esquerda para visualizar mais locais
                 </Text>
               </VStack>
             </HStack>
             <FlatList
+              showsHorizontalScrollIndicator={false}
               data={locations.state.data}
               horizontal
               pagingEnabled
               snapToAlignment="start"
               keyExtractor={(item) => item.id}
+              mb={3}
               renderItem={({ item }) => (
                 <TouchableOpacity onPress={() => handleLocationSelect(item.id)}>
                   <HStack px={5} py={5} w={330} justifyContent={'flex-start'}>
@@ -362,7 +363,7 @@ export function NewLegalQuote() {
               ListEmptyComponent={() => {
                 return (
                   <Text textAlign={'center'} color="gray.400" pt={10}>
-                    Nenhum local encontrado para o servico selecionado
+                    Nenhum local encontrado para o serviço selecionado
                   </Text>
                 );
               }}
@@ -372,17 +373,17 @@ export function NewLegalQuote() {
 
         <VStack px={5} py={1}>
           <VStack backgroundColor="white" borderRadius={10} p={5}>
-            <Text fontSize="md" bold mb={2}>
-              Confirmacao
+            <Text fontSize="sm" bold mb={2}>
+              Confirmação
             </Text>
-            <Text fontSize="xs" mb={3} color="gray.400">
-              Ao solicitar o orcamento, voce concorda com os termos de uso e
+            <Text fontSize="xxs" mb={3} color="gray.400">
+              Ao solicitar o orçamento, você concorda com os termos de uso e
               politica de privacidade
             </Text>
             <Button
               onPress={handleSubmit}
               mb={3}
-              title="Solicitar orcamento"
+              title="Solicitar orçamento"
               isLoading={isSaving}
             />
 
@@ -390,7 +391,8 @@ export function NewLegalQuote() {
               onPress={() => navigation.navigate('quotes')}
               mb={3}
               title="Cancelar"
-              variant={'outline'}
+              variant={'dark'}
+              bg={'red.500'}
               isLoading={isSaving}
             />
           </VStack>

@@ -1,6 +1,5 @@
 import { AppHeader } from '@components/AppHeader';
 import { Button } from '@components/Button';
-import { Input } from '@components/Input';
 import { LoadingModal } from '@components/LoadingModal';
 import { PartnerCard } from '@components/PartnerCard';
 import { ScheduleCalendar } from '@components/ScheduleCalendar';
@@ -270,15 +269,16 @@ export function NewSchedule() {
               Horário
             </Text>
 
-            <Input
-              placeholder={'Selecione um horario'}
-              editable={false}
-              value={time}
-              caretHidden
-            />
+            {time && (
+              <Text mb={3} fontSize={'2xl'} textAlign={'center'}>
+                {time}
+              </Text>
+            )}
+
             <Button
               title="Selecionar horário"
               bgColor={'purple.500'}
+              mb={2}
               onPress={() => {
                 DateTimePickerAndroid.open({
                   mode: 'time',
@@ -289,7 +289,7 @@ export function NewSchedule() {
               }}
             />
             <Text
-              fontSize="xs"
+              fontSize="xxs"
               color="gray.600"
               textAlign="justify"
               w={320}
@@ -307,7 +307,6 @@ export function NewSchedule() {
             </VStack>
             <VStack>
               <TextArea
-                placeholder={'Descreva aqui os problemas apresentados'}
                 w={'full'}
                 h={150}
                 fontSize="sm"
@@ -321,16 +320,20 @@ export function NewSchedule() {
           <UploadFileField
             upload={upload}
             GetUploadImage={GetUploadImage}
-            text="Você pode adicionar imagens adicionais que demonstram os problemas
-            relatados, elas podem ajudar o prestador de serviço a ter o melhor
-            entendimento do problema."
+            text="Imagens"
           />
 
           <Button
             title="Agendar"
             onPress={handleSubmit}
             isLoading={isSubmiting}
-            isLoadingText={'Salvando'}
+            isLoadingText={'Agendando...'}
+          />
+          <Button
+            title="Cancelar"
+            bgColor="red.500"
+            mt={3}
+            onPress={() => navigation.navigate('home')}
           />
         </ScrollView>
       </VStack>

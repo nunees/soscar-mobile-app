@@ -330,7 +330,7 @@ export function NewQuote() {
 
         <VStack px={5} py={1}>
           <VStack backgroundColor="white" borderRadius={10} p={5}>
-            <Text fontSize="md" bold mb={2}>
+            <Text fontSize="sm" bold mb={2}>
               Confirmação
             </Text>
             <Text fontSize="xs" mb={3} color="gray.400">
@@ -349,7 +349,8 @@ export function NewQuote() {
               onPress={() => navigation.navigate('quotes')}
               mb={3}
               title="Cancelar"
-              variant={'outline'}
+              backgroundColor={'red.500'}
+              variant={'dark'}
               isLoading={isSaving}
             />
           </VStack>

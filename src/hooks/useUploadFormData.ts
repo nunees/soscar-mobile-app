@@ -50,6 +50,14 @@ export function useUploadFormData(field: string) {
       }));
 
       if (photoSelected.canceled) {
+        setUpload((prevState) => ({
+          ...prevState,
+          isError: true,
+          isLoading: false,
+          isSucess: false,
+          progress: 0,
+          error: 'Ação cancelada pelo usuário',
+        }));
         return;
       }
 
@@ -97,6 +105,9 @@ export function useUploadFormData(field: string) {
       setUpload((prevState) => ({
         ...prevState,
         isError: true,
+        isLoading: false,
+        isSucess: false,
+        progress: 0,
         error: 'Erro ao carregar a imagem',
       }));
     }

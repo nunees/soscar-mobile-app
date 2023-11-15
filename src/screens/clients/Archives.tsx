@@ -1,4 +1,4 @@
-import TimeImage from '@assets/services/time.png';
+import SaveImage from '@assets/services/save.png';
 import { AppHeader } from '@components/AppHeader';
 import { ServiceCardTypes } from '@components/ServiceCardTypes';
 import { useNavigation } from '@react-navigation/native';
@@ -24,7 +24,7 @@ export function Archives() {
           icon="save"
           title={'Histórico de agendamentos'}
           text={'Acompanhe seus orçamentos realizados'}
-          image={TimeImage}
+          image={SaveImage}
           alt="Acompanhe seus orçamentos realizados"
           onPress={() => navigation.navigate('schedulesList')}
         />
@@ -32,7 +32,7 @@ export function Archives() {
           icon="save"
           title={'Histórico de orçamentos'}
           text={'Acompanhe seus orçamentos realizados'}
-          image={TimeImage}
+          image={SaveImage}
           alt="Acompanhe seus orçamentos realizados"
           onPress={() => navigation.navigate('quotesList')}
         />
@@ -41,7 +41,7 @@ export function Archives() {
           icon="save"
           title={'Histórico de orçamentos judiciais'}
           text={'Acompanhe seus orçamentos judiciais realizados'}
-          image={TimeImage}
+          image={SaveImage}
           alt="Acompanhe seus orçamentos realizados"
           onPress={() => navigation.navigate('legalQuotesList')}
         />

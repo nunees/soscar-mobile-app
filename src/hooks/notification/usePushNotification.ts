@@ -65,6 +65,19 @@ export function usePushNotification() {
       .then((channelId) =>
         setChannels({ ...channels, newsChannel: channelId })
       );
+
+    notifee
+      .createChannel({
+        id: 'assistance',
+        name: 'Assistência',
+        importance: AndroidImportance.HIGH,
+        sound: 'horn',
+        vibration: true,
+        visibility: AndroidVisibility.PUBLIC,
+      })
+      .then((channelId) =>
+        setChannels({ ...channels, newsChannel: channelId })
+      );
   }, []);
 
   async function sendNotification(

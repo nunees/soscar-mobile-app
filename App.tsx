@@ -75,7 +75,7 @@ async function initBackgroundFetch(
   }
 }
 
-initBackgroundFetch(BACKGROUND_FETCH_TASK, notificationTask, 1);
+initBackgroundFetch(BACKGROUND_FETCH_TASK, notificationTask, 2);
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -114,17 +114,6 @@ export default function App() {
   useEffect(() => {
     triggerNotification();
   }, []);
-
-  // useEffect(() => {
-  //   try {
-  //     BackgroundFetch.registerTaskAsync(BACKGROUND_FETCH_TASK, {
-  //       minimumInterval: 60, // seconds,
-  //     });
-  //     console.log('Task registered');
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // }, []);
 
   useEffect(() => {
     return notifee.onBackgroundEvent(async ({ type, detail }) => {

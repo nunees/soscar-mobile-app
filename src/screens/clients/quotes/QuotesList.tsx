@@ -58,9 +58,8 @@ export function QuotesList() {
                   <VStack
                     w={100}
                     h={110}
-                    backgroundColor={'purple.900'}
-                    borderBottomLeftRadius={5}
-                    borderTopLeftRadius={5}
+                    backgroundColor={'purple.700'}
+                    borderRadius={5}
                     alignItems={'center'}
                     justifyContent={'center'}
                   >
@@ -72,7 +71,7 @@ export function QuotesList() {
                     >
                       {item.created_at?.toString().split('T')[0].split('-')[2]}
                     </Text>
-                    <Text color={'white'} textAlign={'center'} fontSize={'lg'}>
+                    <Text color={'white'} textAlign={'center'} fontSize={'md'}>
                       {numberToMonth(
                         item.created_at?.toString().split('T')[0].split('-')[1]
                       )}

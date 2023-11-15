@@ -17,13 +17,13 @@ import {
   Text,
   Center,
   FlatList,
-  Heading,
   Badge,
   ScrollView,
   IconButton,
   Icon,
 } from 'native-base';
 import { useCallback, useState } from 'react';
+import { Pressable } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 
 type RouteParams = {
@@ -88,10 +88,10 @@ export function LegalQuoteDetails() {
                   ? 'green'
                   : 'red'
               }
-              variant={'subtle'}
-              borderRadius={10}
+              variant={'solid'}
+              borderRadius={5}
             >
-              <Text bold>
+              <Text bold color="white">
                 {item.status === 1
                   ? 'Aguardando'
                   : item.status === 2
@@ -114,12 +114,12 @@ export function LegalQuoteDetails() {
                 </HStack>
 
                 <HStack justifyContent={'space-between'}>
-                  <Text>Valor do servico:</Text>
+                  <Text>Valor do serviço:</Text>
                   <Text> R$ {item.service_price}</Text>
                 </HStack>
 
                 <HStack justifyContent={'space-between'}>
-                  <Text>Valor total do document:</Text>
+                  <Text>Valor total do documento:</Text>
                   <Text>
                     R$ {calc(item.service_price, item.franchise_price)}
                   </Text>
@@ -137,17 +137,20 @@ export function LegalQuoteDetails() {
         )}
         <HStack mt={5} alignItems={'center'} justifyContent={'space-between'}>
           <Text fontSize={'xs'} bold>
-            Ult. Atualizacao:{' '}
+            Atualizado em:{' '}
             {item.updated_at
               ? formatDateAndTime(new Date(item.updated_at))
               : formatDateAndTime(new Date(item.created_at))}
           </Text>
           {item.status === 3 && (
-            <IconButton
-              ml={5}
-              icon={<Icon as={Feather} name="download" />}
-              _icon={{ color: 'purple.400' }}
-            />
+            <Pressable>
+              <IconButton
+                ml={5}
+                size={'lg'}
+                icon={<Icon as={Feather} name="download" />}
+                _icon={{ color: 'purple.400' }}
+              />
+            </Pressable>
           )}
         </HStack>
       </VStack>
@@ -173,9 +176,13 @@ export function LegalQuoteDetails() {
           <VStack backgroundColor="white" borderRadius={10} mt={5}>
             <VStack px={5} py={5}>
               <Center>
-                <Heading bold>Resumo</Heading>
-                <QRCode value={hashId} size={100} />
-                <Text fontSize={'xs'} color="gray.400" textAlign={'center'}>
+                <QRCode value={hashId} size={200} />
+                <Text
+                  fontSize={'xxs'}
+                  color="gray.400"
+                  textAlign={'center'}
+                  mt={3}
+                >
                   Esta chave permite a validacao e garante a autenticidade do
                   documento
                 </Text>

@@ -1,6 +1,6 @@
 import { AppHeader } from '@components/AppHeader';
 import { SERVICES_LIST } from '@data/ServicesList';
-import { IQuoteList } from '@dtos/IQuoteList';
+import { ILegalQuote } from '@dtos/ILegalQuote';
 import { useAuth } from '@hooks/useAuth';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
@@ -13,7 +13,7 @@ import { TouchableOpacity } from 'react-native';
 export function LegalQuotesList() {
   const { user } = useAuth();
   const navigation = useNavigation<AppNavigatorRoutesProps>();
-  const [quotes, setQuotes] = useState<IQuoteList[]>([]);
+  const [quotes, setQuotes] = useState<ILegalQuote[]>([]);
 
   async function getLegalQuotes() {
     try {
@@ -64,14 +64,13 @@ export function LegalQuotesList() {
             }
           >
             <VStack px={2} my={2} mx={3}>
-              <VStack backgroundColor={'white'} borderRadius={5} h={70}>
+              <VStack backgroundColor={'white'} borderRadius={5} h={110}>
                 <HStack>
                   <VStack
                     w={100}
-                    h={70}
-                    backgroundColor={'purple.900'}
-                    borderBottomLeftRadius={5}
-                    borderTopLeftRadius={5}
+                    h={110}
+                    backgroundColor={'purple.700'}
+                    borderRadius={5}
                     alignItems={'center'}
                     justifyContent={'center'}
                   >
@@ -90,9 +89,9 @@ export function LegalQuotesList() {
                     </Text>
                   </VStack>
 
-                  <VStack ml={3}>
+                  <VStack ml={3} mt={3}>
                     <HStack>
-                      <Text bold>Tipo: </Text>
+                      <Text bold>Categoria: </Text>
                       <Text color="gray.600">
                         {SERVICES_LIST.map((service) =>
                           service.id === item.service_type_id

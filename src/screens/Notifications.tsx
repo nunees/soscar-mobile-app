@@ -78,11 +78,22 @@ export function Notifications() {
       <VStack px={5} py={1}>
         <HStack background={'white'} p={3} borderRadius={10}>
           <HStack alignItems={'center'}>
-            <VStack w={280}>
-              <Text bold>{item.title}</Text>
-              <Text>{item.body}</Text>
+            <VStack w={300}>
+              <Text fontSize={'md'} bold>
+                {item.title}
+              </Text>
+              <Text fontSize={'md'}>{item.body}</Text>
+              <Text fontSize={'xs'} bold>
+                {item.created_at
+                  ?.toString()
+                  .split('T')[0]
+                  .split('-')
+                  .reverse()
+                  .join('/')}{' '}
+                ás {item.created_at?.toString().split('T')[1].split('.')[0]}
+              </Text>
             </VStack>
-            <VStack ml={10}>
+            <VStack ml={5}>
               <TouchableOpacity onPress={() => deleteNotification(item.id)}>
                 <Icon as={Feather} name="trash-2" size={5} color="gray.600" />
               </TouchableOpacity>

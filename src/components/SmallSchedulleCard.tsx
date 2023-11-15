@@ -51,22 +51,16 @@ export function SmallSchedulleCard({
               })
         }
       >
-        <HStack
-          w={400}
-          h={100}
-          variant="subtle"
-          borderRadius={6}
-          justifyContent={'flex-start'}
-        >
+        <HStack w={400} h={90} justifyContent={'flex-start'}>
           <HStack>
             <VStack
               w={100}
               backgroundColor={'purple.700'}
-              p={1}
+              p={0}
               borderRadius={6}
             >
               <VStack alignItems={'center'}>
-                <Text color={'white'} fontSize={'5xl'} bold>
+                <Text color={'white'} fontSize={'4xl'} bold>
                   {date?.toString().split('T')[0].split('-')[2]}
                 </Text>
                 <Text color="white" fontSize={'md'}>
@@ -100,19 +94,15 @@ export function SmallSchedulleCard({
 
           <VStack position={'absolute'} right={10} top={2}>
             {remainingDays(date) > 0 && (
-              <Badge
-                colorScheme="success"
-                variant="solid"
-                borderLeftRadius={10}
-              >
-                <Text color="white" bold pr={2}>
+              <Badge colorScheme="success" variant="solid" borderRadius={10}>
+                <Text color="white" bold>
                   Em {remainingDays(date)} dias
                 </Text>
               </Badge>
             )}
 
             {remainingDays(date) === 0 && (
-              <Badge colorScheme="red" variant="solid" borderRadius={6}>
+              <Badge colorScheme="red" variant="solid" borderRadius={10}>
                 <Text color="white" bold>
                   Vencido
                 </Text>
@@ -120,7 +110,7 @@ export function SmallSchedulleCard({
             )}
 
             {remainingDays(date) < 0 && (
-              <Badge colorScheme="red" variant="subtle">
+              <Badge colorScheme="red" variant="subtle" borderRadius={10}>
                 <Text color="gray.500" bold>
                   {Math.abs(remainingDays(date))} dias atrasado
                 </Text>
