@@ -14,6 +14,7 @@ import notifee, { EventType } from '@notifee/react-native';
 import { Routes } from '@routes/index';
 import { api } from '@services/api';
 import { storageUserKeysGet } from '@storage/storageUserKeys';
+import { AppError } from '@utils/AppError';
 import * as BackgroundFetch from 'expo-background-fetch';
 import * as TaskManager from 'expo-task-manager';
 import { NativeBaseProvider } from 'native-base';
@@ -30,16 +31,23 @@ let setStateFn: Dispatch<SetStateAction<IPushNotificationDTO[]>> = () => {
 
 async function notificationTask() {
   try {
+    console.log("I'm running background task");
     const { user_id } = await storageUserKeysGet();
-    const result = await api.get('/notifications/all/new', {
-      headers: {
-        id: user_id,
-      },
-    });
-    setStateFn(result.data);
-    return result.data
-      ? BackgroundFetch.BackgroundFetchResult.NewData
-      : BackgroundFetch.BackgroundFetchResult.NoData;
+    console.log('User id: ', user_id);
+    if (user_id) {
+      const result = await api.get('/notifications/all/fresh', {
+        headers: {
+          id: user_id,
+        },
+      });
+
+      console.log('Background task result: ', result.data);
+      setStateFn(result.data);
+      return result.data
+        ? BackgroundFetch.BackgroundFetchResult.NewData
+        : BackgroundFetch.BackgroundFetchResult.NoData;
+    }
+    throw new AppError('User id not provided');
   } catch (error) {
     return BackgroundFetch.BackgroundFetchResult.Failed;
   }
@@ -75,7 +83,7 @@ async function initBackgroundFetch(
   }
 }
 
-initBackgroundFetch(BACKGROUND_FETCH_TASK, notificationTask, 2);
+initBackgroundFetch(BACKGROUND_FETCH_TASK, notificationTask);
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -89,9 +97,10 @@ export default function App() {
 
   setStateFn = setState;
 
+  // Foreground notification event
   async function triggerNotification() {
     try {
-      console.log('Calling triggerNotification');
+      console.log("I'm running foreground task");
       const { user_id } = await storageUserKeysGet();
       if (state !== undefined) {
         state.map(async (notification: IPushNotificationDTO) => {
@@ -115,6 +124,7 @@ export default function App() {
     triggerNotification();
   }, []);
 
+  // Background notification event
   useEffect(() => {
     return notifee.onBackgroundEvent(async ({ type, detail }) => {
       console.log('Background event received. Type: ', type);
