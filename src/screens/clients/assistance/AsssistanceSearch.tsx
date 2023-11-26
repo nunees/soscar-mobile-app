@@ -10,6 +10,7 @@ import {
 } from '@react-navigation/native';
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
 import { api } from '@services/api';
+import { AppError } from '@utils/AppError';
 import { CalculatePositionDistance } from '@utils/CalculatePositionDistance';
 import { FlatList, VStack, Text, Avatar, HStack, Pressable } from 'native-base';
 import { useCallback, useState } from 'react';
@@ -43,12 +44,9 @@ export function AssistanceSearch() {
         },
       });
 
-      console.log(response.data);
-
       setPartnerAvailable(response.data);
-      console.log(response.data);
     } catch (error) {
-      console.log(error);
+      throw new AppError('Erro ao buscar profissionais disponíveis');
     }
   }
 
@@ -62,8 +60,6 @@ export function AssistanceSearch() {
       [position.coords.latitude, position.coords.longitude],
       [Number(latitude), Number(longitude)]
     );
-
-    console.log(distance);
 
     const totalFee = milesFee * distance + price;
     return totalFee.toFixed(2);
@@ -123,7 +119,7 @@ export function AssistanceSearch() {
         orderId: order.data.id,
       });
     } catch (error) {
-      console.log(error);
+      throw new AppError('Erro ao solicitar assistência');
     }
   }
 

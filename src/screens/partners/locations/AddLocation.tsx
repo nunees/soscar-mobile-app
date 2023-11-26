@@ -84,7 +84,6 @@ export function AddLocation() {
 
   const handleCepInput = useCallback(async () => {
     try {
-      console.log('teste');
       setIsLoading(true);
       const fields = getValues();
 

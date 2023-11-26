@@ -146,8 +146,6 @@ export function LocationDetails() {
           },
         });
 
-        console.log(response.data);
-
         setReviews(response.data);
       } catch (error) {
         toast.show({

@@ -60,7 +60,6 @@ export function Assistance() {
           }
         );
       } else {
-        console.log('hit else');
         await api.put(
           `/assistance/status/update/${result.data.id}`,
           {

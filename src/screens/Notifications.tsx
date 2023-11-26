@@ -34,7 +34,7 @@ export function Notifications() {
 
       setNotifications(result.data);
     } catch (error) {
-      console.log(error);
+      throw new AppError('Erro ao buscar notificações');
     }
   }
 

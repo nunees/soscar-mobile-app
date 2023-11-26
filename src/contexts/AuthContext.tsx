@@ -110,7 +110,6 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
       await removeProfile();
       await storageUserKeysRemove();
     } catch (error) {
-      console.log(error);
       throw new AppError('Erro ao deslogar usuário');
     } finally {
       setIsLoadingUserStorageData(false);
@@ -144,7 +143,6 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
   }
 
   async function notificationsRoutine() {
-    console.log('I am running');
     const { user_id } = await storageUserKeysGet();
     const { data } = await api.get(`/notifications/all/new`, {
       headers: {

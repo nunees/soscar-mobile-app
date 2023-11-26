@@ -3,7 +3,6 @@ import * as BackgroundFetch from 'expo-background-fetch';
 
 export function useCreateBackgroundProcess(taskName: string) {
   async function registerBackgroundFetchAsync() {
-    console.log('registerBackgroundFetchAsync');
     return BackgroundFetch.registerTaskAsync(taskName, {
       minimumInterval: 1 * 60, // 1 minutes
       stopOnTerminate: false, // android only,

@@ -76,7 +76,7 @@ export function HomeScreen() {
           phone: response.data.mobile_phone,
         });
       } catch (error) {
-        console.log(error);
+        throw new AppError(error);
       }
     };
 

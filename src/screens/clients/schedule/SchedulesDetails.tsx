@@ -17,6 +17,7 @@ import {
 } from '@react-navigation/native';
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
 import { api } from '@services/api';
+import { AppError } from '@utils/AppError';
 import {
   FlatList,
   HStack,
@@ -81,7 +82,7 @@ export function SchedulesDetails() {
         setLoadedImages((oldState) => [...oldState, file])
       );
     } catch (error) {
-      console.log(error);
+      throw new AppError('Erro ao buscar detalhes do agendamento');
     }
   }, [scheduleId]);
 
@@ -147,7 +148,7 @@ export function SchedulesDetails() {
         }
       );
     } catch (error) {
-      console.log(error);
+      throw new AppError('Erro ao avaliar agendamento');
     }
   }
 
@@ -168,7 +169,7 @@ export function SchedulesDetails() {
 
       setUserReview(userReview);
     } catch (error) {
-      console.log(error);
+      throw new AppError('Erro ao buscar avaliações');
     }
   }
 
@@ -182,8 +183,6 @@ export function SchedulesDetails() {
       };
     }, [scheduleId])
   );
-
-  console.log(rating);
 
   return (
     <VStack flex={1}>

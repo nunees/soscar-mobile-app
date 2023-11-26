@@ -36,18 +36,9 @@ const styles = StyleSheet.create({
   },
 });
 
-type DestinationType = {
-  latitude: number;
-  longitude: number;
-};
-
 export function AssistanceMap() {
   const [showContainer, setShowContainer] = useState<boolean>(false);
 
-  const [showOnRoute, setShowOnRoute] = useState<boolean>(false);
-  const [destination, setDestination] = useState<DestinationType>(
-    {} as DestinationType
-  );
   const [order, setOrder] = useState<IAssistanceOrderDTO>(
     {} as IAssistanceOrderDTO
   );
@@ -55,7 +46,6 @@ export function AssistanceMap() {
     {} as LocationObjectCoords
   );
 
-  const GOOGLE_MAPS_APIKEY = 'AIzaSyBR5ADBhZkf4clkPBwBvJ7_cAdRgaTuCr8';
   const [permissionGranted, setPermissionGranted] = useState<boolean>(false);
   const [assistanceId, setAssistanceId] = useState<string>('');
 
@@ -171,14 +161,6 @@ export function AssistanceMap() {
         },
       });
 
-      setDestination({
-        latitude: Number(order.latitude),
-        longitude: Number(order.longitude),
-      });
-
-      console.log(position, destination);
-
-      setShowOnRoute(true);
       setShowContainer(false);
     } catch (error) {
       const isAppError = error instanceof AppError;
@@ -211,8 +193,6 @@ export function AssistanceMap() {
         if (order.id !== orderInformation.data.id) {
           setOrder(orderInformation.data);
           setShowContainer(true);
-
-          console.log(order);
         }
       } else {
         setOrder({} as IAssistanceOrderDTO);
@@ -220,28 +200,22 @@ export function AssistanceMap() {
       }
     } catch (error) {
       const isAppError = error instanceof AppError;
-      console.log(isAppError ? error.message : error);
+      const message = isAppError
+        ? error.message
+        : 'Ocorreu um erro ao verificar se existe um pedido de assistência, tente novamente!';
+      toast.show({
+        title: message,
+        placement: 'top',
+        bgColor: 'red.500',
+      });
     }
   }
-
-  // await api.put(
-  //   `/assistance/status/update/${order.data.id}`,
-  //   {
-  //     busy: true,
-  //   },
-  //   {
-  //     headers: {
-  //       id: user.id,
-  //     },
-  //   }
-  // );
 
   useFocusEffect(
     useCallback(() => {
       requestLocationPermissions();
       const interval = setInterval(async () => {
         await getCurrentPosition();
-        console.log(position);
         await checkIfThereIsAnOrder();
         await changeServerStatus(2);
       }, 1000);
@@ -287,55 +261,6 @@ export function AssistanceMap() {
           longitudeDelta: 0.005,
         }}
       ></MapView>
-
-      {/* {userLocation && (
-          <Marker
-            coordinate={{
-              latitude: userLocation?.latitude,
-              longitude: userLocation?.longitude,
-            }}
-            title="Sua posicao"
-            description="Sua localização atual"
-            identifier="userLocation"
-          >
-            <VStack
-              w={pointIconSize}
-              h={pointIconSize}
-              backgroundColor="blue.400"
-              borderRadius={100}
-              shadow={1}
-            />
-          </Marker>
-        )} */}
-
-      {/* {partnerLocation && (
-          <Marker
-            coordinate={{
-              latitude: partnerLocation.latitude,
-              longitude: partnerLocation.longitude,
-            }}
-            title="Sua posicao"
-            description="Sua localização atual"
-            identifier="partnerLocation"
-          >
-            <Image source={CarPng} alt="Carro" size="xs" />
-          </Marker>
-        )} */}
-
-      {/* {showOnRoute && (
-        <VStack px={5} h={150} w={300} position={'absolute'} top={2} left={0}>
-          <VStack backgroundColor={'white'} p={3} borderRadius={10}>
-            <Text px={5} py={1} textAlign={'center'}>
-              Aguardando chamado
-            </Text>
-            <ScrollView
-              horizontal={true}
-              showsHorizontalScrollIndicator={false}
-              ml={3}
-            ></ScrollView>
-          </VStack>
-        </VStack>
-      )} */}
 
       {showContainer && (
         <View

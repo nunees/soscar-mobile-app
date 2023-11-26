@@ -107,8 +107,6 @@ export function AssistanceArchieve() {
 
       const result = await axios.get(search_url);
 
-      console.log(result.data.results);
-
       result.data.results.map(async (item: ISearchAssistanceDTO) => {
         const phone_number = await fetchLocationPhoneNumber(item.place_id);
         // eslint-disable-next-line no-param-reassign
@@ -119,7 +117,6 @@ export function AssistanceArchieve() {
       setLoading(false);
 
       if (result.data.results.length === 0) {
-        console.log('new search');
         fetchUserLocation();
       }
     } catch (error) {

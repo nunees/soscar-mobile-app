@@ -97,7 +97,7 @@ export function usePushNotification() {
         },
       });
     } catch (error) {
-      console.log(error);
+      throw new Error("Couldn't send notification");
     }
   }
 
@@ -139,107 +139,4 @@ export function usePushNotification() {
   };
 }
 
-// async function updateNotification() {
-//   await notifee.requestPermission();
-
-//   const channelId = await notifee.createChannel({
-//     id: 'default',
-//     name: 'Test',
-//     vibration: true,
-//     importance: AndroidImportance.HIGH,
-//   });
-
-//   await notifee.displayNotification({
-//     id: '1',
-//     title: 'My notification title',
-//     body: 'My notification body',
-//     android: {
-//       channelId,
-//     },
-//   });
-// }
-
-// async function displayNotification() {
-//   await notifee.requestPermission();
-
-//   const channelId = await notifee.createChannel({
-//     id: 'default',
-//     name: 'Test',
-//     vibration: true,
-//     importance: AndroidImportance.HIGH,
-//   });
-
-//   await notifee.displayNotification({
-//     id: '1',
-//     title: 'My notification title',
-//     body: 'My notification body',
-//     android: {
-//       channelId,
-//     },
-//   });
-// }
-
-// async function cancelNotification() {
-//   await notifee.cancelNotification('1');
-// }
-
-// async function scheduledNotification() {
-//   const date = new Date(Date.now());
-//   date.setMinutes(date.getMinutes() + 1);
-
-//   const trigger: TimestampTrigger = {
-//     type: TriggerType.TIMESTAMP,
-//     timestamp: date.getTime(),
-//   };
-
-//   await notifee.createTriggerNotification(
-//     {
-//       title: 'My notification title',
-//       body: 'My notification body',
-//       android: {
-//         channelId: 'test',
-//       },
-//     },
-//     trigger
-//   );
-// }
-
-// async function listScheduledNotifications() {
-//   notifee.getTriggerNotificationIds().then((ids) => {
-//     console.log(ids);
-//   });
-// }
-
-// useEffect(() => {
-//   return notifee.onForegroundEvent(({ type, detail }) => {
-//     switch (type) {
-//       case EventType.DISMISSED:
-//         console.log('User dismissed notification', detail.notification);
-//         break;
-//       case EventType.ACTION_PRESS:
-//         console.log('User pressed notification action button', detail);
-//         break;
-//       default:
-//         break;
-//     }
-//   });
-// }, []);
-
-// useEffect(() => {
-//   return notifee.onBackgroundEvent(async ({ type, detail }) => {
-//     switch (type) {
-//       case EventType.DISMISSED:
-//         console.log('User dismissed notification', detail.notification);
-//         break;
-//       case EventType.PRESS:
-//         console.log('User pressed notification action button', detail);
-//         break;
-//       default:
-//         break;
-//     }
-//   });
-// }, []);
-
-// useEffect(() => {
-//   displayNotification();
-// }, []);
+/

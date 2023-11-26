@@ -55,7 +55,6 @@ export function LegalQuoteDetails() {
 
   async function downloadFile(filename: string, item: ILegalQuote) {
     try {
-      console.log(hashId, item.id);
       const response = await api.get(`/legal/documents/${hashId}`, {
         headers: {
           id: user.id,
@@ -72,8 +71,6 @@ export function LegalQuoteDetails() {
           'Permissão negada, não foi possível baixar o arquivo'
         );
       }
-
-      console.log(partnerDocumentFiles);
 
       partnerDocumentFiles.map(async (file: any) => {
         try {

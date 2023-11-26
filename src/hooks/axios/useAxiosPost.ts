@@ -17,7 +17,6 @@ export function useAxiosPost<Type>() {
     api
       .request(params)
       .then((response) => {
-        console.log();
         setPostState((prevState) => ({
           ...prevState,
           isLoading: false,

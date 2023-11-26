@@ -81,7 +81,7 @@ export function ScheduleDetail() {
         setLoadedImages((oldState) => [...oldState, file])
       );
     } catch (error) {
-      console.log(error);
+      throw new AppError('Ocorreu um erro ao buscar os dados do agendamento');
     }
   }, []);
 

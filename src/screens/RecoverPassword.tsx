@@ -21,7 +21,7 @@ export function RecoverPassword() {
 
       setPages(1);
     } catch (error) {
-      console.log(error);
+      throw new Error('Erro ao enviar e-mail');
     }
   }
 
@@ -41,7 +41,7 @@ export function RecoverPassword() {
         });
       }
     } catch (error) {
-      console.log(error);
+      throw new Error('Erro ao verificar código');
     }
   }
 

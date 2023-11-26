@@ -288,13 +288,7 @@ export function NewSchedule() {
                 });
               }}
             />
-            <Text
-              fontSize="xxs"
-              color="gray.600"
-              textAlign="justify"
-              w={320}
-              onPressIn={() => console.log('ok')}
-            >
+            <Text fontSize="xxs" color="gray.600" textAlign="justify" w={320}>
               O tempo médio de reparo é de 1 hora, no entanto pode ser
               necessário mais tempo. Não se preocupe, seu mecânico irá
               informá-lo se necessário.

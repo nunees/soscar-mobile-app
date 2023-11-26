@@ -231,7 +231,7 @@ export default function EditProfileInformation() {
     <VStack>
       <VStack>
         <AppHeader
-          title="Editar informacoes pessoais"
+          title="Editar informações pessoais"
           navigation={navigation}
           screen="profile"
         />

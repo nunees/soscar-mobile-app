@@ -91,15 +91,10 @@ export function AssistanceMap() {
         },
       }
     );
-
-    if (response.status !== 200) {
-      console.log('Erro ao atualizar a localização');
-    }
   }
 
   useFocusEffect(
     useCallback(() => {
-      console.log('Inside loop');
       requestLocationPermissions();
       if (permissionGranted) {
         const interval = setInterval(async () => {

@@ -31,7 +31,6 @@ export default function App() {
 
   async function triggerNotification() {
     try {
-      console.log("I'm running foreground task");
       const { user_id } = await storageUserKeysGet();
       if (state !== undefined) {
         state.map(async (notification: IPushNotificationDTO) => {
@@ -58,14 +57,10 @@ export default function App() {
   // Background notification event
   useEffect(() => {
     return notifee.onBackgroundEvent(async ({ type, detail }) => {
-      console.log('Background event received. Type: ', type);
       switch (type) {
         case EventType.DISMISSED:
-          console.log('User dismissed notification', detail.notification);
-          console.log('User dismissed notification action', type);
           break;
         case EventType.PRESS:
-          console.log('User pressed notification action button', detail);
           break;
         default:
           break;

@@ -14,7 +14,7 @@ export function QuoteDone() {
         <Center mt={50}>
           <Heading pb={3}>Tudo certo 👍</Heading>
           <Text textAlign={'center'}>
-            Seu pedido de orcamento foi enviado com sucesso.
+            Seu pedido de orçamento foi enviado com sucesso.
           </Text>
           <TaskDoneSVG width={300} height={300} />
           <Text px={5} textAlign={'center'}>
