@@ -150,7 +150,7 @@ export default function EditProfileInformation() {
       setIsPhotoLoading(true);
       const photoSelected = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        quality: 1,
+        quality: 0,
         aspect: [4, 4],
         allowsEditing: true,
       });

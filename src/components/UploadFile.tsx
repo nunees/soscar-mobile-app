@@ -28,19 +28,21 @@ export function UploadFile({ fileType, remoteFieldName }: Props) {
       if (fileType === 'image') {
         media = await ImagePicker.launchImageLibraryAsync({
           mediaTypes: ImagePicker.MediaTypeOptions.Images,
-          quality: 1,
+          quality: 0,
           aspect: [4, 4],
           allowsEditing: true,
         });
       } else if (fileType === 'video') {
         media = await ImagePicker.launchImageLibraryAsync({
           mediaTypes: ImagePicker.MediaTypeOptions.Videos,
-          quality: 1,
+          quality: 0,
           aspect: [4, 4],
         });
       } else {
         media = await ImagePicker.launchImageLibraryAsync({
           mediaTypes: ImagePicker.MediaTypeOptions.All,
+          quality: 0,
+          aspect: [4, 4],
         });
       }
 

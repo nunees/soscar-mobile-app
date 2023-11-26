@@ -138,5 +138,3 @@ export function usePushNotification() {
     scheduleNotifications,
   };
 }
-
-/

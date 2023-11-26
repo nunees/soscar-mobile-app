@@ -142,7 +142,7 @@ export function LegalQuoteDetail() {
       setIsUploadingMessage('Enviando arquivo... 5%');
       const photoSelected = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        quality: 1,
+        quality: 0,
       });
 
       if (photoSelected.canceled) {

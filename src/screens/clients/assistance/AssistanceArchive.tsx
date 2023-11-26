@@ -103,7 +103,7 @@ export function AssistanceArchieve() {
 
       const search_url =
         `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=` +
-        `${latitude}%2C${longitude}&radius=${radius}&keyword=${queryString}&key=${process.env.GOOGLE_MAPS_APIKEY}`;
+        `${latitude}%2C${longitude}&radius=${radius}&keyword=${queryString}&key=AIzaSyBR5ADBhZkf4clkPBwBvJ7_cAdRgaTuCr8`;
 
       const result = await axios.get(search_url);
 
@@ -153,7 +153,7 @@ export function AssistanceArchieve() {
                 <Avatar
                   source={{
                     uri: item.photos
-                      ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=100&photoreference=${item.photos[0].photo_reference}&sensor=false&key=${process.env.GOOGLE_MAPS_APIKEY}`
+                      ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=100&photoreference=${item.photos[0].photo_reference}&sensor=false&key=AIzaSyBR5ADBhZkf4clkPBwBvJ7_cAdRgaTuCr8`
                       : `https://ui-avatars.com/api/?format=png&name=${item.name}&size=512`,
                   }}
                   size={'lg'}

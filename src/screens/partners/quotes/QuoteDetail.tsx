@@ -106,7 +106,7 @@ export function QuoteDetail() {
   const handleDocumentUpload = useCallback(async () => {
     const photoSelected = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 1,
+      quality: 0,
     });
 
     if (photoSelected.canceled) {

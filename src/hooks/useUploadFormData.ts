@@ -40,7 +40,7 @@ export function useUploadFormData(field: string) {
 
       const photoSelected = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        quality: 1,
+        quality: 0,
         allowsEditing: true,
       });
 
