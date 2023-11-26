@@ -108,7 +108,7 @@ export function EditLocation() {
         .split(':')
         .slice(0, 2)
         .join(':');
-      console.log(tempDate);
+
       if (state === 'open') {
         setValue('openAt', tempDate);
       } else if (state === 'close') {
@@ -394,7 +394,7 @@ export function EditLocation() {
               <Controller
                 control={control}
                 name="business_email"
-                rules={{ required: 'Informe o endereco de email valido' }}
+                rules={{ required: 'Informe o endereço de email valido' }}
                 render={({ field: { onChange, value } }) => (
                   <Input
                     placeholder="Email"
@@ -448,7 +448,7 @@ export function EditLocation() {
               <Controller
                 control={control}
                 name="address_line"
-                rules={{ required: 'Informe um endereco valido' }}
+                rules={{ required: 'Informe um endereço valido' }}
                 render={({ field: { onChange, value } }) => (
                   <Input
                     placeholder="Endereço"
@@ -636,24 +636,16 @@ export function EditLocation() {
                   <Controller
                     control={control}
                     name="openAt"
-                    rules={{ required: 'Informe um horario de abertura' }}
+                    rules={{ required: 'Informe um horário de abertura' }}
                     render={({ field: { value } }) => (
                       <Input
                         w={120}
                         placeholder="Abre as"
                         fontSize={'md'}
                         editable={false}
-                        isDisabled={true}
-                        caretHidden={true}
+                        isDisabled={false}
+                        caretHidden={false}
                         showSoftInputOnFocus={false}
-                        onPressIn={() =>
-                          DateTimePickerAndroid.open({
-                            mode: 'time',
-                            is24Hour: true,
-                            value: new Date(),
-                            onChange: (event, date) => handleHour(date, 'open'),
-                          })
-                        }
                         value={value}
                         errorMessage={errors.cnpj?.message}
                       />
@@ -665,7 +657,7 @@ export function EditLocation() {
                   <Controller
                     control={control}
                     name="closeAt"
-                    rules={{ required: 'Informe um horario de fechamento' }}
+                    rules={{ required: 'Informe um horário de fechamento' }}
                     render={({ field: { value } }) => (
                       <Input
                         w={120}
@@ -675,15 +667,6 @@ export function EditLocation() {
                         isDisabled={true}
                         caretHidden={true}
                         showSoftInputOnFocus={false}
-                        onPressIn={() =>
-                          DateTimePickerAndroid.open({
-                            mode: 'time',
-                            is24Hour: true,
-                            value: new Date(),
-                            onChange: (event, date) =>
-                              handleHour(date, 'close'),
-                          })
-                        }
                         value={value}
                         errorMessage={errors.cnpj?.message}
                       />
@@ -691,6 +674,38 @@ export function EditLocation() {
                   />
                 </VStack>
               </HStack>
+
+              <VStack>
+                <Button
+                  title="Selecionar horário de abertura"
+                  bgColor={'purple.500'}
+                  mb={2}
+                  onPress={() =>
+                    DateTimePickerAndroid.open({
+                      mode: 'time',
+                      is24Hour: true,
+                      value: new Date(),
+                      onChange: (event, date) =>
+                        handleHour(date as Date, 'open'),
+                    })
+                  }
+                />
+
+                <Button
+                  title="Selecionar horário de fechamento"
+                  bgColor={'purple.500'}
+                  mb={2}
+                  onPress={() => {
+                    DateTimePickerAndroid.open({
+                      mode: 'time',
+                      is24Hour: true,
+                      value: new Date(),
+                      onChange: (event, date) =>
+                        handleHour(date as Date, 'close'),
+                    });
+                  }}
+                />
+              </VStack>
             </VStack>
           </VStack>
 
@@ -702,7 +717,7 @@ export function EditLocation() {
               <Controller
                 control={control}
                 name="business_description"
-                rules={{ required: 'Informe uma descricao de seu local' }}
+                rules={{ required: 'Informe uma descrição de seu local' }}
                 render={({ field: { onChange, value } }) => (
                   <TextArea
                     h={150}

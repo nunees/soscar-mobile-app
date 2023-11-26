@@ -6,7 +6,7 @@ import {
 import { ChangePassword } from '@screens/ChangePassword';
 import { Archives } from '@screens/clients/Archives';
 import { AssistanceArchieve } from '@screens/clients/assistance/AssistanceArchive';
-import { AssistanceContactType } from '@screens/clients/assistance/AssistanceContactType';
+import { AssistanceMap } from '@screens/clients/assistance/AssistanceMap';
 import { AssistancesList } from '@screens/clients/assistance/AssistancesList';
 import { AssistanceSearch } from '@screens/clients/assistance/AsssistanceSearch';
 import { HomeScreen } from '@screens/clients/HomeScreen';
@@ -15,7 +15,6 @@ import { LegalQuotes } from '@screens/clients/legalQuotes/LegalQuotes';
 import { LegalQuotesList } from '@screens/clients/legalQuotes/LegalQuotesList';
 import { NewLegalQuote } from '@screens/clients/legalQuotes/NewLegalQuote';
 import { SearchLegalQuote } from '@screens/clients/legalQuotes/SearchLegalQuote';
-import { PartnerDetails } from '@screens/clients/PartnerDetails';
 import { NewQuote } from '@screens/clients/quotes/NewQuote';
 import { QuoteDetails } from '@screens/clients/quotes/QuoteDetails';
 import { Quotes } from '@screens/clients/quotes/Quotes';
@@ -76,6 +75,7 @@ type AppRotes = {
 
   // List all assistances
   assistanceList: undefined;
+  assistanceMap: { latitude: string; longitude: string; orderId: string };
 
   // Assistance contact type (on-line and archive)
   assistanceContactType: { serviceId: number };
@@ -183,15 +183,6 @@ export function AppRoutes() {
       <Screen
         name="searchSchedule"
         component={SearchSchedule}
-        options={{
-          tabBarButton: () => null,
-          tabBarStyle: { display: 'none' },
-        }}
-      />
-
-      <Screen
-        name="partnerDetails"
-        component={PartnerDetails}
         options={{
           tabBarButton: () => null,
           tabBarStyle: { display: 'none' },
@@ -431,15 +422,6 @@ export function AppRoutes() {
       />
 
       <Screen
-        name="assistanceContactType"
-        component={AssistanceContactType}
-        options={{
-          tabBarButton: () => null,
-          tabBarStyle: { display: 'none' },
-        }}
-      />
-
-      <Screen
         name="assistanceSearch"
         component={AssistanceSearch}
         options={{
@@ -460,6 +442,15 @@ export function AppRoutes() {
       <Screen
         name="archives"
         component={Archives}
+        options={{
+          tabBarButton: () => null,
+          tabBarStyle: { display: 'none' },
+        }}
+      />
+
+      <Screen
+        name="assistanceMap"
+        component={AssistanceMap}
         options={{
           tabBarButton: () => null,
           tabBarStyle: { display: 'none' },

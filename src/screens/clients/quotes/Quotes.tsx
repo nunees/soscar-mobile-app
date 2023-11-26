@@ -46,7 +46,7 @@ export function Quotes() {
             alt={'Elétrica'}
             title={'Elétrica'}
             content={
-              'Resolva problemas instalações eletricas, baterias e problemas relacionados'
+              'Resolva problemas instalações elétricas, baterias e problemas relacionados'
             }
             onPress={() =>
               navigation.navigate('searchQuote', {

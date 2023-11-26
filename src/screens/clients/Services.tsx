@@ -37,7 +37,7 @@ export function Services() {
         <ServiceCardTypes
           icon="file-text"
           title={'Orçamentos'}
-          text={'Realize orcamentos sem sair de casa'}
+          text={'Realize orçamentos sem sair de casa'}
           onPress={() => navigation.navigate('quotes')}
           image={PaperImage}
           alt="Orçamento de serviços"
@@ -76,14 +76,6 @@ export function Services() {
           alt="Valide a autenticidade do documento de orçamento"
           onPress={() => navigation.navigate('validateDocument')}
         />
-
-        {/* <ServiceCardTypes
-          icon="compass"
-          title={'Encontre um profissional'}
-          text={'Encontre um profissional para realizar seu serviço'}
-          image={FindImage}
-          alt="Encontre um profissional para realizar seu serviço"
-        /> */}
       </ScrollView>
     </VStack>
   );

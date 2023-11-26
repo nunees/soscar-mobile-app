@@ -9,14 +9,14 @@ async function displayAddress(coords: LocationObjectCoords) {
 }
 
 export function UserLocation() {
-  const { coords } = useGPS();
+  const { position } = useGPS();
   const [address, setAddress] = useState<string>('');
 
   useEffect(() => {
-    displayAddress(coords).then((response) =>
+    displayAddress(position.coords).then((response) =>
       setAddress(`${response[0].street}, ${response[0].district}`)
     );
-  }, [coords]);
+  }, [position]);
 
   return (
     <HStack>

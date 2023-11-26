@@ -1,9 +1,16 @@
+/* eslint-disable consistent-return */
 /* eslint-disable import/no-extraneous-dependencies */
 import { AppHeader } from '@components/AppHeader';
+import { LoadingModal } from '@components/LoadingModal';
 import { ASSISTANCE_SERVICES } from '@data/AssistanceServices';
 import { ISearchAssistanceDTO } from '@dtos/ISearchAssistanceDTO';
+import { FontAwesome5 } from '@expo/vector-icons';
 import { useGPS } from '@hooks/useGPS';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
 import { AppError } from '@utils/AppError';
 import { CalculatePositionDistance } from '@utils/CalculatePositionDistance';
@@ -16,22 +23,23 @@ import {
   Text,
   Avatar,
   Badge,
+  Icon,
 } from 'native-base';
-import { useEffect, useState } from 'react';
-import { TouchableOpacity } from 'react-native';
+import { useCallback, useState } from 'react';
+import { Linking, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 type RouteProps = {
   serviceId: number;
 };
 
-// Search within a 4km radius
 const radius = 4 * 1000;
 
 export function AssistanceArchieve() {
   const [latitude, setLatitude] = useState(0);
   const [longitude, setLongitude] = useState(0);
   const [locations, setLocations] = useState<ISearchAssistanceDTO[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const navigation = useNavigation<AppNavigatorRoutesProps>();
   const route = useRoute();
@@ -56,8 +64,37 @@ export function AssistanceArchieve() {
     }
   };
 
+  async function fetchLocationPhoneNumber(placeId: string) {
+    const url = `https://maps.googleapis.com/maps/api/place/details/json?location=${latitude}%2C${longitude}&fields=formatted_phone_number&place_id=${placeId}&key=${process.env.GOOGLE_MAPS_APIKEY}`;
+
+    const result = await axios.get(url);
+
+    return result.data.result.formatted_phone_number;
+  }
+
+  function sendMessagetoWhatsapp(phoneNumber: string) {
+    if (!phoneNumber)
+      return toast.show({
+        title: 'Número de telefone não encontrado ou não cadastrado',
+        placement: 'top',
+        bgColor: 'red.500',
+      });
+    try {
+      Linking.openURL(
+        `whatsapp://send?phone=${phoneNumber}&text=Olá, gostaria de solicitar um serviço, você está disponível?`
+      );
+    } catch (error) {
+      toast.show({
+        title: 'Erro ao abrir o whatsapp',
+        placement: 'top',
+        bgColor: 'red.500',
+      });
+    }
+  }
+
   const fetchLocations = async () => {
     try {
+      setLoading(true);
       const queryString = ASSISTANCE_SERVICES.find(
         (item) => item.id === serviceId
       )?.searchQuery;
@@ -70,8 +107,21 @@ export function AssistanceArchieve() {
 
       const result = await axios.get(search_url);
 
+      console.log(result.data.results);
+
+      result.data.results.map(async (item: ISearchAssistanceDTO) => {
+        const phone_number = await fetchLocationPhoneNumber(item.place_id);
+        // eslint-disable-next-line no-param-reassign
+        item.phone_number = phone_number;
+      });
+
       setLocations(result.data.results);
-      console.log(locations[0].photos[0].html_attributions[0].split('"')[1]);
+      setLoading(false);
+
+      if (result.data.results.length === 0) {
+        console.log('new search');
+        fetchUserLocation();
+      }
     } catch (error) {
       const isAppError = error instanceof AppError;
       const message = isAppError ? error.message : 'Erro ao buscar locais';
@@ -80,35 +130,42 @@ export function AssistanceArchieve() {
         placement: 'top',
         bgColor: 'red.500',
       });
+    } finally {
+      setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchUserLocation();
-  }, [latitude, longitude]);
+  useFocusEffect(
+    useCallback(() => {
+      fetchUserLocation();
+      fetchLocations();
 
-  useEffect(() => {
-    if (latitude && longitude) fetchLocations();
-  }, [serviceId]);
+      return () => {
+        setLocations([]);
+      };
+    }, [serviceId])
+  );
 
   const renderItem = (item: ISearchAssistanceDTO) => {
     return (
       <TouchableOpacity>
         <VStack px={5} py={3}>
           <VStack background={'white'} p={5} borderRadius={10}>
-            <HStack justifyContent={'space-between'}>
+            <HStack justifyContent={'flex-start'}>
               <VStack>
                 <Avatar
                   source={{
-                    uri: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=100&photoreference=${item.photos[0].photo_reference}&sensor=false&key=${process.env.GOOGLE_MAPS_APIKEY}`,
+                    uri: item.photos
+                      ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=100&photoreference=${item.photos[0].photo_reference}&sensor=false&key=${process.env.GOOGLE_MAPS_APIKEY}`
+                      : `https://ui-avatars.com/api/?format=png&name=${item.name}&size=512`,
                   }}
                   size={'lg'}
                 />
               </VStack>
-              <VStack px={5}>
+              <VStack px={5} w={200}>
                 <Text bold>
-                  {item.name.length > 20
-                    ? item.name.slice(0, 20).concat('...').toLocaleLowerCase()
+                  {item.name.length > 15
+                    ? item.name.slice(0, 15).concat('...').toLocaleLowerCase()
                     : item.name.toLocaleLowerCase().charAt(0).toUpperCase() +
                       item.name.slice(1)}
                 </Text>
@@ -126,14 +183,39 @@ export function AssistanceArchieve() {
               </VStack>
               <VStack>
                 <Badge
-                  colorScheme={item.opening_hours ? 'green' : 'red'}
+                  colorScheme={item.opening_hours ? 'purple' : 'red'}
                   variant={'solid'}
                   borderRadius={6}
+                  marginRight={item.opening_hours ? 5 : 0}
                 >
                   <Text fontSize={'xs'} color="white" bold>
-                    {item.opening_hours ? 'Disponivel' : 'Indisponivel'}
+                    {item.opening_hours ? 'Disponível' : 'Indisponível'}
                   </Text>
                 </Badge>
+
+                <VStack>
+                  <HStack mt={5}>
+                    {item.phone_number && (
+                      <Icon
+                        name="whatsapp"
+                        as={FontAwesome5}
+                        size={8}
+                        color="green.500"
+                        onPress={() =>
+                          sendMessagetoWhatsapp(item.phone_number as string)
+                        }
+                      />
+                    )}
+                    {!item.phone_number && (
+                      <Icon
+                        name="whatsapp"
+                        as={FontAwesome5}
+                        size={8}
+                        color="gray.200"
+                      />
+                    )}
+                  </HStack>
+                </VStack>
               </VStack>
             </HStack>
           </VStack>
@@ -161,17 +243,22 @@ export function AssistanceArchieve() {
       <VStack>
         <AppHeader
           navigation={navigation}
-          screen={'assistanceContactType'}
+          screen={'assistanceList'}
           payload={{ serviceId }}
-          title={'Profissionais off-line'}
+          title={'Lista de Profissionais'}
         />
       </VStack>
+
+      {loading && (
+        <LoadingModal showModal={loading} message="Buscando parceiros" />
+      )}
+
       <FlatList
         contentContainerStyle={{ paddingBottom: 100 }}
         data={locations}
         renderItem={({ item }) => renderItem(item)}
         ListEmptyComponent={() => renderEmpty()}
-        keyExtractor={(item) => item.name}
+        keyExtractor={(item) => item.vicinity}
       />
     </SafeAreaView>
   );

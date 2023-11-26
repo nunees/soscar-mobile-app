@@ -1,23 +1,20 @@
 /* eslint-disable no-restricted-syntax */
 
+import { Button } from '@components/Button';
 import { SERVICES_TYPES } from '@data/ServicesTypes';
 import { FlatList, VStack } from 'native-base';
 import { useState } from 'react';
 
-import { Button } from './Button';
-
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 export function MultiSelection() {
-  const [state, setState] = useState({
+  const [state] = useState({
     selected: [] as any[],
     renderData: SERVICES_TYPES,
   });
 
   const onPressHandler = (id: number) => {
     const { selected } = state;
-
-    const renderData = [...state.renderData];
 
     const index = selected.findIndex((item) => item === id);
     if (index === -1) {

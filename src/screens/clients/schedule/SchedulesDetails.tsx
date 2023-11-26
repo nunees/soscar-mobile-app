@@ -88,7 +88,7 @@ export function SchedulesDetails() {
   async function handleCancelSchedule() {
     Alert.alert(
       'Deseja realmente cancelar o agendamento?',
-      'Essa açãoo não pode ser desfeita',
+      'Essa ação não pode ser desfeita',
       [
         {
           text: 'Cancelar',
@@ -238,7 +238,7 @@ export function SchedulesDetails() {
               )}
               {schedule?.status === 1 && (
                 <VStack alignItems="center">
-                  <Text>Aguardando confirmacao</Text>
+                  <Text>Aguardando confirmação</Text>
                   <Text fontSize={'xs'} color="gray.400">
                     Seu agendamento esta pendente de confirmação
                   </Text>
@@ -359,12 +359,12 @@ export function SchedulesDetails() {
           </VStack>
 
           <VStack mt={5} backgroundColor="white" p={5} borderRadius={10}>
-            <Text bold>Horario</Text>
+            <Text bold>Horário</Text>
             <Text>{schedule?.time}</Text>
           </VStack>
 
           <VStack mt={5} backgroundColor="white" p={5} borderRadius={10}>
-            <Text bold>Categoria de servico</Text>
+            <Text bold>Categoria de serviço</Text>
             <Text>{schedule?.service_type?.name}</Text>
           </VStack>
 
@@ -403,7 +403,7 @@ export function SchedulesDetails() {
                   <Icon as={Feather} name="info" size={8} color="purple.500" />
                 </VStack>
                 <VStack ml={3}>
-                  <Text bold>Informacoes finais</Text>
+                  <Text bold>Informações finais</Text>
                   <Text>{schedule?.partner_notes}</Text>
                 </VStack>
               </HStack>
@@ -414,7 +414,7 @@ export function SchedulesDetails() {
             <VStack mt={5} backgroundColor="white" p={5} borderRadius={10}>
               <HStack>
                 <VStack ml={3}>
-                  <Text bold>Seus comentarios</Text>
+                  <Text bold>Seus comentários</Text>
                   <Text>{userReview.review}</Text>
                   <Text>Nota: {userReview.rating}</Text>
                 </VStack>
@@ -442,7 +442,7 @@ export function SchedulesDetails() {
             <VStack mt={5} backgroundColor="white" p={5} borderRadius={10}>
               <VStack>
                 <TextArea
-                  placeholder={'Deixe uma avaliacao'}
+                  placeholder={'Deixe uma avaliação'}
                   value={review}
                   onChangeText={setReview}
                 />

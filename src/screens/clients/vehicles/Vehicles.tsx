@@ -72,7 +72,7 @@ export function Vechicles() {
             ) : (
               <VStack mt={100} alignItems={'center'}>
                 <Text textAlign={'center'} color="gray.500">
-                  Não há veiculos cadastrados.
+                  Não há veículos cadastrados.
                 </Text>
                 <CarSVG width={300} opacity={0.5} />
               </VStack>

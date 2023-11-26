@@ -4,10 +4,9 @@ import { Entypo } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { AppNavigatorRoutesProps } from '@routes/app.routes';
 import { VStack, Text, HStack, Image, Icon } from 'native-base';
-import { IVStackProps } from 'native-base/lib/typescript/components/primitives/Stack/VStack';
 import { TouchableOpacity } from 'react-native';
 
-type QuickVehicleCardProps = IVStackProps & {
+type QuickVehicleCardProps = {
   vehicle: IVehicleDTO;
 };
 

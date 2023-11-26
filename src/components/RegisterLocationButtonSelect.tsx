@@ -16,29 +16,6 @@ function RegisterLocationButtonSelect({
   saveText,
   setState,
 }: Props) {
-  // const handleMultipleStateSelection = useCallback(
-  //   (
-  //     changeFunction: React.Dispatch<React.SetStateAction<any[]>>,
-  //     state: unknown[],
-  //     value: unknown
-  //   ) => {
-  //     const alreadySelected = state.includes(value);
-
-  //     if (alreadySelected === undefined) {
-  //       changeFunction([value]);
-  //       return;
-  //     }
-  //     if (!alreadySelected) {
-  //       changeFunction([...state!, value]);
-  //       return;
-  //     }
-  //     if (alreadySelected) {
-  //       changeFunction(state?.filter((item) => item !== value));
-  //     }
-  //   },
-  //   []
-  // );
-
   const handleMultipleStateSelection = useCallback(
     (
       changeFunction: React.Dispatch<React.SetStateAction<any[]>>,

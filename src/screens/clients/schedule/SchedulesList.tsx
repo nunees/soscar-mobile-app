@@ -174,7 +174,7 @@ export function SchedulesList() {
           ListEmptyComponent={() => (
             <Center>
               <Text bold color="gray.600">
-                Nao exitem orcamentos registrados
+                Nao exitem orçamentos registrados
               </Text>
             </Center>
           )}

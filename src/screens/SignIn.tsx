@@ -12,7 +12,7 @@ import {
   Text,
   useToast,
   Icon,
-  Box,
+  ScrollView,
 } from 'native-base';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { Eye, EyeClosed } from 'phosphor-react-native';
@@ -31,6 +31,8 @@ const loginSchema = yup.object().shape({
   email: yup.string().required('Informe um e-mail'),
   password: yup.string().required('Informe uma senha'),
 });
+
+const BOTTOM_PADDING = 70;
 
 export function SignIn() {
   const [isLoading, setIsLoading] = useState(false);
@@ -72,7 +74,11 @@ export function SignIn() {
 
   return (
     <SafeAreaView>
-      <Box>
+      <ScrollView
+        contentContainerStyle={{
+          paddingBottom: BOTTOM_PADDING,
+        }}
+      >
         <VStack borderBottomRadius={40} pb={70} bg={'white'}>
           <VStack>
             <Center mt={20}>
@@ -83,7 +89,7 @@ export function SignIn() {
                 </Heading>
               </Heading>
               <Text color={'gray.500'} px={20} textAlign={'center'}>
-                Encontre profissionais ou preste servicos, tudo em um so lugar.
+                Encontre profissionais ou preste serviços, tudo em um so lugar.
               </Text>
             </Center>
 
@@ -171,10 +177,10 @@ export function SignIn() {
 
         <Center mt={5}>
           <Text color="gray.600" fontSize={'xs'}>
-            Versao 1.0.0 (beta-release)
+            Versão 1.0.0 (beta-release)
           </Text>
         </Center>
-      </Box>
+      </ScrollView>
     </SafeAreaView>
   );
 }

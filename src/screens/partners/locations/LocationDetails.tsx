@@ -81,9 +81,17 @@ export function LocationDetails() {
         }
       );
       setProgressValue(100);
-      navigation.navigate('locationDetails', {
-        locationId: location.id,
-      });
+
+      if (user.isPartner) {
+        partnerNavigation.navigate('locationDetails', {
+          locationId: location.id,
+        });
+      } else {
+        userNavigation.navigate('locationDetails', {
+          locationId: location.id,
+        });
+      }
+
       toast.show({
         title: 'Foto atualizada',
         placement: 'top',
@@ -221,10 +229,10 @@ export function LocationDetails() {
                 {!user.isPartner && (
                   <VStack alignSelf={'center'} mr={70} mt={50}>
                     <Text textAlign={'center'} bold>
-                      Nao ha fotos disponiveis
+                      Nao ha fotos disponíveis
                     </Text>
                     <Text textAlign={'center'}>
-                      Quando o profissional adicionar fotos, elas aparecerao
+                      Quando o profissional adicionar fotos, elas aparecerão
                       aqui
                     </Text>
                   </VStack>
@@ -360,7 +368,7 @@ export function LocationDetails() {
 
         <VStack px={5} py={3}>
           <Text bold fontSize={'xs'} color={'gray.600'} pb={1}>
-            Servicos oferecidos
+            Serviços oferecidos
           </Text>
           <VStack>
             {location.business_categories?.map((category) => {
@@ -381,12 +389,12 @@ export function LocationDetails() {
 
         <VStack px={5} py={3}>
           <Text bold fontSize={'xs'} color={'gray.600'} pb={1}>
-            Horario de funcionamento
+            Horário de funcionamento
           </Text>
           <VStack>
             <Text>
               {location.open_hours_weekend?.length === 5 && 'Segunda a Sexta'}
-              {location.open_hours_weekend?.length === 6 && 'Segunda a Sabado'}
+              {location.open_hours_weekend?.length === 6 && 'Segunda a Sábado'}
               {location.open_hours_weekend?.length === 7 && 'Domingo a Domingo'}
             </Text>
             <Text>{location.open_hours}</Text>
@@ -395,7 +403,7 @@ export function LocationDetails() {
 
         <VStack px={5} py={3}>
           <Text bold fontSize={'xs'} color={'gray.600'} pb={1}>
-            Avaliacoes
+            Avaliações
           </Text>
           <VStack>
             <FlatList

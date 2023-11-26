@@ -5,7 +5,9 @@ export interface ISearchAssistanceDTO {
   };
   rating: number;
   user_ratings_total: number;
+  phone_number?: string;
   vicinity: string;
+  place_id: string;
   geometry: {
     location: {
       lat: number;

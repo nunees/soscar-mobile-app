@@ -88,7 +88,7 @@ export function ScheduleDetail() {
   async function handleCancelSchedule() {
     Alert.alert(
       'Deseja realmente cancelar o agendamento?',
-      'Essa acao nao pode ser desfeita',
+      'Essa ação nao pode ser desfeita',
       [
         {
           text: 'Cancelar',
@@ -130,7 +130,7 @@ export function ScheduleDetail() {
         `/schedules/${scheduleId}`,
         {
           status: 3,
-          partner_notes: observation || 'Nenhuma observacao adicionada',
+          partner_notes: observation || 'Nenhuma observação adicionada',
         },
         {
           headers: {
@@ -237,9 +237,9 @@ export function ScheduleDetail() {
               )}
               {schedule?.status === 1 && (
                 <VStack alignItems="center">
-                  <Text>Aguardando confirmacao</Text>
+                  <Text>Aguardando confirmação</Text>
                   <Text fontSize={'xs'} color="gray.400">
-                    Seu agendamento esta pendente de confirmacao
+                    Seu agendamento esta pendente de confirmação
                   </Text>
                 </VStack>
               )}
@@ -248,7 +248,7 @@ export function ScheduleDetail() {
                   <Text>Em processo de analise</Text>
                   <Text fontSize={'xs'} color="gray.400">
                     Seu agendamento esta em processo de analise e o prestador de
-                    servico entrara em contato.
+                    serviço entrara em contato.
                   </Text>
                 </VStack>
               )}
@@ -257,7 +257,7 @@ export function ScheduleDetail() {
                   <Text>Finalizado</Text>
                   <Text fontSize={'xs'} color="gray.400">
                     Seu agendamento foi confirmado, aguarde o prestador de
-                    servico entrar em contato.
+                    serviço entrar em contato.
                   </Text>
                 </VStack>
               )}
@@ -308,7 +308,7 @@ export function ScheduleDetail() {
           </VStack>
 
           <VStack mt={5} backgroundColor="white" p={5} borderRadius={10}>
-            <Text bold>Informacoes do usuario</Text>
+            <Text bold>Informações do usuário</Text>
             <Text>{schedule?.notes ? schedule?.notes : 'Sem observações'}</Text>
           </VStack>
         </VStack>
@@ -317,12 +317,12 @@ export function ScheduleDetail() {
           <Text bold>Dados do prestador</Text>
 
           <VStack mt={5} backgroundColor="white" p={5} borderRadius={10}>
-            <Text bold>Local de servico</Text>
+            <Text bold>Local de serviço</Text>
             <Text>{schedule?.location?.business_name}</Text>
           </VStack>
 
           <VStack mt={5} backgroundColor="white" p={5} borderRadius={10}>
-            <Text bold>Endereco</Text>
+            <Text bold>Endereço</Text>
             <Text>
               {schedule?.location?.address_line}, {schedule?.location?.number} -{' '}
               {schedule?.location?.district} / {schedule?.location?.state}
@@ -360,12 +360,12 @@ export function ScheduleDetail() {
           </VStack>
 
           <VStack mt={5} backgroundColor="white" p={5} borderRadius={10}>
-            <Text bold>Horario</Text>
+            <Text bold>Horário</Text>
             <Text>{schedule?.time}</Text>
           </VStack>
 
           <VStack mt={5} backgroundColor="white" p={5} borderRadius={10}>
-            <Text bold>Servico</Text>
+            <Text bold>Serviço</Text>
             <Text>{schedule?.service_type?.name}</Text>
           </VStack>
 
@@ -394,7 +394,7 @@ export function ScheduleDetail() {
                 <Icon as={Feather} name="info" size={8} color="purple.500" />
               </VStack>
               <VStack ml={3}>
-                <Text bold>Informacoes adicionais</Text>
+                <Text bold>Informações adicionais</Text>
               </VStack>
             </HStack>
             <HStack py={3}>
@@ -412,7 +412,7 @@ export function ScheduleDetail() {
                       h={150}
                       value={observation}
                       onChangeText={setObservation}
-                      placeholder="Voce pode adicionar informacoes adicionais para o cliente."
+                      placeholder="Voce pode adicionar informações adicionais para o cliente."
                     />
                   </VStack>
                 ))}

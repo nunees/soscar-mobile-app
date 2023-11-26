@@ -144,6 +144,7 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
   }
 
   async function notificationsRoutine() {
+    console.log('I am running');
     const { user_id } = await storageUserKeysGet();
     const { data } = await api.get(`/notifications/all/new`, {
       headers: {
@@ -182,7 +183,7 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
     if (user.id !== undefined) {
       const interval = setInterval(async () => {
         notificationsRoutine();
-      }, 10000);
+      }, 3000);
 
       return () => clearInterval(interval);
     }

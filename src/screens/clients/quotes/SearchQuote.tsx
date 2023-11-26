@@ -63,7 +63,7 @@ export function SearchQuote() {
     <VStack>
       <VStack mb={5}>
         <AppHeader
-          title="Parceiros disponiveis"
+          title="Parceiros disponíveis"
           navigation={navigation}
           screen="quotes"
         />
@@ -73,7 +73,7 @@ export function SearchQuote() {
         <LoadingModal
           showModal={isLoading}
           setShowModal={setIsLoading}
-          message="Buscando profissionais disponiveis"
+          message="Buscando profissionais disponíveis"
         />
       )}
 

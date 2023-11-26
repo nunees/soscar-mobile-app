@@ -36,7 +36,7 @@ export function Locations() {
     try {
       Alert.alert(
         'Deseja realmente excluir o local?',
-        'A acao nao pode ser revertida e voce perdera todos dos dados assiciaods ao local.',
+        'A ação nao pode ser revertida e voce perdera todos dos dados associados ao local.',
         [
           {
             text: 'Cancelar',

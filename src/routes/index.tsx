@@ -15,24 +15,10 @@ export function Routes() {
   theme.colors.background = colors.gray[100];
   const { user, isLoadingUserStorageData } = useAuth();
 
-  // if (isLoadingUserStorageData) {
-  //   return <Loading />;
-  // }
-
   return (
     <Box flex={1} bg={'white'}>
       {isLoadingUserStorageData && <Loading />}
       <NavigationContainer theme={theme}>
-        {/* {
-          // eslint-disable-next-line no-nested-ternary
-          !user?.id ? (
-            <AuthRoutes />
-          ) : user.isPartner ? (
-            <PartnerRoutes />
-          ) : (
-            <AppRoutes />
-          )
-        } */}
         {!user.id && <AuthRoutes />}
         {user.id && !user.isPartner && <AppRoutes />}
         {user.id && user.isPartner && <PartnerRoutes />}

@@ -10,7 +10,6 @@ import { VechiclesBrands } from '@data/VechiclesBrands';
 import { VEHICLE_MODELS } from '@data/VehiclesModels';
 import { ILocation } from '@dtos/ILocation';
 import { IQuoteList } from '@dtos/IQuoteList';
-import { AppError } from '@utils/AppError';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useAuth } from '@hooks/useAuth';
 import {
@@ -20,6 +19,7 @@ import {
 } from '@react-navigation/native';
 import { PartnerNavigatorRoutesProps } from '@routes/partner.routes';
 import { api } from '@services/api';
+import { AppError } from '@utils/AppError';
 import { IFileInfo } from 'expo-file-system';
 import * as FileSystem from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';
@@ -41,16 +41,16 @@ type FormDataProps = {
 };
 
 const quoteSchema = yup.object().shape({
-  partnerNotes: yup.string().required('Informe suas observacoes'),
-  serviceDescription: yup.string().required('Informe a descricao do servico'),
-  serviceValue: yup.string().required('Informe o valor do servico'),
+  partnerNotes: yup.string().required('Informe suas observações'),
+  serviceDescription: yup.string().required('Informe a descrição do serviço'),
+  serviceValue: yup.string().required('Informe o valor do serviço'),
   franchisePrice: yup
     .string()
     .required('Informe o valor da franquia da seguradora'),
 });
 
 export function QuoteDetail() {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading] = useState(false);
 
   const [quote, setQuote] = useState<IQuoteList>({} as IQuoteList);
   const [location, setLocation] = useState<ILocation>({} as ILocation);
@@ -67,6 +67,7 @@ export function QuoteDetail() {
   const {
     control,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<FormDataProps>({
     resolver: yupResolver(quoteSchema),
@@ -176,10 +177,10 @@ export function QuoteDetail() {
           });
 
           setQuote(response.data);
-          setFranchisePrice(response.data.franchise_price);
-          setServiceDescription(response.data.service_decription);
-          setServiceValue(response.data.service_price);
-          setPartnerNotes(response.data.partner_notes);
+          setValue('partnerNotes', response.data.partner_notes);
+          setValue('serviceDescription', response.data.service_decription);
+          setValue('serviceValue', response.data.service_price);
+          setValue('franchisePrice', response.data.franchise_price);
         } catch (error) {
           throw new AppError('Erro ao buscar detalhes do orçamento');
         }
@@ -274,7 +275,7 @@ export function QuoteDetail() {
       >
         <VStack px={3} py={3}>
           <Text bold pb={2}>
-            Dados do proprietario
+            Dados do proprietário
           </Text>
           <VStack backgroundColor="white" borderRadius={10} p={5}>
             <HStack>
@@ -394,7 +395,7 @@ export function QuoteDetail() {
                   CNPJ/CPF: <Text fontStyle={'normal'}>{location.cnpj}</Text>
                 </Text>
                 <Text fontWeight={'bold'}>
-                  Endereco:{' '}
+                  Endereço:{' '}
                   <Text fontStyle={'normal'}>
                     {location.address_line},{location.number} - {location.city}{' '}
                     - {location.state}
@@ -415,7 +416,7 @@ export function QuoteDetail() {
 
         <VStack px={3} py={3}>
           <Text bold pb={2}>
-            Servico requerido
+            Serviço requerido
           </Text>
           <VStack backgroundColor="white" borderRadius={10} p={5}>
             <Text>
@@ -429,7 +430,7 @@ export function QuoteDetail() {
 
         <VStack px={3} py={3}>
           <Text bold pb={2}>
-            Observacoes do proprietario
+            Observações do proprietário
           </Text>
           <VStack backgroundColor="white" borderRadius={10} p={5}>
             <Text>{quote.user_notes}</Text>
@@ -438,7 +439,7 @@ export function QuoteDetail() {
 
         <VStack px={3} py={3}>
           <Text bold pb={2}>
-            Arquivos de midia
+            Arquivos de mídia
           </Text>
           <VStack backgroundColor="white" borderRadius={10} p={5}>
             {userMidia.map((file) => (
@@ -448,7 +449,7 @@ export function QuoteDetail() {
                 source={{
                   uri: `${api.defaults.baseURL}/quotes/document/${file.id}/${file.hashId}`,
                 }}
-                alt="Imagem do usuario"
+                alt="Imagem do usuário"
                 resizeMode="cover"
                 size={350}
                 mb={5}
@@ -459,17 +460,17 @@ export function QuoteDetail() {
 
         <VStack px={3} py={3}>
           <Text bold pb={2}>
-            Observacoes (opcional)
+            Observações (opcional)
           </Text>
           <VStack backgroundColor="white" borderRadius={10} p={5}>
             {quote.status !== 3 && (
               <Controller
                 control={control}
                 name="partnerNotes"
-                rules={{ required: 'Adicione informacoes adicionais' }}
+                rules={{ required: 'Adicione informações adicionais' }}
                 render={({ field: { onChange, value } }) => (
                   <TextArea
-                    placeholder="Suas observacoes"
+                    placeholder="Suas observações"
                     fontSize="sm"
                     onChangeText={onChange}
                     value={value}
@@ -484,17 +485,17 @@ export function QuoteDetail() {
 
         <VStack px={3} py={3}>
           <Text bold pb={2}>
-            Descricao do servico
+            Descrição do serviço
           </Text>
           <VStack backgroundColor="white" borderRadius={10} p={5}>
             {quote.status !== 3 && (
               <Controller
                 control={control}
                 name="serviceDescription"
-                rules={{ required: 'Descreve o servico' }}
+                rules={{ required: 'Descreve o serviço' }}
                 render={({ field: { onChange, value } }) => (
                   <TextArea
-                    placeholder="Descricao do servico"
+                    placeholder="Descrição do serviço"
                     fontSize="sm"
                     defaultValue=""
                     onChangeText={onChange}
@@ -546,10 +547,10 @@ export function QuoteDetail() {
               <Controller
                 control={control}
                 name="serviceValue"
-                rules={{ required: 'Insira o valor do servico' }}
+                rules={{ required: 'Insira o valor do serviço' }}
                 render={({ field: { onChange, value } }) => (
                   <Input
-                    placeholder="Valor do servico"
+                    placeholder="Valor do serviço"
                     fontSize="sm"
                     defaultValue=""
                     onChangeText={onChange}
@@ -566,7 +567,7 @@ export function QuoteDetail() {
 
         <VStack px={3} py={3}>
           <Text bold pb={2}>
-            Documento de orcamento
+            Documento de orçamento
           </Text>
           <VStack backgroundColor="white" borderRadius={10} p={5}>
             {partnerMidia.length > 0 &&
@@ -577,7 +578,7 @@ export function QuoteDetail() {
                   source={{
                     uri: `${api.defaults.baseURL}/quotes/document/${file.id}/${file.hashId}`,
                   }}
-                  alt="Imagem do usuario"
+                  alt="Imagem do usuário"
                   resizeMode="cover"
                   size={350}
                   mb={5}
@@ -597,12 +598,12 @@ export function QuoteDetail() {
         {quote.status !== 3 && (
           <VStack px={3} py={3}>
             <Button
-              title="Enviar orcamento"
+              title="Enviar orçamento"
               mt={5}
               onPress={handleSubmit(handleSubmitSucess)}
               isLoading={isLoading}
             />
-            <Button title="Recusar orcamento" variant={'outline'} mt={5} />
+            <Button title="Recusar orçamento" variant={'outline'} mt={5} />
           </VStack>
         )}
       </ScrollView>

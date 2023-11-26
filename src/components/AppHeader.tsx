@@ -5,6 +5,7 @@ import { TouchableOpacity } from 'react-native';
 type Props = IIconProps & {
   title: string;
   icon?: string;
+  isPartner?: boolean;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   navigation: any;
   screen: string;
@@ -12,7 +13,14 @@ type Props = IIconProps & {
   payload?: object;
 };
 
-export function AppHeader({ title, icon, navigation, screen, payload }: Props) {
+export function AppHeader({
+  title,
+  icon,
+  navigation,
+  screen,
+  payload,
+  isPartner = false,
+}: Props) {
   const handleGoBack = () => {
     if (payload) {
       navigation.navigate(screen, payload);
@@ -49,9 +57,26 @@ export function AppHeader({ title, icon, navigation, screen, payload }: Props) {
         </VStack>
 
         <VStack>
-          <TouchableOpacity onPress={() => navigation.navigate('home')}>
-            <Icon as={FontAwesome5} name="home" size={5} color="white" />
-          </TouchableOpacity>
+          <HStack>
+            {isPartner && (
+              <TouchableOpacity
+                onPress={() => navigation.navigate('assistanceMap')}
+                style={{
+                  marginRight: 15,
+                }}
+              >
+                <Icon
+                  as={FontAwesome5}
+                  name="hands-helping"
+                  size={5}
+                  color="white"
+                />
+              </TouchableOpacity>
+            )}
+            <TouchableOpacity onPress={() => navigation.navigate('home')}>
+              <Icon as={FontAwesome5} name="home" size={5} color="white" />
+            </TouchableOpacity>
+          </HStack>
         </VStack>
       </HStack>
     </VStack>

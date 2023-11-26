@@ -12,92 +12,23 @@ import { useNotification } from '@hooks/notification/useNotification';
 import { usePushNotification } from '@hooks/notification/usePushNotification';
 import notifee, { EventType } from '@notifee/react-native';
 import { Routes } from '@routes/index';
-import { api } from '@services/api';
 import { storageUserKeysGet } from '@storage/storageUserKeys';
-import { AppError } from '@utils/AppError';
-import * as BackgroundFetch from 'expo-background-fetch';
-import * as TaskManager from 'expo-task-manager';
 import { NativeBaseProvider } from 'native-base';
-import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'react-native';
 
 import { THEME } from './src/theme';
-
-const BACKGROUND_FETCH_TASK = 'background-fetch-task';
-
-let setStateFn: Dispatch<SetStateAction<IPushNotificationDTO[]>> = () => {
-  console.log('State not yet initialized');
-};
-
-async function notificationTask() {
-  try {
-    console.log("I'm running background task");
-    const { user_id } = await storageUserKeysGet();
-    console.log('User id: ', user_id);
-    if (user_id) {
-      const result = await api.get('/notifications/all/fresh', {
-        headers: {
-          id: user_id,
-        },
-      });
-
-      console.log('Background task result: ', result.data);
-      setStateFn(result.data);
-      return result.data
-        ? BackgroundFetch.BackgroundFetchResult.NewData
-        : BackgroundFetch.BackgroundFetchResult.NoData;
-    }
-    throw new AppError('User id not provided');
-  } catch (error) {
-    return BackgroundFetch.BackgroundFetchResult.Failed;
-  }
-}
-
-TaskManager.defineTask(BACKGROUND_FETCH_TASK, async () => {
-  try {
-    const result = await notificationTask();
-    return result;
-  } catch (error) {
-    return BackgroundFetch.BackgroundFetchResult.Failed;
-  }
-});
-
-async function initBackgroundFetch(
-  taskName: string,
-  taskfn: {
-    (): Promise<BackgroundFetch.BackgroundFetchResult>;
-    (body: TaskManager.TaskManagerTaskBody<object>): void;
-  },
-  interval = 60 * 1
-) {
-  try {
-    if (!TaskManager.isTaskDefined(taskName)) {
-      TaskManager.defineTask(taskName, taskfn);
-    }
-    const options = {
-      minimumInterval: interval,
-    };
-    await BackgroundFetch.registerTaskAsync(taskName, options);
-  } catch (error) {
-    console.log('registerTaskAsyn failed: ', error);
-  }
-}
-
-initBackgroundFetch(BACKGROUND_FETCH_TASK, notificationTask);
 
 export default function App() {
   const [fontsLoaded] = useFonts({
     Nunito_400Regular,
     Nunito_700Bold,
   });
-  const [state, setState] = useState<IPushNotificationDTO[]>([]);
+  const [state] = useState<IPushNotificationDTO[]>([]);
 
   const { sendNotification } = usePushNotification();
   const { markAsRead } = useNotification();
 
-  setStateFn = setState;
-
-  // Foreground notification event
   async function triggerNotification() {
     try {
       console.log("I'm running foreground task");

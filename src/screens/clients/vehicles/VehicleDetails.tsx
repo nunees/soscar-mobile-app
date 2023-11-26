@@ -1,9 +1,10 @@
 import { AppHeader } from '@components/AppHeader';
 import { Button } from '@components/Button';
 import { useAuth } from '@hooks/useAuth';
-import { useRoute } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { AppNavigatorRoutesProps } from '@routes/app.routes';
 import { api } from '@services/api';
-import { ScrollView, VStack, Text, useToast, Image, HStack } from 'native-base';
+import { ScrollView, VStack, Text, useToast, HStack } from 'native-base';
 import { useCallback, useEffect, useState } from 'react';
 
 type RouteParamsProps = {
@@ -17,13 +18,15 @@ export function VehicleDetails() {
   const [year, setYear] = useState<string>('');
   const [plate, setPlate] = useState<string>('');
   const [engineMiles, setEngineMiles] = useState('');
-  const [totalSpent, setTotalSpent] = useState(0);
+  const [totalSpent] = useState(0);
 
   const route = useRoute();
   const toast = useToast();
 
   const { user } = useAuth();
   const { vehicleId } = route.params as RouteParamsProps;
+
+  const navigation = useNavigation<AppNavigatorRoutesProps>();
 
   const fetchVehicleDetails = useCallback(async () => {
     try {
@@ -55,7 +58,11 @@ export function VehicleDetails() {
   return (
     <VStack>
       <VStack>
-        <AppHeader title="Detalhes do Veículo" />
+        <AppHeader
+          title="Detalhes do Veículo"
+          navigation={navigation}
+          screen="vehicles"
+        />
       </VStack>
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -105,7 +112,7 @@ export function VehicleDetails() {
 
           <VStack mb={5} backgroundColor="white" p={5} borderRadius={10}>
             <Text bold pb={2}>
-              Kilometragen
+              Kilometragem
             </Text>
             <Text>{engineMiles}</Text>
           </VStack>

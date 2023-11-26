@@ -24,63 +24,6 @@ import toyota from '@assets/logos/Toyota.png';
 import volkswagen from '@assets/logos/Volkswagen.png';
 import volvo from '@assets/logos/volvo.png';
 
-// export default function getLogoImage(brandName: string) {
-//   switch (brandName) {
-//     case 'audi.png':
-//       return audi;
-//     case 'bww.png':
-//       return bmw;
-//     case 'caoa.png':
-//       return caoa;
-//     case 'chevrolet.png':
-//       return chevrolet;
-//     case 'citroen.png':
-//       return citroen;
-//     case 'fiat.png':
-//       return fiat;
-//     case 'ford.png':
-//       return ford;
-//     case 'honda.png':
-//       return honda;
-//     case 'hyundai.png':
-//       return hyundai;
-//     case 'iveco.png':
-//       return iveco;
-//     case 'jeep.png':
-//       return jeep;
-//     case 'kia.png':
-//       return kia;
-//     case 'landrover.png':
-//       return landrover;
-//     case 'mercedes.png':
-//       return mercedes;
-//     case 'mitsubishi.png':
-//       return mitsubish;
-//     case 'nissan.png':
-//       return nissan;
-//     case 'peugeot.png':
-//       return peugeot;
-//     case 'porsche.png':
-//       return porsche;
-//     case 'renault.png':
-//       return renault;
-//     case 'scania.png':
-//       return scania;
-//     case 'subaru.png':
-//       return subaru;
-//     case 'suzuki.png':
-//       return suzuki;
-//     case 'toyota.png':
-//       return toyota;
-//     case 'volkswagen.png':
-//       return volkswagen;
-//     case 'volvo.png':
-//       return volvo;
-//     default:
-//       return '';
-//   }
-// }
-
 export default function getLogoImage(brandName: string) {
   switch (brandName) {
     case 'audi.png':

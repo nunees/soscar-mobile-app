@@ -39,6 +39,8 @@ type PartnerRoutes = {
   legalQuoteDetail: { legalQuoteId: string; locationId: string };
   validateDocument: undefined;
   notifications: undefined;
+
+  // assistance
   assistanceMap: undefined;
 };
 

@@ -17,7 +17,7 @@ export function AssistancesList() {
     <SafeAreaView>
       <VStack>
         <AppHeader
-          title="Tipos de assistencia"
+          title="Tipos de assistência"
           navigation={navigation}
           screen={'services'}
         />
@@ -35,7 +35,7 @@ export function AssistancesList() {
             title={'Borracheiro'}
             content={'Problema com os pneus do veiculo?'}
             onPress={() =>
-              navigation.navigate('assistanceContactType', { serviceId: 1 })
+              navigation.navigate('assistanceArchive', { serviceId: 3 })
             }
           />
 
@@ -45,7 +45,7 @@ export function AssistancesList() {
             title={'Chaveiro'}
             content={'Problema com a chave do veiculo? '}
             onPress={() =>
-              navigation.navigate('assistanceContactType', { serviceId: 2 })
+              navigation.navigate('assistanceArchive', { serviceId: 4 })
             }
           />
 
@@ -55,17 +55,17 @@ export function AssistancesList() {
             title={'Guinchos'}
             content={'O carro quebrou?'}
             onPress={() =>
-              navigation.navigate('assistanceContactType', { serviceId: 3 })
+              navigation.navigate('assistanceArchive', { serviceId: 1 })
             }
           />
 
           <ListServices
             image={EletricProblemImage}
-            alt={'Pane Eletrica'}
-            title={'Pane Eletrica'}
+            alt={'Pane Elétrica'}
+            title={'Pane Elétrica'}
             content={'Problema com a bateria? '}
             onPress={() =>
-              navigation.navigate('assistanceContactType', { serviceId: 4 })
+              navigation.navigate('assistanceArchive', { serviceId: 2 })
             }
           />
 
@@ -73,9 +73,9 @@ export function AssistancesList() {
             image={NoFuelImage}
             alt={'Pane Seca'}
             title={'Pane Seca'}
-            content={'Acabou a combustivel?'}
+            content={'Acabou a combustível?'}
             onPress={() =>
-              navigation.navigate('assistanceContactType', { serviceId: 5 })
+              navigation.navigate('assistanceArchive', { serviceId: 5 })
             }
           />
         </VStack>

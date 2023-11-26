@@ -56,14 +56,18 @@ export function SearchLegalQuote() {
   return (
     <VStack>
       <VStack mb={5}>
-        <AppHeader title="Parceiros disponiveis" />
+        <AppHeader
+          title="Parceiros disponíveis"
+          navigation={navigation}
+          screen="services"
+        />
       </VStack>
 
       {isLoading && (
         <LoadingModal
           showModal={isLoading}
           setShowModal={setIsLoading}
-          message="Buscando profissionais disponiveis"
+          message="Buscando profissionais disponíveis"
         />
       )}
 

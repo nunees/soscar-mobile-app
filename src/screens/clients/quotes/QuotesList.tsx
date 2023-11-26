@@ -27,7 +27,7 @@ export function QuotesList() {
     <VStack pb={10}>
       <VStack mb={5}>
         <AppHeader
-          title="Orcamentos"
+          title="Orçamentos"
           navigation={navigation}
           screen="services"
         />
@@ -115,7 +115,7 @@ export function QuotesList() {
                           variant={'solid'}
                         >
                           <Text fontSize={'xs'} color={'white'}>
-                            Analise
+                            Análise
                           </Text>
                         </Badge>
                       )}
@@ -155,7 +155,7 @@ export function QuotesList() {
                           variant={'solid'}
                         >
                           <Text fontSize={'xs'} color={'white'}>
-                            juridico
+                            jurídico
                           </Text>
                         </Badge>
                       )}
@@ -189,7 +189,7 @@ export function QuotesList() {
         ListEmptyComponent={() => (
           <Center>
             <Text bold color="gray.400">
-              Nao exitem orcamentos registrados
+              Nao exitem orçamentos registrados
             </Text>
           </Center>
         )}

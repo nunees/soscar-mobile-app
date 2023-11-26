@@ -89,7 +89,7 @@ export function NewLegalQuote() {
       setIsLoading(false);
     } catch (error) {
       toast.show({
-        title: 'Erro ao buscar informacoes do veiculo',
+        title: 'Erro ao buscar informações do veiculo',
         placement: 'top',
         bgColor: 'red.500',
       });
@@ -139,7 +139,7 @@ export function NewLegalQuote() {
       const generatedHash = generateId(128);
 
       await api.post(
-        '/quotes/legal',
+        '/legal',
         {
           user_id: user.id,
           hashId: generatedHash,
@@ -152,7 +152,6 @@ export function NewLegalQuote() {
         {
           headers: {
             id: user.id,
-            'Content-Type': 'application/json',
           },
         }
       );
@@ -183,7 +182,7 @@ export function NewLegalQuote() {
 
       setIsSaving(false);
       toast.show({
-        title: 'Orcamento solicitado com sucesso',
+        title: 'Orçamento solicitado com sucesso',
         placement: 'top',
         bgColor: 'green.500',
       });
@@ -193,7 +192,7 @@ export function NewLegalQuote() {
       const isAppError = error instanceof AppError;
       const title = isAppError
         ? error.message
-        : 'Ocorreu um erro ao solicitar o orcamento';
+        : 'Ocorreu um erro ao solicitar o orçamento';
       toast.show({
         title,
         placement: 'top',

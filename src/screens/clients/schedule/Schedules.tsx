@@ -47,7 +47,7 @@ export function Schedules() {
             alt={'Elétrica'}
             title={'Elétrica'}
             content={
-              'Resolva problemas com instalações eletricas, baterias e problemas relacionados'
+              'Resolva problemas com instalações elétricas, baterias e problemas relacionados'
             }
             onPress={() =>
               navigation.navigate('searchSchedule', { serviceId: '3' })

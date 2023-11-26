@@ -107,7 +107,7 @@ export function NewQuote() {
       setVehicles(response.data);
       setIsLoading(false);
     } catch (error) {
-      throw new AppError('Erro ao buscar veiculos');
+      throw new AppError('Erro ao buscar veículos');
     } finally {
       setIsLoading(false);
     }
@@ -198,7 +198,7 @@ export function NewQuote() {
         <LoadingModal
           showModal={isLoading}
           setShowModal={setIsLoading}
-          message="Carregando informaçoes"
+          message="Carregando informações"
         />
       )}
       <ScrollView
@@ -340,9 +340,9 @@ export function NewQuote() {
             <Button
               onPress={handleSubmit}
               mb={3}
-              title="Solicitar orcamento"
+              title="Solicitar orçamento"
               isLoading={isSaving}
-              isLoadingText="Solicitando orcamento"
+              isLoadingText="Solicitando orçamento"
             />
 
             <Button

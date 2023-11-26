@@ -8,8 +8,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 export function RecoverPassword() {
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+
   const [pages, setPages] = useState(0);
 
   const toast = useToast();

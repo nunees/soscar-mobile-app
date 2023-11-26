@@ -1,3 +1,4 @@
+import { ILocation } from './ILocation';
 import { IQuotesDocumentDTO } from './IQuoteDocumentDTO';
 
 export interface IQuoteList {
@@ -34,6 +35,7 @@ export interface IQuoteList {
     name: string;
     id: number;
   };
+  location?: ILocation;
   vehicles: {
     brand_id: number;
     color: string;

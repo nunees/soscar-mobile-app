@@ -47,7 +47,7 @@ export default function MyAccountInformation() {
 
     if (response.data.isPartner === user.isPartner) {
       toast.show({
-        title: 'Tipo de usuario alterado com sucesso!',
+        title: 'Tipo de usuário alterado com sucesso!',
         placement: 'bottom',
         bgColor: 'green.500',
       });
@@ -77,8 +77,8 @@ export default function MyAccountInformation() {
                 <Text fontSize={'xl'}>Atencao!</Text>
               </Modal.Header>
               <Text p={3}>
-                Para que as alteracoes tenham efeito, e necessario que voce saia
-                da aplicacao e faca login novamente.
+                Para que as alterações tenham efeito, e necessário que voce saia
+                da aplicação e faca login novamente.
               </Text>
               <Button
                 title="Sair"
@@ -113,7 +113,7 @@ export default function MyAccountInformation() {
         </VStack>
         <VStack>
           <Center>
-            <Text fontSize={'xl'}>Informacoes pessoais</Text>
+            <Text fontSize={'xl'}>Informações pessoais</Text>
           </Center>
         </VStack>
 
@@ -121,7 +121,7 @@ export default function MyAccountInformation() {
           <VStack backgroundColor="white" borderRadius={10} px={3} py={3}>
             <VStack>
               <HStack justifyContent="space-between" alignItems="center">
-                <Text bold>Tipo de usuario</Text>
+                <Text bold>Tipo de usuário</Text>
                 <Switch
                   defaultIsChecked={user.isPartner}
                   onChange={handleChangeUserType}
@@ -137,7 +137,7 @@ export default function MyAccountInformation() {
           </VStack>
 
           <VStack backgroundColor="white" p={3} borderRadius={10} mt={3}>
-            <Text bold>Numero de indentificacao</Text>
+            <Text bold>Numero de indexificação</Text>
             <Text color="gray.400">{user.id}</Text>
           </VStack>
 
@@ -167,7 +167,7 @@ export default function MyAccountInformation() {
           </VStack>
 
           <VStack backgroundColor="white" p={3} borderRadius={10} mt={3}>
-            <Text bold>Usuario</Text>
+            <Text bold>Usuário</Text>
             <Text color="gray.400">{user.username}</Text>
           </VStack>
 
@@ -180,8 +180,8 @@ export default function MyAccountInformation() {
                     .split('T')[0]
                     .split('-')
                     .reverse()
-                    .join('/') || 'Nao informado'
-                : 'Nao informado'}
+                    .join('/') || 'Não informado'
+                : 'Não informado'}
             </Text>
           </VStack>
 
@@ -190,8 +190,8 @@ export default function MyAccountInformation() {
             <Text color="gray.400">
               {profile.genderId === 1 && 'Masculino'}
               {profile.genderId === 2 && 'Feminino'}
-              {profile.genderId === 3 && 'Transgenero'}
-              {profile.genderId === 4 && 'Nao-binario'}
+              {profile.genderId === 3 && 'Transgênero'}
+              {profile.genderId === 4 && 'Nao-binário'}
               {profile.genderId === 5 && 'Outro'}
               {!profile.genderId && 'Nao informado'}
             </Text>

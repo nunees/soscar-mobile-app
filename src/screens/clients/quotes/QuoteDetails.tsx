@@ -58,8 +58,6 @@ export function QuoteDetails() {
   const toast = useToast();
   const { quoteId, locationId, vehicleId } = route.params as RouteParamsProps;
 
-  console.log(rating);
-
   async function handleReview() {
     try {
       await api.post(
@@ -76,7 +74,7 @@ export function QuoteDetails() {
         }
       );
     } catch (error) {
-      throw new AppError('Erro ao avaliar orcamento');
+      throw new AppError('Erro ao avaliar orçamento');
     }
   }
 
@@ -99,7 +97,7 @@ export function QuoteDetails() {
           setAlreadyReviewd(true);
         }
       } catch (error) {
-        throw new AppError('Erro ao buscar avaliacoes');
+        throw new AppError('Erro ao buscar avaliações');
       }
     }
 
@@ -117,7 +115,7 @@ export function QuoteDetails() {
             try {
               setIsLoading(true);
               await api.put(
-                `/quotes/status/${locationId}`,
+                `/quotes/status/${quoteId}`,
                 {
                   status: 4,
                 },
@@ -305,18 +303,32 @@ export function QuoteDetails() {
           <VStack backgroundColor="white" borderRadius={10} mt={5}>
             <VStack px={5} py={5}>
               <Text bold>Status</Text>
-              {quote.status === 1 && <Text>Solicitado</Text>}
-              {quote.status === 2 && <Text>Em analise</Text>}
-              {quote.status === 3 && <Text>Aprovado</Text>}
+              {quote.status === 1 && (
+                <Text color="yellow.500" bold>
+                  Solicitado
+                </Text>
+              )}
+              {quote.status === 2 && (
+                <Text color="blue.500" bold>
+                  Em análise
+                </Text>
+              )}
+              {quote.status === 3 && (
+                <Text color="green.500" bold>
+                  Aprovado
+                </Text>
+              )}
               {quote.status === 4 && (
-                <Text>Recusado ou Cancelado pelo usuario</Text>
+                <Text color="red.500" bold>
+                  Recusado ou Cancelado pelo usuário
+                </Text>
               )}
             </VStack>
           </VStack>
 
           <VStack backgroundColor="white" borderRadius={10} mt={5}>
             <VStack px={5} py={5}>
-              <Text bold>Chave de verificacao</Text>
+              <Text bold>Chave de verificação</Text>
               <HStack justifyContent={'space-between'} alignItems={'center'}>
                 <VStack w={160}>
                   <Text fontSize={'2xs'}>{quote?.hashId}</Text>
@@ -359,7 +371,7 @@ export function QuoteDetails() {
           <VStack backgroundColor="white" borderRadius={10} mt={5}>
             <VStack px={5} py={5}>
               <Text bold mb={2}>
-                Arquivos enviados pelo usuario
+                Arquivos enviados pelo usuário
               </Text>
               <VStack>
                 <FlatList
@@ -373,7 +385,7 @@ export function QuoteDetails() {
                       source={{
                         uri: `${api.defaults.baseURL}/quotes/document/${item.id}/${item.hashId}`,
                       }}
-                      alt="Imagem do usuario"
+                      alt="Imagem do usuário"
                       resizeMode="cover"
                       size={350}
                       mb={5}
@@ -388,21 +400,21 @@ export function QuoteDetails() {
             <>
               <VStack backgroundColor="white" borderRadius={10} mt={5}>
                 <VStack px={5} py={5}>
-                  <Text bold>Observacoes do profissional</Text>
+                  <Text bold>Observações do profissional</Text>
                   <Text>{quote.partner_notes}</Text>
                 </VStack>
               </VStack>
 
               <VStack backgroundColor="white" borderRadius={10} mt={5}>
                 <VStack px={5} py={5}>
-                  <Text bold>Descricao do servico</Text>
+                  <Text bold>Descrição do serviço</Text>
                   <Text>{quote.service_decription}</Text>
                 </VStack>
               </VStack>
 
               <VStack backgroundColor="white" borderRadius={10} mt={5}>
                 <VStack px={5} py={5}>
-                  <Text bold>Valor do orcamento</Text>
+                  <Text bold>Valor do orçamento</Text>
                   <Text>{quote.service_price}</Text>
                 </VStack>
               </VStack>
@@ -423,7 +435,7 @@ export function QuoteDetails() {
 
               <VStack backgroundColor="white" borderRadius={10} mt={5}>
                 <VStack px={5} py={5}>
-                  <Text bold>Documento de orcamento</Text>
+                  <Text bold>Documento de orçamento</Text>
                   <FlatList
                     data={partnerMidia}
                     keyExtractor={(item) => item.id}
@@ -435,7 +447,7 @@ export function QuoteDetails() {
                         source={{
                           uri: `${api.defaults.baseURL}/quotes/document/${item.id}/${item.hashId}`,
                         }}
-                        alt="Imagem do usuario"
+                        alt="Imagem do usuário"
                         resizeMode="cover"
                         size={350}
                         mb={5}
@@ -447,21 +459,25 @@ export function QuoteDetails() {
             </>
           )}
 
-          {quote.status !== 3 && (
-            <VStack mt={5}>
-              <Button
-                title="Cancelar orçamento"
-                onPress={handleCancelQuote}
-                isLoading={isLoading}
-              />
-            </VStack>
-          )}
+          {quote.status !== 3 ||
+            (quote.status !== 4 && (
+              <VStack mt={5}>
+                <Button
+                  title="Cancelar orçamento"
+                  onPress={handleCancelQuote}
+                  isLoading={isLoading}
+                />
+              </VStack>
+            ))}
 
           {quote?.status === 3 && !alreadyReviewd && (
             <VStack mt={5} backgroundColor="white" p={5} borderRadius={10}>
               <VStack>
+                <Text bold pb={3}>
+                  Avaliação
+                </Text>
                 <TextArea
-                  placeholder={'Deixe uma avaliacao'}
+                  placeholder={'Deixe uma avaliação'}
                   value={review}
                   onChangeText={setReview}
                 />

@@ -1,4 +1,9 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
+import QRCodeImage from '@assets/qrcode.png';
+import CalendarImage from '@assets/services/calendar.png';
+import CompliantImage from '@assets/services/compliant.png';
+import PaperImage from '@assets/services/paper.png';
+import { ServiceCardTypes } from '@components/ServiceCardTypes';
 import { SmallSchedulleCard } from '@components/SmallSchedulleCard';
 import UserPhoto from '@components/UserPhoto';
 import { ISchedules } from '@dtos/ISchedules';
@@ -190,6 +195,32 @@ export function HomeScreen() {
                   </VStack>
                 </HStack>
               )}
+            />
+          </VStack>
+        </VStack>
+
+        <VStack mt={5} px={5}>
+          <VStack>
+            <Text fontSize={'md'} bold pb={3}>
+              Serviços mais procurados
+            </Text>
+
+            <ServiceCardTypes
+              icon="briefcase"
+              title={'Minhas ordens'}
+              text={'Visualize a sua agenda de clientes'}
+              image={PaperImage}
+              alt="Orçamento judiciais de serviços"
+              onPress={() => navigation.navigate('legalQuotes')}
+            />
+
+            <ServiceCardTypes
+              icon="compass"
+              title={'Validar orçamento'}
+              text={'Valide a autenticidade do documento de orçamento'}
+              image={QRCodeImage}
+              alt="Valide a autenticidade do documento de orçamento"
+              onPress={() => navigation.navigate('validateDocument')}
             />
           </VStack>
         </VStack>

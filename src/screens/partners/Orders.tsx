@@ -6,7 +6,7 @@ import { IQuoteList } from '@dtos/IQuoteList';
 import { ISchedules } from '@dtos/ISchedules';
 import { Feather } from '@expo/vector-icons';
 import { useAuth } from '@hooks/useAuth';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { PartnerNavigatorRoutesProps } from '@routes/partner.routes';
 import { api } from '@services/api';
 import {
@@ -21,7 +21,7 @@ import {
   useToast,
   Badge,
 } from 'native-base';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Agenda } from 'react-native-calendars';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -303,7 +303,7 @@ export function Orders() {
                   variant={'solid'}
                 >
                   <Text fontSize={'xs'} color="white" bold>
-                    juridico
+                    jurídico
                   </Text>
                 </Badge>
               )}
@@ -406,7 +406,7 @@ export function Orders() {
                   variant={'solid'}
                 >
                   <Text fontSize={'xs'} color="white" bold>
-                    juridico
+                    jurídico
                   </Text>
                 </Badge>
               )}
@@ -447,7 +447,7 @@ export function Orders() {
       <VStack margin={5} borderRadius={6} justifyContent={'flex-start'} p={5}>
         <Center>
           <Text color={'gray.400'}>
-            Não existe atividiade para o dia selecionado
+            Não existe atividade para o dia selecionado
           </Text>
         </Center>
       </VStack>

@@ -91,7 +91,7 @@ export function ValidateDocument() {
       <VStack px={5} mt={10}>
         <VStack background={'white'} p={3}>
           <Text fontSize={'lg'} bold color={'red.500'} textAlign={'center'}>
-            Não é possivel continuar
+            Não é possível continuar
           </Text>
           <Text fontSize={'lg'} textAlign={'center'}>
             Você deve permitir o acesso a câmera para continuar
@@ -112,7 +112,7 @@ export function ValidateDocument() {
         <VStack px={5} mt={10}>
           <VStack background={'white'} p={3}>
             <Text fontSize={'lg'} bold color={'red.500'} textAlign={'center'}>
-              Não é possivel continuar
+              Não é possível continuar
             </Text>
             <Text fontSize={'lg'} textAlign={'center'}>
               Você deve permitir o acesso a câmera para continuar
@@ -145,7 +145,7 @@ export function ValidateDocument() {
           <VStack px={2}>
             <VStack background={'white'} p={3} borderRadius={10}>
               <Text textAlign={'center'} fontSize={'md'} color="gray.600">
-                Aponte a camera para o Qr Code para scanear.{'\n'}Ela vai focar
+                Aponte a camera para o Qr Code para escanear.{'\n'}Ela vai focar
                 no código depois de alguns segundos.{'\n'}
                 Veja se o código QR está centralizado na tela. As quatro pontas
                 do código devem aparecer da tela de escaneamento.
@@ -184,7 +184,7 @@ export function ValidateDocument() {
               setIsCameraOpen(true);
               setServerResponse([]);
             }}
-            title="Scanear novamente"
+            title="Escanear novamente"
           />
         </VStack>
       )}

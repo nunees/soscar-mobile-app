@@ -18,7 +18,8 @@ type APIInstanceProps = AxiosInstance & {
 
 const api = axios.create({
   // baseURL: 'http://172.28.11.198:3333',
-  baseURL: 'http://192.168.1.106:3333',
+  // baseURL: 'http://192.168.1.108:3333',
+  baseURL: 'https://sosauto-api.onrender.com',
 }) as APIInstanceProps;
 
 let failedQueued: Array<PromiseType> = [];

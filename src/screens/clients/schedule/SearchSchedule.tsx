@@ -66,7 +66,7 @@ export function SearchSchedule() {
     <VStack pb={10}>
       <VStack mb={5}>
         <AppHeader
-          title="Parceiros disponiveis"
+          title="Parceiros disponíveis"
           navigation={navigation}
           screen="schedules"
         />
