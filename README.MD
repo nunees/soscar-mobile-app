@@ -1,0 +1,50 @@
+# Como compilar o projeto
+
+Requísitos de software:
+
+- Java JDK 8 ou 11
+- EAS Expo Build
+- Android SDK
+
+Requisitos de Hardware:
+
+- Pelo menos 4 cores de processamento disponíveis
+- Pelo menos 8Gb de memória instalada
+- Conexão com a internet
+
+## Instalalção de dependencias para compilação
+
+```
+sudo apt-get update && sudo apt-get upgrade -y && sudo apt-get install build-essential cmake ninja-build
+```
+
+## Instalação do Java Jdk (Linux)
+
+```
+sudo apt-get install openjdk-11-jdk openjdk-11-jre
+```
+
+## Instalação EAS Build
+
+O módulo [EAS](https://docs.expo.dev/build/setup/) server para transformar o código javascript em Java e logo em seguida
+compilar as classes
+
+```
+npm install -g eas-cli
+```
+
+Faça o login utilizando sua conta Expo
+
+```
+eas login
+```
+
+Use o comando abaixo para compilar, caso queira utilizar os servidores da expo retire o argumento `--local`, no entanto não será possivel compilar para mais de um sistema ao mesmo tempo (iOS e Android)
+
+- `--local` - Build local na máquina
+- `--profile` - Define o profile com base no arquivo `eas.json`
+- `--plataform` - Para qual plataforma deseja compilar
+
+```
+╰─ eas build --local --profile production --platform android
+```
