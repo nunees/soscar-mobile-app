@@ -54,10 +54,8 @@ Use o comando abaixo para compilar, caso queira utilizar os servidores da expo r
 Baixe o apk [aqui]("./com.felipe.sosauto.apk") e instale no seu dispositivo
 
 
-## Video de demonstração
+## Outros
+Videos de demonstração do aplicativo e o slide utilizado para apresentação estão disponíveis na pasta `docs/`
 
-<video width="400" controls>
-  <source src="docs/Screen_Recording_20231130_123813_sosauto.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
+Made with ❤️ by nunees
 
