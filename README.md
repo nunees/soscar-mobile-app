@@ -56,6 +56,8 @@ Baixe o apk [aqui]("./com.felipe.sosauto.apk") e instale no seu dispositivo
 
 ## Video de demonstração
 
-[![Watch the video]("./docs/Screen_Recording_20231130_123813_sosauto)]("./docs/Screen_Recording_20231130_123813_sosauto.mp4")
-
+<video width="400" controls>
+  <source src="docs/Screen_Recording_20231130_123813_sosauto.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
 
